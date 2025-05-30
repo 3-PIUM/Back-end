@@ -1,4 +1,4 @@
-package project.domain.user;
+package project.domain.member;
 
 public enum Gender {
     MALE, FEMALE, OTHER
