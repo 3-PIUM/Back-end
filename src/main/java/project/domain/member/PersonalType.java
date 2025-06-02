@@ -1,4 +1,4 @@
-package project.domain.user;
+package project.domain.member;
 
 public enum PersonalType {
     TYPE_A, TYPE_B, TYPE_C

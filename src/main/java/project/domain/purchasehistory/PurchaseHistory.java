@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
-import project.domain.user.User;
+import project.domain.member.Member;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,7 +24,7 @@ public class PurchaseHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private User user;
+    private Member member;
 
     @Column(name = "item_id", nullable = false)
     private Long itemId;

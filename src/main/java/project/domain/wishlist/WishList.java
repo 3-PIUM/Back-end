@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
-import project.domain.user.User;
+import project.domain.member.Member;
 
 @Entity
 public class WishList extends BaseEntity {
@@ -19,7 +19,7 @@ public class WishList extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Item item;
