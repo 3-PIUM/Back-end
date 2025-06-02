@@ -1,11 +1,11 @@
 package project.domain.member.dto;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.domain.member.Role;
+
+import java.time.LocalDate;
 
 public abstract class MemberRequest {
 
