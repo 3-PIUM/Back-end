@@ -1,19 +1,19 @@
 package project.domain.cart;
 
 
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.util.Lazy;
+import project.domain.cartitem.CartItem;
 import project.domain.common.BaseEntity;
 import project.domain.member.Member;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,9 +23,12 @@ public class Cart extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(nullable = false)
     private Member member;
+
+    @OneToMany(fetch = LAZY)
+    private List<CartItem> cartItemList = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer totalPrice;

@@ -29,6 +29,5 @@ public class Review extends BaseEntity {
 
     private String content;
 
-    // rank가 예약어이어서 userRank로 변경
-    private Double userRank;
+    private Double reviewRank;
 }

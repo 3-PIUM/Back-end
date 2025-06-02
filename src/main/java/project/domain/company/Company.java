@@ -1,26 +1,27 @@
-package project.domain.store;
+package project.domain.company;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
-import project.domain.inventory.Inventory;
+import project.domain.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Store extends BaseEntity {
+public class Company extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "store")
-    private List<Inventory> inventories = new ArrayList<>();
-
+    @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "company")
+    private List<Item> items = new ArrayList<>();
 }
