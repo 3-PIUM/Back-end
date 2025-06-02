@@ -38,10 +38,26 @@ public enum ErrorStatus {
         "해당 email을 가진 회원이 존재하지 않습니다."),
     MEMBER_DUPLICATE_BY_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4002",
         "이미 가입된 email입니다. "),
+    MEMBER_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "MEMBER4003",
+            "잘못된 비밀번호 입니다. "),
     MEMBER_DUPLICATE_BY_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4004"
         , "이미 있는 닉네임입니다."),
-    MEMBER_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "MEMBER4003",
-        "잘못된 비밀번호 입니다. "),
+    MEMBER_NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "MEMBER4005",
+            "해당 id를 가진 회원이 존재하지 않습니다."),
+
+    /*
+     * cart
+     */
+    CART_NOT_FOUND(HttpStatus.BAD_REQUEST, "CART4000",
+        "장바구니가 존재하지 않습니다."),
+    CART_ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CART4001",
+        "장바구니에 해당 상품이 존재하지 않습니다."),
+
+    /*
+     * item
+     */
+    ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ITEM4000",
+        "해당 상품이 존재하지 않습니다."),
 
     ;
     private final HttpStatus httpStatus;

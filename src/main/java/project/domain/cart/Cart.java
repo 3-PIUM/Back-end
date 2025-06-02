@@ -6,6 +6,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.util.Lazy;
 import project.domain.cartitem.CartItem;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart extends BaseEntity {
 
@@ -31,6 +33,15 @@ public class Cart extends BaseEntity {
     private List<CartItem> cartItemList = new ArrayList<>();
 
     @Column(nullable = false)
-    private Integer totalPrice;
+    private Integer totalPrice = 0;
 
+    public static Cart createCart(Member member) {
+        Cart cart = new Cart();
+        cart.member = member;
+        return cart;
+    }
+
+    public void updateTotalPrice(Integer totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 }
