@@ -1,3 +1,30 @@
 spring:
-  application:
-    name : BackEnd
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+  datasource:
+    url: jdbc:mysql://pium-dev-database-1.chg1ephxbhjv.ap-northeast-2.rds.amazonaws.com:3306/pium
+    username: admin
+    password: pium1234!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 'alvinseok2@gmail.com'
+    password: 'zbzc qhhj ylbk xrjo'
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: rlaehdgkrlatjrcksrlatnghksaktmdalsqkrdusrbdlrudtlrdltmdcjf
+  refresh-token-validity-in-seconds: 1209600 # 14일
+  access-token-validity-in-seconds: 604800 # 7일

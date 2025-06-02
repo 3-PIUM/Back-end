@@ -1,4 +1,4 @@
-package project.domain.cartitem;
+package project.domain.inventory;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -6,27 +6,26 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import project.domain.cart.Cart;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
+import project.domain.store.Store;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CartItem extends BaseEntity {
+public class Inventory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private int quantity;
+
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
-
-    @Column(nullable = false)
-    private int quantity = 1;
-
 }
