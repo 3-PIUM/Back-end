@@ -32,7 +32,7 @@ public enum ErrorStatus {
     /*
      * member
      */
-    MEMBER_NOT_FOUND_BY_Nickname(HttpStatus.BAD_REQUEST, "MEMBER4000",
+    MEMBER_NOT_FOUND_BY_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4000",
         "해당 닉네임를 가진 회원이 존재하지 않습니다."),
     MEMBER_NOT_FOUND_BY_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4001",
         "해당 email을 가진 회원이 존재하지 않습니다."),
@@ -42,6 +42,8 @@ public enum ErrorStatus {
         , "이미 있는 닉네임입니다."),
     MEMBER_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "MEMBER4003",
         "잘못된 비밀번호 입니다. "),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4004",
+    "해당 멤버가 존재하지 않습니다."),
 
     ;
     private final HttpStatus httpStatus;
