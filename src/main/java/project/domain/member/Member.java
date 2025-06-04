@@ -61,7 +61,7 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Language lang = Language.KOREAN;
+    private Language lang = Language.KR;
 
 
     @Builder
