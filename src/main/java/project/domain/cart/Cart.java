@@ -6,6 +6,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.util.Lazy;
@@ -29,16 +30,17 @@ public class Cart extends BaseEntity {
     @JoinColumn(nullable = false)
     private Member member;
 
-    @OneToMany(fetch = LAZY,mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(fetch = LAZY, mappedBy = "cart", cascade = CascadeType.ALL)
     private List<CartItem> cartItemList = new ArrayList<>();
 
     @Column(nullable = false)
     private Integer totalPrice = 0;
 
+    @Builder
     public static Cart createCart(Member member) {
-        Cart cart = new Cart();
-        cart.member = member;
-        return cart;
+        return Cart.builder()
+                .member(member)
+                .build();
     }
 
     public void updateTotalPrice(Integer totalPrice) {

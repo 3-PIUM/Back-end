@@ -13,9 +13,6 @@ public abstract class CartRequest {
     @AllArgsConstructor
     public static class AddItemDTO {
         @NotNull
-        private Long itemId;
-
-        @NotNull
         @Min(1)
         private Integer quantity;
     }

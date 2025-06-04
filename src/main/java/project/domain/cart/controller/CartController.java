@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import project.domain.cart.dto.CartRequest;
 import project.domain.cart.dto.CartResponse.CartDTO;
 import project.domain.cart.service.CartService;
 import project.domain.member.Member;
@@ -13,6 +14,8 @@ import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
 
 import java.io.IOException;
+
+import static project.domain.cart.dto.CartRequest.*;
 
 @Tag(name = "장바구니 API")
 @RestController
@@ -39,8 +42,8 @@ public class CartController {
     @PostMapping("/items/{itemId}")
     public ApiResponse<Boolean> addItemToCart(@Parameter(hidden = true) @LoginMember Member member,
                                               @Parameter(description = "추가할 아이템의 ID") @PathVariable Long itemId,
-                                              @Parameter(description = "추가할 수량") @RequestBody Integer quantity) {
-        return cartService.addItemToCart(member.getId(), itemId, quantity);
+                                              @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO) {
+        return cartService.addItemToCart(member.getId(), itemId, addItemDTO.getQuantity());
     }
 
     @Operation(
