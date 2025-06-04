@@ -7,8 +7,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import project.domain.cart.dto.CartRequest;
+import project.domain.cart.dto.CartResponse;
 import project.domain.cart.dto.CartResponse.CartDTO;
+import project.domain.cart.dto.CartResponse.CartItemDTO;
 import project.domain.cart.service.CartService;
+import project.domain.cartitem.CartItem;
 import project.domain.member.Member;
 import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
@@ -40,19 +43,20 @@ public class CartController {
             description = "특정 상품을 장바구니에 추가합니다."
     )
     @PostMapping("/items/{itemId}")
-    public ApiResponse<Boolean> addItemToCart(@Parameter(hidden = true) @LoginMember Member member,
-                                              @Parameter(description = "추가할 아이템의 ID") @PathVariable Long itemId,
-                                              @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO) {
+    public ApiResponse<CartItemDTO> addItemToCart(@Parameter(hidden = true) @LoginMember Member member,
+                                                  @Parameter(description = "추가할 아이템의 ID") @PathVariable Long itemId,
+                                                  @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO) {
         return cartService.addItemToCart(member.getId(), itemId, addItemDTO.getQuantity());
     }
 
     @Operation(
+
             summary = "아이템 수량 증가(+1)",
             description = "장바구니에 담긴 특정 상품의 수량을 1 증가시킵니다."
     )
     @PatchMapping("/items/{itemId}/increase")
-    public ApiResponse<Boolean> increaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
-                                                         @Parameter(description = "수량 추가시킬 아이템 ID") @PathVariable Long itemId) {
+    public ApiResponse<CartItemDTO> increaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
+                                                             @Parameter(description = "수량 추가시킬 아이템 ID") @PathVariable Long itemId) {
         return cartService.updateCartItem(member.getId(), itemId, 1);
     }
 
@@ -61,8 +65,8 @@ public class CartController {
             description = "장바구니에 담긴 특정 상품의 수량을 1 감소시킵니다."
     )
     @PatchMapping("/items/{itemId}/decrease")
-    public ApiResponse<Boolean> decreaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
-                                                         @Parameter(description = "수량 감소시킬 아이템 ID") @PathVariable Long itemId) {
+    public ApiResponse<CartItemDTO> decreaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
+                                                             @Parameter(description = "수량 감소시킬 아이템 ID") @PathVariable Long itemId) {
         return cartService.updateCartItem(member.getId(), itemId, -1);
     }
 
@@ -72,7 +76,7 @@ public class CartController {
             description = "특정 아이템을 장바구니에서 삭제합니다."
     )
     @DeleteMapping("/items/{itemId}")
-    public ApiResponse<Boolean> removeCartItem(@Parameter(hidden = true) @LoginMember Member member,
+    public ApiResponse<CartItemDTO> removeCartItem(@Parameter(hidden = true) @LoginMember Member member,
                                                @Parameter(description = "삭제할 아이템 ID") @PathVariable Long itemId) {
         return cartService.removeCartItem(member.getId(), itemId);
     }
@@ -86,7 +90,6 @@ public class CartController {
         /*
         generateQrcode에서 url 수정만 하면 됨
          */
-//        return cartService.generateQrCode(member.getId());
-        return cartService.generateQrCode(1L);
+        return cartService.generateQrCode(member.getId());
     }
 }

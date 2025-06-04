@@ -20,7 +20,6 @@ public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "member_id")
     private Long id;
 
     @Column(nullable = false)
@@ -55,14 +54,14 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.USER;
 
     @Column(nullable = false, length = 255)
-    private Area area;
+    private Area area = Area.KOREAN;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Language lang;
+    private Language lang = Language.KOREAN;
 
 
     @Builder

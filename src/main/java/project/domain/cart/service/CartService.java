@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.cart.Cart;
 import project.domain.cart.dto.CartConverter;
+import project.domain.cart.dto.CartResponse;
 import project.domain.cart.dto.CartResponse.CartDTO;
+import project.domain.cart.dto.CartResponse.CartItemDTO;
 import project.domain.cart.repository.CartRepository;
 import project.domain.cartitem.CartItem;
 import project.domain.cartitem.repository.CartItemRepository;
@@ -50,7 +52,7 @@ public class CartService {
     장바구니 추가
      */
     @Transactional
-    public ApiResponse<Boolean> addItemToCart(Long memberId, Long ItemId, Integer quantity) {
+    public ApiResponse<CartItemDTO> addItemToCart(Long memberId, Long ItemId, Integer quantity) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
         Item addItem = findItemById(ItemId); // 추가할 아이템 정보 조회
 
@@ -68,14 +70,17 @@ public class CartService {
 
         // 총액 업데이트
         updateCartTotalPrice(cart);
-        return ApiResponse.onSuccess(true);
+
+        // 추가된 아이템만 DTO로 변환하여 응답
+        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem);
+        return ApiResponse.onSuccess(cartItemDTO);
     }
 
     /*
     장바구니 아이템 수정(수량 변동)
      */
     @Transactional
-    public ApiResponse<Boolean> updateCartItem(Long memberId, Long itemId, Integer changeQuantity) {
+    public ApiResponse<CartItemDTO> updateCartItem(Long memberId, Long itemId, Integer changeQuantity) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
         Item item = findItemById(itemId); // 업데이트할 아이템 정보 조회
 
@@ -89,14 +94,17 @@ public class CartService {
 
         // 총액 업데이트
         updateCartTotalPrice(cart);
-        return ApiResponse.onSuccess(true);
+
+        // 업데이트된 아이템만 DTO로 변환하여 응답
+        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem);
+        return ApiResponse.onSuccess(cartItemDTO);
     }
 
     /*
     장바구니 아이템 삭제
      */
     @Transactional
-    public ApiResponse<Boolean> removeCartItem(Long memberId, Long itemId) {
+    public ApiResponse<CartItemDTO> removeCartItem(Long memberId, Long itemId) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
         Item item = findItemById(itemId); // 삭제할 아이템 정보 조회
 
@@ -109,7 +117,10 @@ public class CartService {
 
         // 총액 업데이트
         updateCartTotalPrice(cart);
-        return ApiResponse.onSuccess(true);
+
+        // 삭제된 아이템만 DTO로 변환하여 응답
+        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem);
+        return ApiResponse.onSuccess(cartItemDTO);
     }
 
     /**
@@ -117,8 +128,8 @@ public class CartService {
      */
     public ApiResponse<byte[]> generateQrCode(Long memberId) throws WriterException, IOException {
         // 존재하는 멤버인지 id로 체크
-//        memberRepository.findById(memberId)
-//                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
 
         // QRCodeWriter(QR 생성기) 객체 생성
         QRCodeWriter writer = new QRCodeWriter();
