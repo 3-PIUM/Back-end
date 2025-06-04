@@ -12,7 +12,7 @@ public abstract class MemberRequest {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class JoinDTO{
+    public static class JoinDTO {
 
         @NotNull
         String nickname;
@@ -30,7 +30,7 @@ public abstract class MemberRequest {
         String gender;
 
         @NotNull
-        String  area;
+        String area;
 
         @NotNull
         String lang;

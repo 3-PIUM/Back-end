@@ -59,11 +59,6 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member findMemberByNickname(String nickname) {
-        return memberRepository.findByNickname(nickname)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_DUPLICATE_BY_NICKNAME));
-    }
-
     public boolean checkMemberByNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isPresent();
     }
