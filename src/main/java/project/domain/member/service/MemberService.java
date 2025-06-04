@@ -93,7 +93,6 @@ public class MemberService {
             .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_NICKNAME));
     }
 
->>>>>>> develop
     public boolean checkMemberByNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isEmpty();
 
@@ -101,7 +100,7 @@ public class MemberService {
 
     private Member findMemberById(Member member) {
         return memberRepository.findById(member.getId())
-            .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
     }
 
 

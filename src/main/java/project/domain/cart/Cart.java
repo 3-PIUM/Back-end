@@ -5,10 +5,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.logging.log4j.util.Lazy;
 import project.domain.cartitem.CartItem;
 import project.domain.common.BaseEntity;
@@ -19,7 +16,9 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart extends BaseEntity {
 
     @Id
@@ -36,10 +35,10 @@ public class Cart extends BaseEntity {
     @Column(nullable = false)
     private Integer totalPrice = 0;
 
-    @Builder
     public static Cart createCart(Member member) {
         return Cart.builder()
                 .member(member)
+                .totalPrice(0)
                 .build();
     }
 
