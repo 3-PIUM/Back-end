@@ -29,7 +29,7 @@ public class Cart extends BaseEntity {
     @JoinColumn(nullable = false)
     private Member member;
 
-    @OneToMany(fetch = LAZY)
+    @OneToMany(mappedBy = "cart", fetch = LAZY)
     private List<CartItem> cartItemList = new ArrayList<>();
 
     @Column(nullable = false)
