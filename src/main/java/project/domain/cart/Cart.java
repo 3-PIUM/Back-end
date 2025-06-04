@@ -27,7 +27,7 @@ public class Cart extends BaseEntity {
     @JoinColumn(nullable = false)
     private Member member;
 
-    @OneToMany(fetch = LAZY)
+    @OneToMany(fetch = LAZY,mappedBy = "cart", cascade = CascadeType.ALL)
     private List<CartItem> cartItemList = new ArrayList<>();
 
     @Column(nullable = false)
