@@ -30,7 +30,7 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-            .title("PIUM API test")
+            .title("PIUM API TEST")
             .description("PIUM Swagger page")
             .version("1.0.0");
     }

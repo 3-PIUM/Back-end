@@ -4,14 +4,16 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import project.domain.cart.Cart;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
 
 @Entity
+@Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CartItem extends BaseEntity {
 
     @Id
@@ -29,4 +31,15 @@ public class CartItem extends BaseEntity {
     @Column(nullable = false)
     private int quantity = 1;
 
+    public static CartItem createCartItem(Cart cart, Item item, int quantity) {
+        return CartItem.builder()
+                .cart(cart)
+                .item(item)
+                .quantity(quantity)
+                .build();
+    }
+
+    public void updateQuantity(int quantity) {
+        this.quantity += quantity;
+    }
 }

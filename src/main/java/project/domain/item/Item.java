@@ -5,6 +5,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
 import project.domain.company.Company;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item extends BaseEntity {
 
@@ -22,8 +24,6 @@ public class Item extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    //TODO
-    // 판매회사, 서브카테고리, 재고 연관관계 맵핑 필요
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "company_id")
     private Company company;

@@ -135,11 +135,11 @@ public class JwtUtil {
     }
 
     public Long getMemberId(String token) {
-        String meberId = Jwts.parser().verifyWith(secretKey).build()
+        String memberId = Jwts.parser().verifyWith(secretKey).build()
             .parseSignedClaims(token)
             .getPayload()
             .get(PAYLOAD_MEMBER_ID_KEY, String.class);
 
-        return Long.valueOf(meberId);
+        return Long.valueOf(memberId);
     }
 }
