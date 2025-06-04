@@ -39,4 +39,43 @@ public abstract class MemberRequest {
 
         String personalType;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateDTO {
+
+        @NotNull
+        String nickname;
+
+        @NotNull
+        LocalDate birth;
+
+        @NotNull
+        String email;
+
+        @NotNull
+        String gender;
+
+        @NotNull
+        String area;
+
+        @NotNull
+        String lang;
+
+        String profileImg;
+
+        String skinType;
+
+        String personalType;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdatePasswordDTO {
+
+        @NotNull
+        String password;
+    }
 }

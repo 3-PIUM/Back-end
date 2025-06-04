@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.common.BaseEntity;
+import project.domain.member.dto.MemberRequest.UpdateDTO;
 
 @Entity
 @NoArgsConstructor(access = PROTECTED)
@@ -78,5 +79,18 @@ public class Member extends BaseEntity {
         this.role = Role.USER;
         this.area = area;
         this.lang = lang;
+    }
+
+
+    public void updateMember(UpdateDTO updateDTO) {
+        this.nickname = updateDTO.getNickname();
+        this.profileImg = updateDTO.getProfileImg();
+        this.email = updateDTO.getEmail();
+        this.birth = updateDTO.getBirth();
+        this.gender = Gender.valueOf(updateDTO.getGender());
+        this.skinType = SkinType.valueOf(updateDTO.getSkinType());
+        this.personalType = PersonalType.valueOf(updateDTO.getPersonalType());
+        this.area = Area.valueOf(updateDTO.getArea());
+        this.lang = Language.valueOf(updateDTO.getLang());
     }
 }
