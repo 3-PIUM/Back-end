@@ -61,7 +61,7 @@ public abstract class MemberRequest {
         String area;
 
         @NotNull
-        String lang;
+        String language;
 
         String profileImg;
 

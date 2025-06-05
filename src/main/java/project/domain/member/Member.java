@@ -13,6 +13,7 @@ import lombok.Setter;
 import project.domain.common.BaseEntity;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.enums.Area;
+import project.domain.member.enums.EnumUtil;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
 import project.domain.member.enums.PersonalType;
@@ -93,9 +94,9 @@ public class Member extends BaseEntity {
         this.email = updateDTO.getEmail();
         this.birth = updateDTO.getBirth();
         this.gender = Gender.valueOf(updateDTO.getGender());
-        this.skinType = SkinType.valueOf(updateDTO.getSkinType());
-        this.personalType = PersonalType.valueOf(updateDTO.getPersonalType());
+        this.skinType = EnumUtil.safeValueOf(SkinType.class,updateDTO.getSkinType());
+        this.personalType = EnumUtil.safeValueOf(PersonalType.class,updateDTO.getPersonalType());
         this.area = Area.valueOf(updateDTO.getArea());
-        this.lang = Language.valueOf(updateDTO.getLang());
+        this.lang = Language.getLanguage(updateDTO.getLanguage());
     }
 }

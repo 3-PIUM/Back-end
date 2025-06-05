@@ -29,6 +29,7 @@ public class CartItem extends BaseEntity {
     private Item item;
 
     @Column(nullable = false)
+    @Builder.Default
     private int quantity = 1;
 
     public static CartItem createCartItem(Cart cart, Item item, int quantity) {

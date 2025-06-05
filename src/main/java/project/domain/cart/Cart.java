@@ -30,9 +30,11 @@ public class Cart extends BaseEntity {
     private Member member;
 
     @OneToMany(fetch = LAZY, mappedBy = "cart", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<CartItem> cartItemList = new ArrayList<>();
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer totalPrice = 0;
 
     public static Cart createCart(Member member) {

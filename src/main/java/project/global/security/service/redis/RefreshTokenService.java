@@ -1,6 +1,6 @@
 package project.global.security.service.redis;
 
-import project.domain.member.Role;
+import project.domain.member.enums.Role;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
 import project.global.security.entity.RefreshToken;
