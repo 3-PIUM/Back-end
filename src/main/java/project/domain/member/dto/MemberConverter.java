@@ -23,7 +23,7 @@ public abstract class MemberConverter {
             .area(Area.valueOf(dto.getArea()))
             .personalType(safeValueOf(PersonalType.class,dto.getPersonalType()))
             .skinType(safeValueOf(SkinType.class,dto.getSkinType()))
-            .lang(Language.getLanguage(dto.getLang()))
+            .lang(Language.getLanguage(dto.getLanguage()))
             .build();
     }
 
