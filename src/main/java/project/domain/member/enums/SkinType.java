@@ -1,5 +1,8 @@
 package project.domain.member.enums;
 
 public enum SkinType {
-    OILY, DRY, COMBINATION, NORMAL
+    건성,
+    지성,
+    복합성,
+    민감성
 }

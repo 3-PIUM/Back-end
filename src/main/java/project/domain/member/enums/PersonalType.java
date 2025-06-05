@@ -1,5 +1,8 @@
 package project.domain.member.enums;
 
 public enum PersonalType {
-    TYPE_A, TYPE_B, TYPE_C
+    봄_웜,
+    여름_쿨,
+    가을_웜,
+    겨울_쿨
 }
