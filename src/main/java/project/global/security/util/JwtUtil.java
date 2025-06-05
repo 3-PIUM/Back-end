@@ -1,6 +1,6 @@
 package project.global.security.util;
 
-import project.domain.member.Role;
+import project.domain.member.enums.Role;
 import project.global.security.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

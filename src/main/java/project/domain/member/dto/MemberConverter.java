@@ -1,11 +1,14 @@
 package project.domain.member.dto;
 
-import project.domain.member.Area;
-import project.domain.member.Gender;
-import project.domain.member.Language;
+import static project.domain.member.enums.EnumUtil.safeValueOf;
+import static project.domain.member.enums.EnumUtil.toStringSafe;
+
+import project.domain.member.enums.Area;
+import project.domain.member.enums.Gender;
+import project.domain.member.enums.Language;
 import project.domain.member.Member;
-import project.domain.member.PersonalType;
-import project.domain.member.SkinType;
+import project.domain.member.enums.PersonalType;
+import project.domain.member.enums.SkinType;
 import project.domain.member.dto.MemberRequest.JoinDTO;
 import project.domain.member.dto.MemberResponse.DetailInfoDTO;
 
@@ -18,8 +21,8 @@ public abstract class MemberConverter {
             .gender(Gender.valueOf(dto.getGender()))
             .birth(dto.getBirth())
             .area(Area.valueOf(dto.getArea()))
-            .personalType(PersonalType.valueOf(dto.getPersonalType()))
-            .skinType(SkinType.valueOf(dto.getSkinType()))
+            .personalType(safeValueOf(PersonalType.class,dto.getPersonalType()))
+            .skinType(safeValueOf(SkinType.class,dto.getSkinType()))
             .lang(Language.valueOf(dto.getLang()))
             .build();
     }
@@ -31,12 +34,11 @@ public abstract class MemberConverter {
             .birth(member.getBirth())
             .profileImg(member.getProfileImg())
             .area(member.getArea().toString())
-            .skinType(member.getSkinType().toString())
+            .skinType(toStringSafe(member.getSkinType()))
             .gender(member.getGender().toString())
-            .personalType(member.getPersonalType().toString())
+            .personalType(toStringSafe(member.getPersonalType()))
             .language(member.getLang().toString())
             .build();
-
     }
 
 }

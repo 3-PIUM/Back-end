@@ -1,7 +1,7 @@
 package project.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import project.domain.member.Role;
+import project.domain.member.enums.Role;
 import project.global.security.dto.UserDetailsDTO;
 import project.global.security.service.redis.RefreshTokenService;
 import project.global.security.util.CookieUtil;
