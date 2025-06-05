@@ -63,6 +63,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 255)
     private Area area = Area.KOREAN;
 
