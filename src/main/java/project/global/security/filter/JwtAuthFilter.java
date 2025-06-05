@@ -3,7 +3,7 @@ package project.global.security.filter;
 import static project.global.response.status.ErrorStatus.AUTHENTICATION_TYPE_IS_NOT_BEARER;
 import static project.global.response.status.ErrorStatus.TOKEN_IS_EXPIRED;
 
-import project.domain.member.Role;
+import project.domain.member.enums.Role;
 import project.global.response.status.ErrorStatus;
 import project.global.security.util.JwtUtil;
 import io.jsonwebtoken.Claims;
