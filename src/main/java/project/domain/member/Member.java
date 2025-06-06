@@ -6,6 +6,7 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -73,7 +74,8 @@ public class Member extends BaseEntity {
 
 
     @Builder
-    private Member(String nickname,String profileImg, String email, String password, LocalDate birth, Gender gender,
+    private Member(String nickname, String profileImg, String email, String password,
+        LocalDate birth, Gender gender,
         SkinType skinType, PersonalType personalType, Area area, Language lang) {
         this.nickname = nickname;
         this.profileImg = profileImg;
@@ -90,14 +92,20 @@ public class Member extends BaseEntity {
 
 
     public void updateMember(UpdateDTO updateDTO) {
-        this.nickname = updateDTO.getNickname();
-        this.profileImg = updateDTO.getProfileImg();
-        this.email = updateDTO.getEmail();
-        this.birth = updateDTO.getBirth();
-        this.gender = Gender.valueOf(updateDTO.getGender());
-        this.skinType = EnumUtil.safeValueOf(SkinType.class,updateDTO.getSkinType());
-        this.personalType = EnumUtil.safeValueOf(PersonalType.class,updateDTO.getPersonalType());
-        this.area = Area.valueOf(updateDTO.getArea());
-        this.lang = Language.getLanguage(updateDTO.getLanguage());
+        Optional.ofNullable(updateDTO.getNickname()).ifPresent(v -> this.nickname = v);
+        Optional.ofNullable(updateDTO.getProfileImg()).ifPresent(v -> this.profileImg = v);
+        Optional.ofNullable(updateDTO.getEmail()).ifPresent(v -> this.email = v);
+        Optional.ofNullable(updateDTO.getBirth()).ifPresent(v -> this.birth = v);
+        Optional.ofNullable(updateDTO.getGender())
+            .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
+        Optional.ofNullable(updateDTO.getSkinType())
+            .ifPresent(v -> this.skinType = EnumUtil.safeValueOf(SkinType.class, v));
+        Optional.ofNullable(updateDTO.getPersonalType())
+            .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
+        Optional.ofNullable(updateDTO.getArea())
+            .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
+        Optional.ofNullable(updateDTO.getLanguage())
+            .ifPresent(v -> this.lang = Language.getLanguage(v));
+
     }
 }

@@ -45,22 +45,16 @@ public abstract class MemberRequest {
     @AllArgsConstructor
     public static class UpdateDTO {
 
-        @NotNull
         String nickname;
 
-        @NotNull
         LocalDate birth;
 
-        @NotNull
         String email;
 
-        @NotNull
         String gender;
 
-        @NotNull
         String area;
 
-        @NotNull
         String language;
 
         String profileImg;
