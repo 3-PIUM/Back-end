@@ -10,11 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
 import project.domain.member.Member;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PurchaseHistory extends BaseEntity {
 
@@ -33,10 +35,10 @@ public class PurchaseHistory extends BaseEntity {
     private String itemName;
 
     @Column(nullable = false)
-    private Long price;
+    private Integer price;
 
     @Column(nullable = false)
-    private Long quantity;
+    private Integer quantity;
 
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
