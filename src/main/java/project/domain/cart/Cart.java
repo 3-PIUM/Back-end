@@ -6,7 +6,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.logging.log4j.util.Lazy;
 import project.domain.cartitem.CartItem;
 import project.domain.common.BaseEntity;
 import project.domain.member.Member;
