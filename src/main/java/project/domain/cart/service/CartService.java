@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.cart.Cart;
 import project.domain.cart.dto.CartConverter;
-import project.domain.cart.dto.CartResponse;
 import project.domain.cart.dto.CartResponse.CartDTO;
 import project.domain.cart.dto.CartResponse.CartItemDTO;
 import project.domain.cart.repository.CartRepository;
@@ -126,6 +125,7 @@ public class CartService {
     /**
      * QR 코드 생성 메소드
      */
+    @Transactional
     public ApiResponse<byte[]> generateQrCode(Long memberId) throws WriterException, IOException {
         // 존재하는 멤버인지 id로 체크
         memberRepository.findById(memberId)
@@ -150,7 +150,7 @@ public class CartService {
     멤버Id로 카트 정보 조회 메소드
      */
     private Cart findCartByMember(Long memberId) {
-        return cartRepository.findById(memberId)
+        return cartRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CART_NOT_FOUND));
     }
 

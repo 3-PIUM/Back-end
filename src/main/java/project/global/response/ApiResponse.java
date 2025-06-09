@@ -17,6 +17,11 @@ public record ApiResponse<T>(
                 result);
     }
 
+    public static <T> ApiResponse<T> onSuccess(String message, T result) {
+        return new ApiResponse<>(true, SuccessStatus.OK.getCode(), message,
+                result);
+    }
+
     public static <T> ApiResponse<T> onFailure(ErrorStatus errorStatus, T data) {
         return new ApiResponse<>(false, errorStatus.getCode(), errorStatus.getMessage(), data);
     }
