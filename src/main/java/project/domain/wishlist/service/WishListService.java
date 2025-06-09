@@ -8,8 +8,6 @@ import project.domain.item.repository.ItemRepository;
 import project.domain.member.Member;
 import project.domain.wishlist.WishList;
 import project.domain.wishlist.dto.WishListConverter;
-import project.domain.wishlist.dto.WishListResponse;
-import project.domain.wishlist.dto.WishListResponse.WishListDTO;
 import project.domain.wishlist.dto.WishListResponse.WishListInfoDTO;
 import project.domain.wishlist.dto.WishListResponse.WishListItemDTO;
 import project.domain.wishlist.repository.WishlistRepository;
