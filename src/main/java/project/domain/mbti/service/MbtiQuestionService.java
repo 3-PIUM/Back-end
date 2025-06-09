@@ -11,6 +11,7 @@ import project.domain.mbti.dto.MbtiQuestionConverter;
 import project.domain.mbti.dto.MbtiQuestionResponse;
 import project.domain.mbti.dto.MbtiQuestionResponse.QuestionInfoList;
 import project.domain.mbti.repository.MbtiQuestionRepository;
+import project.domain.member.enums.Language;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
@@ -22,9 +23,10 @@ public class MbtiQuestionService {
 
     private final MbtiQuestionRepository mbtiQuestionRepository;
 
-    public ApiResponse<QuestionInfoList> getQuestionInfoList(String axis) {
+    public ApiResponse<QuestionInfoList> getQuestionInfoList(String axis,String lang) {
 
-        List<MbtiQuestion> byAxis = mbtiQuestionRepository.findByAxisOrderByStartFirst(SkinAxis.valueOf(axis));
+        List<MbtiQuestion> byAxis = mbtiQuestionRepository.findByAxisOrderByStartFirst(SkinAxis.valueOf(axis),
+            Language.getLanguage(lang));
         QuestionInfoList questionInfoList = MbtiQuestionConverter.toQuestionInfoList(byAxis);
 
         return ApiResponse.onSuccess(questionInfoList);
