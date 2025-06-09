@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.domain.member.enums.Language;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,6 +36,10 @@ public class MbtiQuestion {
 
     @Enumerated(EnumType.STRING)
     private Step step;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Language language;
 
     private int nextQuestionId;
 

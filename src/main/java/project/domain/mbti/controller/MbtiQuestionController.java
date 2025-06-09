@@ -27,8 +27,9 @@ public class MbtiQuestionController {
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/questions")
     public ApiResponse<QuestionInfoList> getTestQuestion(
-        @RequestParam String axis
+        @RequestParam String axis,
+        @RequestParam String lang
     ) {
-        return mbtiQuestionService.getQuestionInfoList(axis);
+        return mbtiQuestionService.getQuestionInfoList(axis,lang);
     }
 }
