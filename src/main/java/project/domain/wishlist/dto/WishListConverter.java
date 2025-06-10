@@ -9,7 +9,6 @@ import project.domain.wishlist.dto.WishListResponse.WishListItemDTO;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 public abstract class WishListConverter {
 
     public static WishListItemDTO toWishListItemDTO(Item item) {

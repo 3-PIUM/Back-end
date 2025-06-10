@@ -76,7 +76,14 @@ public enum ErrorStatus {
             "입력한 찜ID에 해당하는 테이블이 존재하지 않습니다."),
     WISHLIST_ITEM_EXIST(HttpStatus.BAD_REQUEST, "WISHLIST4002",
             "이미 찜 목록에 등록되어 있는 아이템입니다."),
+
+    /**
+     * reivew
+     */
+    REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW4000",
+            "입력된 리뷰ID에 해당하는 리뷰가 존재하지 않습니다."),
     ;
+
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -18,6 +18,9 @@ public abstract class WishListResponse {
         private String itemName;
         private Integer originalPrice;
         private Integer salePrice;
+        /*TODO
+        이미지 추가
+         */
     }
 
     @Getter

@@ -6,15 +6,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import project.domain.member.Member;
-import project.domain.wishlist.dto.WishListResponse;
-import project.domain.wishlist.dto.WishListResponse.WishListDTO;
 import project.domain.wishlist.dto.WishListResponse.WishListInfoDTO;
 import project.domain.wishlist.dto.WishListResponse.WishListItemDTO;
 import project.domain.wishlist.service.WishListService;
 import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
-
-import java.util.List;
 
 @Tag(name = "찜 API")
 @RestController
