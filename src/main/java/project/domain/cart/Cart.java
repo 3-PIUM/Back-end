@@ -46,4 +46,9 @@ public class Cart extends BaseEntity {
     public void updateTotalPrice(Integer totalPrice) {
         this.totalPrice = totalPrice;
     }
+
+    public void clearCart() {
+        cartItemList.clear();
+        this.totalPrice = 0;
+    }
 }
