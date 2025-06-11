@@ -7,9 +7,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.domain.category.Category;
 import project.domain.common.BaseEntity;
 import project.domain.company.Company;
 import project.domain.inventory.Inventory;
+import project.domain.itemimage.ItemImage;
 import project.domain.subcategory.SubCategory;
 
 import java.util.ArrayList;
@@ -29,12 +31,18 @@ public class Item extends BaseEntity {
     private Company company;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "sub_category_id")
     private SubCategory subCategory;
 
     @OneToMany(mappedBy = "item")
     private List<Inventory> inventories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item")
+    private List<ItemImage> itemImages = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
@@ -45,6 +53,8 @@ public class Item extends BaseEntity {
 
     @Column(nullable = false)
     private int salePrice;
+
+    private int discountRate = 0;
 
     @Column(nullable = false)
     private String barcode;

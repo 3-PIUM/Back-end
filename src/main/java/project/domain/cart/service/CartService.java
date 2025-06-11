@@ -10,13 +10,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.cart.Cart;
 import project.domain.cart.dto.CartConverter;
+import project.domain.cart.dto.CartResponse;
 import project.domain.cart.dto.CartResponse.CartDTO;
 import project.domain.cart.dto.CartResponse.CartItemDTO;
+import project.domain.cart.dto.CartResponse.SummaryCartItemDTO;
 import project.domain.cart.repository.CartRepository;
 import project.domain.cartitem.CartItem;
 import project.domain.cartitem.repository.CartItemRepository;
 import project.domain.item.Item;
 import project.domain.item.repository.ItemRepository;
+import project.domain.itemimage.ItemImage;
+import project.domain.itemimage.enums.ImageType;
+import project.domain.itemimage.repository.ItemImageRepository;
 import project.domain.member.repository.MemberRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
@@ -25,7 +30,11 @@ import project.global.response.status.ErrorStatus;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +45,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
+    private final ItemImageRepository itemImageRepository;
 
     /*
     장바구니 아이템 조회
@@ -43,7 +53,24 @@ public class CartService {
     public ApiResponse<CartDTO> getCartItems(Long memberId) {
         Cart cart = findCartByMember(memberId);
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
-        CartDTO cartDTO = CartConverter.toCartDTO(cart, cartItems);
+
+        // 장바구니에 담긴 아이템 id 저장
+        List<Long> ids = cartItems.stream()
+                .map(cartItem -> cartItem.getItem().getId())
+                .distinct()
+                .toList();
+
+        // 각 아이템 별 메인 이미지 저장
+        List<ItemImage> mainImages = itemImageRepository.findByItemIdInAndImageType(ids, ImageType.MAIN);
+
+        Map<Long, ItemImage> itemImageMap = mainImages.stream()
+                .collect(Collectors.toMap(
+                        itemImage -> itemImage.getItem().getId()
+                        , Function.identity()
+                ));
+
+
+        CartDTO cartDTO = CartConverter.toCartDTO(cart, cartItems, itemImageMap);
         return ApiResponse.onSuccess(cartDTO);
     }
 
@@ -51,9 +78,9 @@ public class CartService {
     장바구니 추가
      */
     @Transactional
-    public ApiResponse<CartItemDTO> addItemToCart(Long memberId, Long ItemId, Integer quantity) {
+    public ApiResponse<CartItemDTO> addItemToCart(Long memberId, Long itemId, Integer quantity) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
-        Item addItem = findItemById(ItemId); // 추가할 아이템 정보 조회
+        Item addItem = findItemById(itemId); // 추가할 아이템 정보 조회
 
         // 카트에 이미 존재하는지 확인
         // 존재O -> 수량 추가, 존재X -> 카트에 새로 등록
@@ -61,7 +88,7 @@ public class CartService {
         CartItem cartItem;
         if (existingCartItem.isPresent()) { // 수량 추가
             cartItem = existingCartItem.get();
-            cartItem.updateQuantity(cartItem.getQuantity() + quantity);
+            cartItem.updateQuantity(quantity);
         } else {    // 카트에 아이템 추가
             cartItem = CartItem.createCartItem(cart, addItem, quantity);
         }
@@ -70,16 +97,18 @@ public class CartService {
         // 총액 업데이트
         updateCartTotalPrice(cart);
 
-        // 추가된 아이템만 DTO로 변환하여 응답
-        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem);
-        return ApiResponse.onSuccess(cartItemDTO);
+        List<ItemImage> itemImages = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.MAIN);
+        ItemImage mainImage = itemImages != null ? itemImages.get(0) : null;
+
+        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem, mainImage);
+        return ApiResponse.onSuccess("장바구니에 추가된 아이템", cartItemDTO);
     }
 
     /*
     장바구니 아이템 수정(수량 변동)
      */
     @Transactional
-    public ApiResponse<CartItemDTO> updateCartItem(Long memberId, Long itemId, Integer changeQuantity) {
+    public ApiResponse<SummaryCartItemDTO> updateCartItem(Long memberId, Long itemId, Integer changeQuantity) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
         Item item = findItemById(itemId); // 업데이트할 아이템 정보 조회
 
@@ -94,16 +123,15 @@ public class CartService {
         // 총액 업데이트
         updateCartTotalPrice(cart);
 
-        // 업데이트된 아이템만 DTO로 변환하여 응답
-        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem);
-        return ApiResponse.onSuccess(cartItemDTO);
+        SummaryCartItemDTO cartItemDTO = CartConverter.toSummaryCartItemDTO(cartItem);
+        return ApiResponse.onSuccess("장바구니에서 수정된 아이템", cartItemDTO);
     }
 
     /*
     장바구니 아이템 삭제
      */
     @Transactional
-    public ApiResponse<CartItemDTO> removeCartItem(Long memberId, Long itemId) {
+    public ApiResponse<SummaryCartItemDTO> removeCartItem(Long memberId, Long itemId) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
         Item item = findItemById(itemId); // 삭제할 아이템 정보 조회
 
@@ -117,9 +145,19 @@ public class CartService {
         // 총액 업데이트
         updateCartTotalPrice(cart);
 
-        // 삭제된 아이템만 DTO로 변환하여 응답
-        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem);
-        return ApiResponse.onSuccess(cartItemDTO);
+        SummaryCartItemDTO cartItemDTO = CartConverter.toSummaryCartItemDTO(cartItem);
+        return ApiResponse.onSuccess("장바구니에서 삭제된 아이템", cartItemDTO);
+    }
+
+    /*
+    장바구니 초기화
+     */
+    @Transactional
+    public ApiResponse<Void> clearCart(Long memberId){
+        Cart cart = findCartByMember(memberId);
+        cart.clearCart();
+
+        return ApiResponse.OK;
     }
 
     /**
