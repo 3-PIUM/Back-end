@@ -19,7 +19,7 @@ import project.domain.review.service.ReviewService;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
-import project.global.s3.service.S3Uploader;
+import project.global.s3.util.S3Uploader;
 import project.global.security.annotation.LoginMember;
 
 import java.util.ArrayList;
