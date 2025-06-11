@@ -6,6 +6,7 @@ import project.domain.wishlist.WishList;
 import project.domain.wishlist.dto.WishListResponse.DeleteItemDTO;
 import project.domain.wishlist.dto.WishListResponse.ItemSummaryDTO;
 import project.domain.wishlist.dto.WishListResponse.WishListResponseDTO;
+import project.global.util.ImageUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -43,16 +44,10 @@ public abstract class WishListConverter {
                                 .originalPrice(wishList.getItem().getOriginalPrice())
                                 .salePrice(wishList.getItem().getSalePrice())
                                 .discountRate(wishList.getItem().getDiscountRate())
-                                .mainImageUrl(getMainImageUrl(wishList.getItem().getId(), itemImageMap))
+                                .mainImageUrl(ImageUtil.getMainImageUrl(wishList.getItem().getId(), itemImageMap))
                                 .build())
                         .build())
                 .toList();
-    }
-
-    // 해당 itemId에 맞는 메인 이미지 찾기
-    private static String getMainImageUrl(Long itemId, Map<Long, ItemImage> itemImageMap) {
-        ItemImage mainImage = itemImageMap.get(itemId);
-        return mainImage != null ? mainImage.getUrl() : null;
     }
 
     public static DeleteItemDTO toDeleteItemDTO(Item item) {

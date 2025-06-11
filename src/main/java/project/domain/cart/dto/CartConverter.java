@@ -7,6 +7,7 @@ import project.domain.cart.dto.CartResponse.SummaryCartItemDTO;
 import project.domain.cartitem.CartItem;
 import project.domain.item.Item;
 import project.domain.itemimage.ItemImage;
+import project.global.util.ImageUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public abstract class CartConverter {
                                         .itemName(item.getItem().getName())
                                         .originalPrice(item.getItem().getOriginalPrice())
                                         .salePrice(item.getItem().getSalePrice())
-                                        .mainImageUrl(CartConverter.getMainImageUrl(
+                                        .mainImageUrl(ImageUtil.getMainImageUrl(
                                                 item.getItem().getId(), itemImages
                                         ))
                                         .quantity(item.getQuantity())
@@ -61,11 +62,5 @@ public abstract class CartConverter {
                 )
                 .totalPrice(cart.getTotalPrice())
                 .build();
-    }
-
-    // 해당 itemId에 맞는 메인 이미지 찾기
-    private static String getMainImageUrl(Long itemId, Map<Long, ItemImage> itemImageMap) {
-        ItemImage mainImage = itemImageMap.get(itemId);
-        return mainImage != null ? mainImage.getUrl() : null;
     }
 }
