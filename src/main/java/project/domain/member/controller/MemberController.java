@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.Member;
 import project.domain.member.dto.MemberRequest.JoinDTO;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
@@ -51,9 +53,9 @@ public class MemberController {
         @RequestParam String nickname
     ) {
         boolean chk = memberService.checkMemberByNickname(nickname);
-        if(chk) {
+        if (chk) {
             return ApiResponse.onSuccess(true);
-        }else{
+        } else {
             throw new GeneralException(ErrorStatus.MEMBER_DUPLICATE_BY_NICKNAME);
         }
     }
@@ -84,6 +86,19 @@ public class MemberController {
     }
 
     @Operation(
+        summary = "사용자 프로필 사진 수정",
+        description = "사용자가 요청한 사진으로 프로필을 수정합니다."
+    )
+    @PatchMapping("/image")
+    public ApiResponse<Boolean> updateMemberImage(
+        @LoginMember Member member,
+        @RequestParam("profileImage") MultipartFile file
+    ) {
+        return memberService.updateProfile(member, file);
+    }
+
+
+    @Operation(
         summary = "비밀번호 수정",
         description = "사용자로부터 새로운 비밀번호를 받고 수정해줍니다."
     )
@@ -95,6 +110,18 @@ public class MemberController {
     ) {
         memberService.createNewPassword(member, updatePasswordDTO.getPassword());
         return ApiResponse.onSuccess(true);
+    }
+
+    @Operation(
+        summary = "회원 탈퇴",
+        description = "해당하는 사용자 회원탈퇴를 합니다."
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping
+    public void deleteMember(
+        @LoginMember Member member
+    ) {
+
     }
 
 }
