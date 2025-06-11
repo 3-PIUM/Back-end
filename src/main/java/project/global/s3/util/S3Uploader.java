@@ -1,4 +1,4 @@
-package project.global.s3.service;
+package project.global.s3.util;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -29,7 +29,7 @@ public class S3Uploader {
         metadata.setContentType(file.getContentType());
 
         amazonS3.putObject(
-                new PutObjectRequest(bucket, uploadFileName, file.getInputStream(), metadata)
+            new PutObjectRequest(bucket, uploadFileName, file.getInputStream(), metadata)
                         /*
                          .withCannedAcl(CannedAccessControlList.PublicRead) // public 읽기 권한 부여 */
         );

@@ -1,9 +1,11 @@
 package project.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.domain.cart.Cart;
 import project.domain.cart.repository.CartRepository;
 import project.domain.member.Member;
@@ -16,8 +18,10 @@ import project.domain.member.repository.MemberRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
+import project.global.s3.util.S3Uploader;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,6 +30,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final CartRepository cartRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final S3Uploader s3Uploader;
+
+    private final String dirName = "member-images";
 
 
     // 회원가입
@@ -86,6 +93,43 @@ public class MemberService {
 
         DetailInfoDTO detailInfoDTO = MemberConverter.toDetailInfoDTO(memberById);
         return ApiResponse.onSuccess(detailInfoDTO);
+    }
+
+    //멤버 프로필사진 수정
+    @Transactional
+    public ApiResponse<Boolean> updateProfile(Member member, MultipartFile file) {
+        Member updateMember = memberRepository.findById(member.getId())
+            .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
+
+        String profileImg = updateMember.getProfileImg();
+        // 기존 이미지 삭제
+        deleteProfileImg(profileImg);
+        // 수정 이미지 업로드
+        String newProfileImg = updateProfileImg(file);
+
+        updateMember.updateProfileImg(newProfileImg);
+
+        return ApiResponse.onSuccess(true);
+    }
+
+    private String updateProfileImg(MultipartFile file) {
+        try {
+            return s3Uploader.uploadFile(file, dirName);
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR, "S3 업로드를 실패했습니다.");
+        }
+    }
+
+    // S3 멤버 프로필 삭제
+    private void deleteProfileImg(String profileImg) {
+        if (profileImg != null) {
+            try {
+                String fileName = s3Uploader.extractFileNameFromUrl(profileImg);
+                s3Uploader.deleteFile(fileName, dirName);
+            } catch (Exception e) {
+                throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR, "S3에서 삭제를 실패했습니다.");
+            }
+        }
     }
 
     public Member findMemberByNickname(String nickname) {

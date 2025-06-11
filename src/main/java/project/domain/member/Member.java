@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.common.BaseEntity;
+import project.domain.member.dto.MemberRequest;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.enums.Area;
 import project.domain.member.enums.EnumUtil;
@@ -33,7 +34,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(name = "profile_img", length = 100)
+    @Column(name = "profile_img", length = 500)
     private String profileImg;
 
     @Column(nullable = false, length = 320, unique = true)
@@ -72,6 +73,8 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Language lang = Language.KR;
 
+    //TODO
+    // 설문을 이용한 사용자의 피부 MBTI를 저장합니다.
 
     @Builder
     private Member(String nickname, String profileImg, String email, String password,
@@ -106,6 +109,9 @@ public class Member extends BaseEntity {
             .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
         Optional.ofNullable(updateDTO.getLanguage())
             .ifPresent(v -> this.lang = Language.getLanguage(v));
+    }
 
+    public void updateProfileImg(String profileImg) {
+        this.profileImg = profileImg;
     }
 }

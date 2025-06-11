@@ -20,7 +20,7 @@ import project.domain.reviewimage.repository.ReviewImageRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
-import project.global.s3.service.S3Uploader;
+import project.global.s3.util.S3Uploader;
 
 import java.util.ArrayList;
 import java.util.Collections;
