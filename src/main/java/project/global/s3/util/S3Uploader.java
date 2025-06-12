@@ -30,8 +30,6 @@ public class S3Uploader {
 
         amazonS3.putObject(
             new PutObjectRequest(bucket, uploadFileName, file.getInputStream(), metadata)
-                        /*
-                         .withCannedAcl(CannedAccessControlList.PublicRead) // public 읽기 권한 부여 */
         );
 
         return amazonS3.getUrl(bucket, uploadFileName).toString(); // 이미지 URL 반환
