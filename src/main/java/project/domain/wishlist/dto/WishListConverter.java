@@ -48,6 +48,7 @@ public abstract class WishListConverter {
                                 .build())
                         .build())
                 .toList();
+
     }
 
     public static DeleteItemDTO toDeleteItemDTO(Item item) {

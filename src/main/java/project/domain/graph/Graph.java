@@ -1,4 +1,4 @@
-package project.domain.aisummary;
+package project.domain.graph;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
-import project.global.enums.skin.SkinType;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -14,20 +13,17 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AiSummary extends BaseEntity {
+public class Graph extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
+    @JoinColumn(name = "item_id")
     private Item item;
 
-    private String title;
+    private String name;
 
-    private String content;
-
-    private int ranking;
-
+    private int percentage;
 }

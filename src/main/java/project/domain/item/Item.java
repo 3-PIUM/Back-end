@@ -12,6 +12,7 @@ import project.domain.category.Category;
 import project.domain.common.BaseEntity;
 import project.domain.company.Company;
 import project.domain.containingredient.ContainIngredient;
+import project.domain.graph.Graph;
 import project.domain.inventory.Inventory;
 import project.domain.item.enums.VeganType;
 import project.domain.itemimage.ItemImage;
@@ -60,6 +61,9 @@ public class Item extends BaseEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<ContainIngredient> containIngredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<Graph> graphs = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;

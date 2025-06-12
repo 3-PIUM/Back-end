@@ -24,5 +24,6 @@ public class CautionSkinType extends BaseEntity {
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
+    @Enumerated(EnumType.STRING)
     private SkinType skinType;
 }
