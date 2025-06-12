@@ -118,10 +118,10 @@ public class MemberController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping
-    public void deleteMember(
+    public ApiResponse<Boolean> deleteMember(
         @LoginMember Member member
     ) {
-
+        return memberService.deleteMember(member);
     }
 
 }

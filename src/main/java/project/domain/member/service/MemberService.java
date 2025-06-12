@@ -112,6 +112,14 @@ public class MemberService {
         return ApiResponse.onSuccess(true);
     }
 
+    @Transactional
+    public ApiResponse<Boolean> deleteMember(Member member) {
+        memberRepository.findById(member.getId())
+            .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
+        memberRepository.deleteById(member.getId());
+        return ApiResponse.onSuccess(true);
+    }
+
     private String updateProfileImg(MultipartFile file) {
         try {
             return s3Uploader.uploadFile(file, dirName);
