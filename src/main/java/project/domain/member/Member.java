@@ -12,15 +12,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.common.BaseEntity;
-import project.domain.member.dto.MemberRequest;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.enums.Area;
 import project.domain.member.enums.EnumUtil;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
-import project.domain.member.enums.PersonalType;
+import project.global.enums.skin.PersonalType;
 import project.domain.member.enums.Role;
-import project.domain.member.enums.SkinType;
+import project.global.enums.skin.SkinType;
 
 @Entity
 @NoArgsConstructor(access = PROTECTED)

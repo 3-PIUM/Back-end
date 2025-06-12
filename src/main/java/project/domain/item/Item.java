@@ -7,11 +7,16 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.domain.aisummary.AiSummary;
 import project.domain.category.Category;
 import project.domain.common.BaseEntity;
 import project.domain.company.Company;
+import project.domain.containingredient.ContainIngredient;
 import project.domain.inventory.Inventory;
+import project.domain.item.enums.VeganType;
 import project.domain.itemimage.ItemImage;
+import project.domain.itemoption.ItemOption;
+import project.domain.itemscore.ItemScore;
 import project.domain.subcategory.SubCategory;
 
 import java.util.ArrayList;
@@ -38,11 +43,23 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "sub_category_id")
     private SubCategory subCategory;
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<Inventory> inventories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<ItemImage> itemImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<AiSummary> aiSummaries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<ItemScore> itemScores = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<ItemOption> itemOptions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<ContainIngredient> containIngredients = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
@@ -56,7 +73,9 @@ public class Item extends BaseEntity {
 
     private int discountRate = 0;
 
-    @Column(nullable = false)
-    private String barcode;
+    private int totalStar = 0;
+
+    @Enumerated(EnumType.STRING)
+    private VeganType veganType;
 
 }

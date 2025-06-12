@@ -7,8 +7,8 @@ import project.domain.member.enums.Area;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
 import project.domain.member.Member;
-import project.domain.member.enums.PersonalType;
-import project.domain.member.enums.SkinType;
+import project.global.enums.skin.PersonalType;
+import project.global.enums.skin.SkinType;
 import project.domain.member.dto.MemberRequest.JoinDTO;
 import project.domain.member.dto.MemberResponse.DetailInfoDTO;
 

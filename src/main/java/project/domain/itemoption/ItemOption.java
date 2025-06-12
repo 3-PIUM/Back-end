@@ -1,28 +1,27 @@
-package project.domain.subcategory;
+package project.domain.itemoption;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SubCategory extends BaseEntity {
+public class ItemOption extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "subCategory")
-    private List<Item> item = new ArrayList<>();
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @Column(nullable = false)
     private String name;
-
 }

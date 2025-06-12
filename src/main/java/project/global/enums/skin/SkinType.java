@@ -1,4 +1,4 @@
-package project.domain.member.enums;
+package project.global.enums.skin;
 
 public enum SkinType {
     건성,
