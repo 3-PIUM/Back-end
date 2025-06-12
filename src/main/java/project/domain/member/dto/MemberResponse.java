@@ -28,6 +28,9 @@ public abstract class MemberResponse {
 
         public String personalType;
 
+        // 사용자의 mbti에 관한 코드
+        public String mbtiCode;
+
         public String area;
 
         public String language;

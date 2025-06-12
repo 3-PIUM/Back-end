@@ -37,6 +37,15 @@ public abstract class MemberRequest {
 
         String skinType;
 
+        // 색소축관한 타입
+        String pigmentType;
+
+        // 수분/유분 관한 타입
+        String moistureType;
+
+        // 반응성 관한 타입
+        String reactivityType;
+
         String personalType;
     }
 
@@ -60,6 +69,12 @@ public abstract class MemberRequest {
         String profileImg;
 
         String skinType;
+
+        String pigmentType;
+
+        String moistureType;
+
+        String reactivityType;
 
         String personalType;
     }

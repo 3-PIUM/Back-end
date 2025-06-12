@@ -3,7 +3,6 @@ package project.domain.mbti;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public enum SkinAxis {
 
     private final String string;
 
-    public static SkinAxis getSkinAxis(String axis) {
+    public static SkinAxis getString(String axis) {
         return Arrays.stream(SkinAxis.values())
             .filter(axis1 -> axis1.string.equals(axis))
             .findFirst()

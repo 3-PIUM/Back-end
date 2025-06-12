@@ -3,6 +3,7 @@ package project.domain.member.dto;
 import static project.domain.member.enums.EnumUtil.safeValueOf;
 import static project.domain.member.enums.EnumUtil.toStringSafe;
 
+import project.domain.mbti.Step;
 import project.domain.member.enums.Area;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
@@ -21,8 +22,11 @@ public abstract class MemberConverter {
             .gender(Gender.valueOf(dto.getGender()))
             .birth(dto.getBirth())
             .area(Area.valueOf(dto.getArea()))
-            .personalType(safeValueOf(PersonalType.class,dto.getPersonalType()))
-            .skinType(safeValueOf(SkinType.class,dto.getSkinType()))
+            .personalType(safeValueOf(PersonalType.class, dto.getPersonalType()))
+            .skinType(SkinType.getSkinType(dto.getSkinType()))
+            .pigmentType(safeValueOf(Step.class, dto.getPigmentType()))
+            .moistureType(safeValueOf(Step.class, dto.getMoistureType()))
+            .reactivityType(safeValueOf(Step.class, dto.getReactivityType()))
             .lang(Language.getLanguage(dto.getLanguage()))
             .build();
     }
@@ -34,7 +38,8 @@ public abstract class MemberConverter {
             .birth(member.getBirth())
             .profileImg(member.getProfileImg())
             .area(member.getArea().toString())
-            .skinType(toStringSafe(member.getSkinType()))
+            .skinType(member.getSkinType() != null ? member.getSkinType().getString() : "")
+            .mbtiCode(member.createMbti())
             .gender(member.getGender().toString())
             .personalType(toStringSafe(member.getPersonalType()))
             .language(member.getLang().toString())
