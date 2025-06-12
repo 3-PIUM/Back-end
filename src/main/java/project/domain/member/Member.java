@@ -6,12 +6,16 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.common.BaseEntity;
+import project.domain.mbti.Step;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.enums.Area;
 import project.domain.member.enums.EnumUtil;
@@ -50,8 +54,21 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Gender gender;
 
+    // 피부상태
     @Enumerated(EnumType.STRING)
     private SkinType skinType;
+
+    // 색소축
+    @Enumerated(EnumType.STRING)
+    private Step pigmentType;
+
+    // 수분/유분
+    @Enumerated(EnumType.STRING)
+    private Step moistureType;
+
+    // 반응성
+    @Enumerated(EnumType.STRING)
+    private Step reactivityType;
 
     @Enumerated(EnumType.STRING)
     private PersonalType personalType;
@@ -77,7 +94,7 @@ public class Member extends BaseEntity {
 
     @Builder
     private Member(String nickname, String profileImg, String email, String password,
-        LocalDate birth, Gender gender,
+        LocalDate birth, Gender gender, Step pigmentType, Step moistureType, Step reactivityType,
         SkinType skinType, PersonalType personalType, Area area, Language lang) {
         this.nickname = nickname;
         this.profileImg = profileImg;
@@ -86,6 +103,9 @@ public class Member extends BaseEntity {
         this.birth = birth;
         this.gender = gender;
         this.skinType = skinType;
+        this.pigmentType = pigmentType;
+        this.moistureType = moistureType;
+        this.reactivityType = reactivityType;
         this.personalType = personalType;
         this.role = Role.USER;
         this.area = area;
@@ -95,13 +115,18 @@ public class Member extends BaseEntity {
 
     public void updateMember(UpdateDTO updateDTO) {
         Optional.ofNullable(updateDTO.getNickname()).ifPresent(v -> this.nickname = v);
-        Optional.ofNullable(updateDTO.getProfileImg()).ifPresent(v -> this.profileImg = v);
         Optional.ofNullable(updateDTO.getEmail()).ifPresent(v -> this.email = v);
         Optional.ofNullable(updateDTO.getBirth()).ifPresent(v -> this.birth = v);
         Optional.ofNullable(updateDTO.getGender())
             .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
         Optional.ofNullable(updateDTO.getSkinType())
-            .ifPresent(v -> this.skinType = EnumUtil.safeValueOf(SkinType.class, v));
+            .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
+        Optional.ofNullable(updateDTO.getPigmentType())
+            .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(Step.class, v));
+        Optional.ofNullable(updateDTO.getMoistureType())
+            .ifPresent(v -> moistureType = EnumUtil.safeValueOf(Step.class, v));
+        Optional.ofNullable(updateDTO.getReactivityType())
+            .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(Step.class, v));
         Optional.ofNullable(updateDTO.getPersonalType())
             .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
         Optional.ofNullable(updateDTO.getArea())
@@ -110,7 +135,26 @@ public class Member extends BaseEntity {
             .ifPresent(v -> this.lang = Language.getLanguage(v));
     }
 
+    /*
+        사용자의 이미지 업로드를 위해 사용합니다.
+     */
     public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
+    }
+
+    /*
+        사용자의 타입을 조합하여 mbti를 만들어줍니다.
+     */
+    public String createMbti() {
+        if (Stream.of(this.skinType, this.pigmentType, this.moistureType, this.reactivityType)
+            .anyMatch(Objects::isNull)) {
+            return "";
+        }
+
+        return Stream.of(skinType, pigmentType, moistureType, reactivityType)
+            .filter(Objects::nonNull)
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
+
     }
 }

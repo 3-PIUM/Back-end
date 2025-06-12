@@ -7,7 +7,7 @@ public enum Step {
     B,
     F,
     S,
-    A,
+    R,
     W;
 
     public static Boolean checkEnd(Step step) {
