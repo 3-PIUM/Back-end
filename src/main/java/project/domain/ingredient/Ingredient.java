@@ -1,5 +1,6 @@
 package project.domain.ingredient;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import project.domain.cautionskintype.CautionSkinType;
 import project.domain.common.BaseEntity;
 import project.domain.containingredient.ContainIngredient;
+import project.domain.ingredient.enums.Risk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,14 @@ public class Ingredient extends BaseEntity {
 
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    private Risk risk; // SAFE, CAUTION, DANGER, NONE
+
+    @Nullable
+    private String riskCategory;
+
     @Column(length = 500)
     private String effect;
 
-    private int score;
+    private int ranking; // 1~2: 1, 3~4: 2, ..., 9~10: 5
 }

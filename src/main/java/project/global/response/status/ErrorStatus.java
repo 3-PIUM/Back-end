@@ -66,6 +66,14 @@ public enum ErrorStatus {
     ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ITEM4000",
             "해당 상품이 존재하지 않습니다."),
 
+    /**
+     * itemimage
+     */
+    MAIN_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "ITEM_IMAGE4000",
+            "메인 이미지가 존재하지 않습니다."),
+    DETAIL_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "ITEM_IMAGE4001",
+            "세부 이미지가 존재하지 않습니다."),
+
 
     /**
      * wishlist
