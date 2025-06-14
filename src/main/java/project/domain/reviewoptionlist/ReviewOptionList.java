@@ -1,4 +1,4 @@
-package project.domain.graph;
+package project.domain.reviewoptionlist;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
+import project.domain.reviewoption.ReviewOption;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -13,7 +14,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Graph extends BaseEntity {
+public class ReviewOptionList extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -23,9 +24,8 @@ public class Graph extends BaseEntity {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    private String name;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "review_option_id")
+    private ReviewOption reviewOption;
 
-    private String optionName;
-
-    private int percentage;
 }

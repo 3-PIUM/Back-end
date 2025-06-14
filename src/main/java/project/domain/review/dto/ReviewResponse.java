@@ -5,12 +5,38 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.domain.reviewimage.ReviewImage;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public abstract class ReviewResponse {
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewOptionDTO{
+        private String name;
+        private List<String> options;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewOptionListDTO {
+        private Long id;
+        private List<ReviewOptionDTO> reviewOptionList;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SelectOptionDTO {
+        private String name;
+        private String selectOption;
+    }
 
     @Getter
     @Builder
@@ -22,6 +48,8 @@ public abstract class ReviewResponse {
         private String content;
         private Double rating;
         private List<String> reviewImages;
+        private int recommend;
+        private List<SelectOptionDTO> options;
         @JsonFormat(pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime updatedAt;
     }

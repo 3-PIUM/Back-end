@@ -25,15 +25,8 @@ public class ReviewImage extends BaseEntity {
     private Review review;
 
     @Lob
-    @Nullable
+    @Column(length = 500)
     private String url;
-
-    public static ReviewImage createReviewImage(Review review, String imageUrl) {
-        return ReviewImage.builder()
-                .review(review)
-                .url(imageUrl)
-                .build();
-    }
 
     public void updateReview(String imageUrl) {
         this.url = imageUrl;

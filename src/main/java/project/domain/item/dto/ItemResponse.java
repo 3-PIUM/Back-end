@@ -1,8 +1,6 @@
 package project.domain.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
@@ -22,6 +20,7 @@ public abstract class ItemResponse {
     public static class ItemInfoDTO{
         private Long id;
         private String itemName;
+        private int originalPrice;
         private int salePrice;
         private int discountRate;
         private List<String> options;
@@ -98,6 +97,7 @@ public abstract class ItemResponse {
     public static class GraphSummaryDTO {
         private Long id;
         private String name;
+        private String optionName;
         private int percentage;
     }
 

@@ -2,6 +2,7 @@ package project.domain.review.dto;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.domain.review.dto.ReviewResponse.SelectOptionDTO;
 
 import java.util.List;
 
@@ -13,9 +14,10 @@ public abstract class ReviewRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AddReviewBodyDTO {
-        private List<MultipartFile> files;
         private String content;
         private Double rating;
+        private List<SelectOptionDTO> selectOptions;
+        private List<MultipartFile> files;
     }
 
     @Getter
@@ -35,7 +37,7 @@ public abstract class ReviewRequest {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ImageDTO{
+    public static class ImageBodyDTO {
         private String type;
         private String url;
         private MultipartFile file;
@@ -47,9 +49,10 @@ public abstract class ReviewRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class EditReviewBodyDTO {
-        private List<ImageDTO> reviewImages;
+        private List<ImageBodyDTO> reviewImages;
         private String content;
         private Double rating;
+        private List<SelectOptionDTO> selectOptions;
     }
 
     @Getter
@@ -60,5 +63,6 @@ public abstract class ReviewRequest {
         private List<String> reviewImages;
         private String content;
         private Double rating;
+        private List<SelectOptionDTO> reviewOption;
     }
 }
