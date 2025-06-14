@@ -1,8 +1,5 @@
 package project.domain.item;
 
-import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,10 +15,14 @@ import project.domain.item.enums.VeganType;
 import project.domain.itemimage.ItemImage;
 import project.domain.itemoption.ItemOption;
 import project.domain.itemscore.ItemScore;
+import project.domain.reviewoptionlist.ReviewOptionList;
 import project.domain.subcategory.SubCategory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
@@ -65,10 +66,11 @@ public class Item extends BaseEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<Graph> graphs = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<ReviewOptionList> reviewOptionLists = new ArrayList<>();
+
     @Column(nullable = false)
     private String name;
-
-    private String content;
 
     private int originalPrice = 0;
 

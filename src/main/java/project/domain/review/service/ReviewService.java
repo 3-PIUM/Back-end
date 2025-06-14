@@ -3,29 +3,31 @@ package project.domain.review.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import project.domain.item.Item;
 import project.domain.item.repository.ItemRepository;
 import project.domain.member.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.review.Review;
 import project.domain.review.dto.ReviewConverter;
-import project.domain.review.dto.ReviewRequest.AddReviewDTO;
-import project.domain.review.dto.ReviewRequest.EditReviewDTO;
-import project.domain.review.dto.ReviewRequest.ImageDTO;
+import project.domain.review.dto.ReviewRequest.*;
 import project.domain.review.dto.ReviewResponse.ReviewDTO;
 import project.domain.review.dto.ReviewResponse.ReviewListDTO;
+import project.domain.review.dto.ReviewResponse.ReviewOptionListDTO;
+import project.domain.review.dto.ReviewResponse.SelectOptionDTO;
 import project.domain.review.repository.ReviewRepository;
 import project.domain.reviewimage.ReviewImage;
 import project.domain.reviewimage.repository.ReviewImageRepository;
+import project.domain.selectoption.SelectOption;
+import project.domain.selectoption.repository.SelectOptionRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
 import project.global.s3.util.S3Uploader;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,17 @@ public class ReviewService {
     private final ItemRepository itemRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Uploader s3Uploader;
+    private final SelectOptionRepository selectOptionRepository;
+
+    /*
+    리뷰 옵션 조회
+     */
+    public ApiResponse<ReviewOptionListDTO> getReviewOption(Long itemId) {
+        Item item = isExistsItem(itemId);
+
+        ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item);
+        return ApiResponse.onSuccess(reviewOptionListDTO);
+    }
 
     /*
         리뷰 조회
@@ -45,8 +58,19 @@ public class ReviewService {
         isExistsItem(itemId);
 
         List<Review> reviewList = reviewRepository.findByItemId(itemId);
-        ReviewListDTO reviewListDTO = ReviewConverter.toReviewListDTO(reviewList);
 
+        List<Long> reviewIds = reviewList.stream()
+                .map(Review::getId)
+                .toList();
+
+        List<SelectOption> allSelectOptions = selectOptionRepository.findByReviewIdIn(reviewIds);
+
+        Map<Long, List<SelectOption>> selectOptions = allSelectOptions.stream()
+                .collect(Collectors.groupingBy(
+                        selectOption -> selectOption.getReview().getId()
+                ));
+
+        ReviewListDTO reviewListDTO = ReviewConverter.toReviewListDTO(reviewList, selectOptions);
         return ApiResponse.onSuccess(reviewListDTO);
     }
 
@@ -54,16 +78,49 @@ public class ReviewService {
     리뷰 등록
      */
     @Transactional
-    public ReviewDTO addReview(AddReviewDTO addReviewDTO) {
-        Member member = isExistsMember(addReviewDTO.getMemberId());
-        Item item = isExistsItem(addReviewDTO.getItemId());
+    public ApiResponse<ReviewDTO> addReview(Long memberId, Long itemId, AddReviewBodyDTO reviewData) {
+        Member member = isExistsMember(memberId);
+        Item item = isExistsItem(itemId);
 
+        try {
+            List<MultipartFile> files = reviewData.getFiles();
+            List<String> urls = new ArrayList<>();
 
-        Review newReview = Review.createReview(
-                member, item, addReviewDTO.getContent(), addReviewDTO.getRating(), addReviewDTO.getReviewImages());
-        reviewRepository.save(newReview);
+            // s3에 리뷰 이미지 저장 후 해당 url 반환
+            if (files != null) {
+                urls = s3Uploader.uploadFiles(files, "review-images");
+            }
 
-        return ReviewConverter.toReviewDTO(newReview);
+            AddReviewDTO addReviewDTO = ReviewConverter
+                    .toAddReviewDTO(
+                            memberId, itemId, reviewData.getContent(), reviewData.getRating(), urls);
+
+            // 리뷰 생성
+            Review newReview = Review.createReview(
+                    member, item, addReviewDTO.getContent(), addReviewDTO.getRating(), addReviewDTO.getReviewImages());
+            reviewRepository.save(newReview);
+
+            // 선택한 리뷰 옵션 테이블 리스트 생성
+            List<SelectOption> selectOptions = new ArrayList<>();
+            List<SelectOptionDTO> reviewOption = reviewData.getSelectOptions();
+            if (reviewOption != null && !reviewOption.isEmpty()) {
+                reviewOption.forEach(r -> {
+                    SelectOption selectOption = SelectOption.builder()
+                            .review(newReview)
+                            .name(r.getName())
+                            .selection(r.getSelectOption())
+                            .build();
+                    selectOptions.add(selectOption);
+                });
+
+                selectOptionRepository.saveAll(selectOptions);
+            }
+
+            ReviewDTO reviewDTO = ReviewConverter.toReviewDTO(newReview, selectOptions);
+            return ApiResponse.onSuccess(reviewDTO);
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
 
@@ -71,15 +128,39 @@ public class ReviewService {
     리뷰 수정
      */
     @Transactional
-    public ReviewDTO editReview(Long reviewId, EditReviewDTO editReviewDTO) {
+    public ApiResponse<Void> editReview(Long reviewId, EditReviewBodyDTO editReviewData, List<MultipartFile> newImages) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.REVIEW_NOT_FOUND));
 
+        List<ImageBodyDTO> imageUrls = editReviewData.getReviewImages();
+        if (imageUrls != null && newImages != null) {
+            // 새로운 이미지 넣기
+            setNewImages(imageUrls, newImages);
+            // 새로 추가한 이미지만 S3에 저장
+            updateReviewImages(imageUrls);
+            // 더이상 필요없는 이미지 파일 S3에서 삭제
+            deleteOriginalImages(reviewId, imageUrls);
+        }
+
+
+        // 리뷰 옵션 설정
+        List<SelectOption> reviewOptions = new ArrayList<>();
+        List<SelectOptionDTO> selectOptions = editReviewData.getSelectOptions();
+        if (selectOptions != null && !selectOptions.isEmpty()) {
+            for (SelectOptionDTO s : selectOptions) {
+                reviewOptions.add(SelectOption.builder()
+                        .review(review)
+                        .name(s.getName())
+                        .selection(s.getSelectOption())
+                        .build());
+            }
+        }
+
         review.updateReview(
-                editReviewDTO.getReviewImages(), editReviewDTO.getContent(), editReviewDTO.getRating());
+                imageUrls, editReviewData.getContent(), editReviewData.getRating(), reviewOptions);
         reviewRepository.save(review);
 
-        return ReviewConverter.toReviewDTO(review);
+        return ApiResponse.OK;
     }
 
 
@@ -87,7 +168,7 @@ public class ReviewService {
     리뷰 삭제
      */
     @Transactional
-    public ReviewDTO deleteReview(Long reviewId) {
+    public ApiResponse<Void> deleteReview(Long reviewId) {
         Review deleteReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.REVIEW_NOT_FOUND));
 
@@ -107,34 +188,56 @@ public class ReviewService {
             }
         }
 
-        return ReviewConverter.toReviewDTO(deleteReview);
+        return ApiResponse.OK;
+    }
+
+    /*
+    리뷰 추천 +1/-1
+     */
+    @Transactional
+    public ApiResponse<Void> recommendReview(Long reviewId, String type) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.REVIEW_NOT_FOUND));
+
+        int recommend = type.equals("increase") ? 1 : -1;
+
+        review.updateRecommend(recommend);
+        reviewRepository.save(review);
+
+        return ApiResponse.OK;
+    }
+
+    /*
+    type: new인 곳에 newImage를 순서대로 넣어주는 메소드
+     */
+    public void setNewImages(List<ImageBodyDTO> Images, List<MultipartFile> newImages) {
+        if (Images != null || newImages != null) {
+            int idx = 0;
+
+            for (ImageBodyDTO imageBodyDTO : Images) {
+                if ("new".equals(imageBodyDTO.getType())) {
+                    imageBodyDTO.setFile(newImages.get(idx++));
+                }
+            }
+        }
     }
 
     /*
     새로운 이미지만 s3에 저장
      */
-    public List<String> updateReviewImages(List<ImageDTO> imageDTOList) {
-        List<String> imageUrls = new ArrayList<>();
-        // null 체크
-        List<ImageDTO> imageList = Optional.ofNullable(imageDTOList)
-                .orElse(Collections.emptyList());
-
-
-        // 기존 이미지는 s3에 저장 x, 새로운 이미지만 s3에 저장
-        for (ImageDTO imageDTO : imageList) {
-            if ("exist".equals(imageDTO.getType())) {
-                imageUrls.add(imageDTO.getUrl());
-            } else if ("new".equals(imageDTO.getType())) {
+    public void updateReviewImages(List<ImageBodyDTO> imageBodyDTOList) {
+        // 새로운 이미지 s3에 저장
+        for (ImageBodyDTO imageBodyDTO : imageBodyDTOList) {
+            if ("new".equals(imageBodyDTO.getType())) {
                 try {
-                    String url = s3Uploader.uploadFile(imageDTO.getFile(), "review-images");
-                    imageUrls.add(url);
+                    String url = s3Uploader.uploadFile(imageBodyDTO.getFile(), "review-images");
+                    imageBodyDTO.setFile(null);
+                    imageBodyDTO.setUrl(url);
                 } catch (Exception e) {
                     throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR);
                 }
             }
         }
-
-        return imageUrls;
     }
 
     /*
@@ -149,13 +252,17 @@ public class ReviewService {
     /*
     수정으로 인해 더이상 필요없는 이미지 파일 S3에서 삭제
      */
-    public void deleteOriginalImages(Long reviewId, List<String> newImageUrls) {
-        // 기존 이미지 조회
+    public void deleteOriginalImages(Long reviewId, List<ImageBodyDTO> newImageUrls) {
+        // 기존 이미지
         List<String> originalImages = getOriginalImages(reviewId);
+        // 새로운 이미지
+        List<String> newImages = newImageUrls.stream()
+                .map(ImageBodyDTO::getUrl)
+                .toList();
 
         // 삭제된 이미지 확인
         List<String> deleteImages = originalImages.stream()
-                .filter(originalImage -> !newImageUrls.contains(originalImage))
+                .filter(originalImage -> !newImages.contains(originalImage))
                 .toList();
 
         // 삭제된 이미지 S3에서 삭제

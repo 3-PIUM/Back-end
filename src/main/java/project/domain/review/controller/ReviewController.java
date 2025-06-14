@@ -1,28 +1,25 @@
 package project.domain.review.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.Member;
-import project.domain.review.dto.ReviewConverter;
 import project.domain.review.dto.ReviewRequest.AddReviewBodyDTO;
-import project.domain.review.dto.ReviewRequest.AddReviewDTO;
 import project.domain.review.dto.ReviewRequest.EditReviewBodyDTO;
-import project.domain.review.dto.ReviewRequest.EditReviewDTO;
+import project.domain.review.dto.ReviewResponse;
 import project.domain.review.dto.ReviewResponse.ReviewDTO;
 import project.domain.review.dto.ReviewResponse.ReviewListDTO;
 import project.domain.review.service.ReviewService;
 import project.global.response.ApiResponse;
-import project.global.response.exception.GeneralException;
-import project.global.response.status.ErrorStatus;
-import project.global.s3.util.S3Uploader;
 import project.global.security.annotation.LoginMember;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "리뷰 API")
@@ -32,7 +29,17 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final S3Uploader s3Uploader;
+
+    @Operation(
+            summary = "리뷰 옵션 조회",
+            description = "입력한 아이템 ID에 해당하는 아이템 리뷰 옵션을 조회합니다."
+    )
+    @GetMapping("/{itemId}/option")
+    public ApiResponse<ReviewResponse.ReviewOptionListDTO> getReviewOption(
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId
+    ) {
+        return reviewService.getReviewOption(itemId);
+    }
 
     @Operation(
             summary = "리뷰 조회",
@@ -49,66 +56,97 @@ public class ReviewController {
             summary = "리뷰 등록",
             description = "입력한 아이템 ID에 해당하는 아이템에 리뷰를 등록합니다."
     )
-    @PostMapping(value = "/{itemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{itemId}/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ReviewDTO> addReview(
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "아이템 ID") @PathVariable Long itemId,
-            @Parameter(description = "리뷰 정보(사진+리뷰+평점)") @ModelAttribute AddReviewBodyDTO addReviewBodyDTO
-    ) {
-        try {
-            List<MultipartFile> files = addReviewBodyDTO.getFiles();
-            List<String> urls = new ArrayList<>();
+            @Parameter(
+                    description = "리뷰 정보(리뷰+평점+옵션)",
+                    schema = @Schema(
+                            type = "string",
+                            format = "textarea",
+                            example = """
+                                    {
+                                       "content": "dummy 리뷰",
+                                       "rating": 4,
+                                       "selectOptions": [
+                                         {"name": "피부타입", "selectOption": "건성"},
+                                         {"name": "발림성", "selectOption": "좋음"},
+                                         {"name": "수분감", "selectOption": "보통"}
+                                       ]
+                                     }
+                                    """
+                    )) @RequestPart("data") String reviewDataJson,
+            @Parameter(description = "사진") @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) throws JsonProcessingException {
 
-            // s3에 리뷰 이미지 저장 후 해당 url 반환
-            if (files != null) {
-                urls = s3Uploader.uploadFiles(files, "review-images");
-            }
+        ObjectMapper objectMapper = new ObjectMapper();
+        AddReviewBodyDTO reviewData = objectMapper.readValue(reviewDataJson, AddReviewBodyDTO.class);
+        reviewData.setFiles(images);
 
-            AddReviewDTO addReviewDTO = ReviewConverter
-                    .toAddReviewDTO(
-                            member.getId(), itemId, addReviewBodyDTO.getContent(), addReviewBodyDTO.getRating(), urls);
-
-            ReviewDTO addedReviewDTO = reviewService.addReview(addReviewDTO);
-            return ApiResponse.onSuccess("추가된 리뷰", addedReviewDTO);
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR);
-        }
+        return reviewService.addReview(member.getId(), itemId, reviewData);
     }
 
     @Operation(
             summary = "리뷰 수정",
             description = "입력한 리뷰 ID에 해당하는 리뷰 수정"
     )
-    @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ReviewDTO> editReview(
+    @PatchMapping(value = "/{reviewId}/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Void> editReview(
+            @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "리뷰 ID") @PathVariable Long reviewId,
-            @Parameter(description = "수정 내용(사진+리뷰+평점)") @ModelAttribute EditReviewBodyDTO editReviewBodyDTO
-    ) {
-        // 새로 추가한 이미지만 S3에 저장
-        List<String> imageUrls = reviewService.updateReviewImages(editReviewBodyDTO.getReviewImages());
-        // 더이상 필요없는 이미지 파일 S3에서 삭제
-        reviewService.deleteOriginalImages(reviewId, imageUrls);
+            @Parameter(
+                    description = "수정 정보(리뷰+평점+옵션)",
+                    schema = @Schema(
+                            example = """
+                                    {
+                                      "content": "수정된 리뷰 내용",
+                                      "rating": 4.5,
+                                      "selectOptions": [
+                                        {"name": "피부타입", "selectOption": "지성"},
+                                        {"name": "발림성", "selectOption": "좋음"},
+                                        {"name": "수분감", "selectOption": "좋음"}
+                                      ],
+                                      "reviewImages": [
+                                        {"type": "exist", "url": "https://s3.amazonaws.com/bucket/existing-image.jpg"},
+                                        {"type": "new"}
+                                      ]
+                                    }
+                                    """
+                    ))
+            @RequestPart(value = "editData") String editReviewDataJson,
+            @Parameter(description = "수정 리뷰 사진") @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages
+    ) throws JsonProcessingException {
 
-        EditReviewDTO editReviewDTO = ReviewConverter.toEditReviewDTO(
-                imageUrls,
-                editReviewBodyDTO.getContent(),
-                editReviewBodyDTO.getRating()
-        );
+        ObjectMapper objectMapper = new ObjectMapper();
+        EditReviewBodyDTO editReviewData = objectMapper.readValue(editReviewDataJson, EditReviewBodyDTO.class);
 
-        ReviewDTO updateReview = reviewService.editReview(reviewId, editReviewDTO);
-
-        return ApiResponse.onSuccess("수정된 리뷰", updateReview);
+        return reviewService.editReview(reviewId, editReviewData, newImages);
     }
 
     @Operation(
             summary = "리뷰 삭제",
             description = "입력한 리뷰 ID에 해당하는 리뷰 삭제"
     )
-    @DeleteMapping("/{reviewId}")
-    public ApiResponse<ReviewDTO> deleteReview(
+    @DeleteMapping("/{reviewId}/remove")
+    public ApiResponse<Void> deleteReview(
+            @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "삭제할 리뷰 ID") @PathVariable Long reviewId
     ) {
-        ReviewDTO deleteReview = reviewService.deleteReview(reviewId);
-        return ApiResponse.onSuccess("삭제된 리뷰", deleteReview);
+        return reviewService.deleteReview(reviewId);
+
     }
+
+    @Operation(
+            summary = "리뷰 추천수 업데이트",
+            description = "리뷰 추천수를 업데이트합니다."
+    )
+    @PatchMapping("/recommend/{reviewId}/{type}")
+    public ApiResponse<Void> updateRecommend(
+            @Parameter(description = "리뷰 ID") @PathVariable Long reviewId,
+            @Parameter(description = "증(increase)/감(decrease)") @PathVariable String type
+    ) {
+        return reviewService.recommendReview(reviewId, type);
+    }
+
 }
