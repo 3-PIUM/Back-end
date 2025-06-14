@@ -13,6 +13,8 @@ import project.domain.cart.dto.CartResponse.SummaryCartItemDTO;
 import project.domain.cart.service.CartService;
 import project.domain.member.Member;
 import project.global.response.ApiResponse;
+import project.global.response.exception.GeneralException;
+import project.global.response.status.ErrorStatus;
 import project.global.security.annotation.LoginMember;
 
 import java.io.IOException;
@@ -45,7 +47,7 @@ public class CartController {
     public ApiResponse<CartItemDTO> addItemToCart(@Parameter(hidden = true) @LoginMember Member member,
                                                   @Parameter(description = "추가할 아이템의 ID") @PathVariable Long itemId,
                                                   @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO) {
-        return cartService.addItemToCart(member.getId(), itemId, addItemDTO.getQuantity());
+        return cartService.addItemToCart(member.getId(), itemId, addItemDTO);
     }
 
     @Operation(
@@ -53,20 +55,31 @@ public class CartController {
             summary = "장바구니 아이템 수량 증가(+1)",
             description = "장바구니에 담긴 특정 상품의 수량을 1 증가시킵니다."
     )
-    @PatchMapping("/items/{itemId}/increase")
-    public ApiResponse<SummaryCartItemDTO> increaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
-                                                                    @Parameter(description = "수량 추가시킬 아이템 ID") @PathVariable Long itemId) {
-        return cartService.updateCartItem(member.getId(), itemId, 1);
+    @PatchMapping("/items/{cartItemId}/increase")
+    public ApiResponse<Void> increaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
+                                                      @Parameter(description = "수량 추가시킬 CartItem ID") @PathVariable Long cartItemId) {
+        return cartService.updateCartItem(member.getId(), cartItemId, 1);
     }
 
     @Operation(
             summary = "장바구니 아이템 수량 감소(-1)",
             description = "장바구니에 담긴 특정 상품의 수량을 1 감소시킵니다."
     )
-    @PatchMapping("/items/{itemId}/decrease")
-    public ApiResponse<SummaryCartItemDTO> decreaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
-                                                             @Parameter(description = "수량 감소시킬 아이템 ID") @PathVariable Long itemId) {
-        return cartService.updateCartItem(member.getId(), itemId, -1);
+    @PatchMapping("/items/{cartItemId}/decrease")
+    public ApiResponse<Void> decreaseCartItemQuantity(@Parameter(hidden = true) @LoginMember Member member,
+                                                      @Parameter(description = "수량 감소시킬 CartItem ID") @PathVariable Long cartItemId) {
+        return cartService.updateCartItem(member.getId(), cartItemId, -1);
+    }
+
+    @Operation(
+            summary = "장바구니 아이템 옵션 변경",
+            description = "장바구니에 담긴 특정 상품의 옵션을 변경합니다."
+    )
+    @PatchMapping("/items/{cartItemId}/updateOption")
+    public ApiResponse<Void> updateCartItemOption(@Parameter(hidden = true) @LoginMember Member member,
+                                                  @Parameter(description = "옵션 변경할 CartItem ID") @PathVariable Long cartItemId,
+                                                  @Parameter(description = "변경 옵션명") @RequestBody UpdateOptionDTO option) {
+        return cartService.updateCartItemOption(cartItemId, option.getChangeOption());
     }
 
 
@@ -74,10 +87,10 @@ public class CartController {
             summary = "장바구니 아이템 삭제",
             description = "특정 아이템을 장바구니에서 삭제합니다."
     )
-    @DeleteMapping("/items/{itemId}")
+    @DeleteMapping("/items/{cartItemId}")
     public ApiResponse<SummaryCartItemDTO> removeCartItem(@Parameter(hidden = true) @LoginMember Member member,
-                                               @Parameter(description = "삭제할 아이템 ID") @PathVariable Long itemId) {
-        return cartService.removeCartItem(member.getId(), itemId);
+                                                          @Parameter(description = "삭제할 CartItem ID") @PathVariable Long cartItemId) {
+        return cartService.removeCartItem(member.getId(), cartItemId);
     }
 
     @Operation(
