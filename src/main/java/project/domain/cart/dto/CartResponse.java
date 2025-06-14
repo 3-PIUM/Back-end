@@ -3,6 +3,7 @@ package project.domain.cart.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import project.domain.itemoption.ItemOption;
 
 import java.util.List;
 
@@ -11,9 +12,18 @@ public abstract class CartResponse {
     @Getter
     @Builder
     @AllArgsConstructor
+    public static class OptionDTO{
+        private String selectOption;
+        private List<String> options;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
     public static class CartItemDTO {
-        private Long itemId;
+        private Long cartItemId;
         private String itemName;
+        private OptionDTO optionInfo;
         private String mainImageUrl;
         private Integer originalPrice;
         private Integer salePrice;
@@ -37,6 +47,7 @@ public abstract class CartResponse {
     public static class SummaryCartItemDTO {
         private Long itemId;
         private String itemName;
+        private String option;
         private Integer originalPrice;
         private Integer salePrice;
         private Integer discountRate;
