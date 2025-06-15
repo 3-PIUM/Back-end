@@ -12,7 +12,7 @@ import project.domain.item.dto.ItemResponse.*;
 import project.domain.item.service.ItemService;
 import project.global.response.ApiResponse;
 
-@Tag(name = "아이템 API")
+@Tag(name = "상품 정보 조회 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/item")
