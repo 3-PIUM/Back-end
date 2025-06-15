@@ -6,6 +6,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import jakarta.persistence.*;
 import lombok.*;
 import project.domain.cart.Cart;
+import project.domain.cart.dto.CartRequest;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
 
@@ -32,15 +33,24 @@ public class CartItem extends BaseEntity {
     @Builder.Default
     private int quantity = 1;
 
-    public static CartItem createCartItem(Cart cart, Item item, int quantity) {
+    @Builder.Default
+    private String itemOption = "default";
+
+    public static CartItem createCartItem(Cart cart, Item item, CartRequest.AddItemDTO addItemDTO) {
         return CartItem.builder()
                 .cart(cart)
                 .item(item)
-                .quantity(quantity)
+                .quantity(addItemDTO.getQuantity())
+                .itemOption(addItemDTO.getItemOption() != null ? addItemDTO.getItemOption() : "default")
                 .build();
     }
 
-    public void updateQuantity(int quantity) {
+    public int updateQuantity(int quantity) {
         this.quantity += quantity;
+        return this.quantity;
+    }
+
+    public void updateOption(String itemOption) {
+        this.itemOption = itemOption;
     }
 }
