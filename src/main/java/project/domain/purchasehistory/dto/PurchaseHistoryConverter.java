@@ -45,6 +45,7 @@ public abstract class PurchaseHistoryConverter {
             .price(purchaseHistory.getPrice())
             .imgUrl(purchaseHistory.getImgUrl())
             .itemOption(purchaseHistory.getItemOption())
+            .discountRate(purchaseHistory.getDiscountRate())
             .build();
     }
 

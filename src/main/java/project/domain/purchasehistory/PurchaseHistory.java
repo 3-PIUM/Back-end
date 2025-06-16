@@ -41,11 +41,13 @@ public class PurchaseHistory extends BaseEntity {
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
+    private Integer discountRate;
+
     private String itemOption;
 
     @Builder
     private PurchaseHistory(Member member, Long itemId, String itemName, Integer price,
-        Integer quantity, String imgUrl, String itemOption) {
+        Integer quantity, String imgUrl, String itemOption, Integer discountRate) {
         this.member = member;
         this.itemId = itemId;
         this.itemName = itemName;
@@ -53,5 +55,6 @@ public class PurchaseHistory extends BaseEntity {
         this.quantity = quantity;
         this.imgUrl = imgUrl;
         this.itemOption = itemOption != null ? itemOption : "default";
+        this.discountRate = discountRate != null ? discountRate : 0;
     }
 }

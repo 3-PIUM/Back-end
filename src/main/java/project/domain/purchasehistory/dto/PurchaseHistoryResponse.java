@@ -71,6 +71,7 @@ public abstract class PurchaseHistoryResponse {
         private Integer price;
         private Integer quantity;
         private String itemOption;
+        private Integer discountRate;
     }
 
 }
