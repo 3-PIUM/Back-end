@@ -254,6 +254,7 @@ public class CartService {
                     .itemName(payItem.getItem().getName())
                     .price(payItem.getItem().getSalePrice())
                     .quantity(payItem.getQuantity())
+                    .discountRate(payItem.getItem().getDiscountRate())
                     .imgUrl(ImageUtil.getMainImageUrl(payItem.getItem().getId(), itemImageMap))
                     .build();
 
@@ -262,6 +263,9 @@ public class CartService {
 
         // 장바구니에서 구매된 제품 삭제
         cartItemRepository.deleteAll(payItems);
+        // 장바구니 총 금액 업데이트
+        Cart cart = findCartByMember(memberId);
+        updateCartTotalPrice(cart);
 
         return ApiResponse.OK;
     }

@@ -30,7 +30,7 @@ public abstract class CartResponse {
         private Integer salePrice;
         private Integer discountRate;
         private Integer quantity;
-        private Integer totalPrice;
+        private Integer itemTotalPrice;
     }
 
     @Getter
@@ -39,7 +39,7 @@ public abstract class CartResponse {
     public static class CartDTO {
         private Long cartId;
         private List<CartItemDTO> items;
-        private Integer totalPrice;
+        private Integer cartTotalPrice;
     }
 
     @Getter
@@ -53,6 +53,6 @@ public abstract class CartResponse {
         private Integer salePrice;
         private Integer discountRate;
         private Integer quantity;
-        private Integer totalPrice;
+        private Integer itemTotalPrice;
     }
 }

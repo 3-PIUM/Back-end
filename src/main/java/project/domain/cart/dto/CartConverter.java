@@ -24,7 +24,7 @@ public abstract class CartConverter {
                 .originalPrice(item.getOriginalPrice())
                 .salePrice(item.getSalePrice())
                 .quantity(cartItem.getQuantity())
-                .totalPrice(item.getSalePrice() * cartItem.getQuantity())
+                .itemTotalPrice(item.getSalePrice() * cartItem.getQuantity())
                 .build();
     }
 
@@ -43,7 +43,7 @@ public abstract class CartConverter {
                 .salePrice(item.getSalePrice())
                 .mainImageUrl(mainImage.getUrl())
                 .quantity(cartItem.getQuantity())
-                .totalPrice(item.getSalePrice() * cartItem.getQuantity())
+                .itemTotalPrice(item.getSalePrice() * cartItem.getQuantity())
                 .build();
     }
 
@@ -73,11 +73,11 @@ public abstract class CartConverter {
                                         ))
                                         .quantity(ci.getQuantity())
                                         .discountRate(ci.getItem().getDiscountRate())
-                                        .totalPrice(ci.getItem().getSalePrice() * ci.getQuantity())
+                                        .itemTotalPrice(ci.getItem().getSalePrice() * ci.getQuantity())
                                         .build()
                         ).toList()
                 )
-                .totalPrice(cart.getTotalPrice())
+                .cartTotalPrice(cart.getTotalPrice())
                 .build();
     }
 }
