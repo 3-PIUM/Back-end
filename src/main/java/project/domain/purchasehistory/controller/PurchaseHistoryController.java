@@ -1,6 +1,8 @@
 package project.domain.purchasehistory.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.member.Member;
+import project.domain.purchasehistory.dto.PurchaseHistoryResponse;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.DetailInfoListDTO;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.InfoListDTO;
 import project.domain.purchasehistory.service.PurchaseHistoryService;
@@ -40,9 +43,11 @@ public class PurchaseHistoryController {
         summary = "상세 구매 내역 조회",
         description = "날짜 관련 상세 구매내역을 조회합니다."
     )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공",
+        content = @Content(schema = @Schema(implementation = PurchaseHistoryResponse.DetailInfoListDTO.class)))
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/detail")
-    public ApiResponse<DetailInfoListDTO> getPurchaseHistoryDetail(
+    public ApiResponse<PurchaseHistoryResponse.DetailInfoListDTO> getPurchaseHistoryDetail(
         @LoginMember Member member,
         @RequestParam LocalDate date
     ){

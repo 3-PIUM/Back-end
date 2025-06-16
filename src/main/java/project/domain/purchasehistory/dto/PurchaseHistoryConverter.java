@@ -10,22 +10,23 @@ import project.domain.purchasehistory.PurchaseHistory;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.DateInfoListDTO;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.DetailInfoDTO;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.DetailInfoListDTO;
+import project.domain.purchasehistory.dto.PurchaseHistoryResponse.HistoryDTO;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.InfoListDTO;
 
 public abstract class PurchaseHistoryConverter {
 
     private static DateInfoListDTO toDateInfoList(
-        List<String> imgList,
+        List<HistoryDTO> historys,
         LocalDate localDate
     ) {
         return DateInfoListDTO.builder()
             .date(localDate)
-            .imgUrlList(imgList)
+            .historys(historys)
             .build();
     }
 
     public static InfoListDTO toInfoListDTO(
-        Map<LocalDate, List<String>> groupedByDate
+        Map<LocalDate, List<HistoryDTO>> groupedByDate
     ) {
         List<DateInfoListDTO> dateInfoList = groupedByDate.entrySet().stream()
             .map(entry -> toDateInfoList(entry.getValue(), entry.getKey()))
@@ -43,6 +44,7 @@ public abstract class PurchaseHistoryConverter {
             .quantity(purchaseHistory.getQuantity())
             .price(purchaseHistory.getPrice())
             .imgUrl(purchaseHistory.getImgUrl())
+            .itemOption(purchaseHistory.getItemOption())
             .build();
     }
 

@@ -14,6 +14,7 @@ import project.domain.member.Member;
 import project.domain.purchasehistory.PurchaseHistory;
 import project.domain.purchasehistory.dto.PurchaseHistoryConverter;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.DetailInfoListDTO;
+import project.domain.purchasehistory.dto.PurchaseHistoryResponse.HistoryDTO;
 import project.domain.purchasehistory.dto.PurchaseHistoryResponse.InfoListDTO;
 import project.domain.purchasehistory.repository.PurchaseHistoryRepository;
 import project.global.response.ApiResponse;
@@ -33,10 +34,12 @@ public class PurchaseHistoryService {
         List<PurchaseHistory> purchaseHistoryByMemberId = purchaseHistoryRepository.findByMemberId(
             member.getId());
 
-        Map<LocalDate, List<String>> groupedByDate = purchaseHistoryByMemberId.stream()
+        Map<LocalDate, List<HistoryDTO>> groupedByDate = purchaseHistoryByMemberId.stream()
             .collect(Collectors.groupingBy(
-                ph-> ph.getCreatedAt().toLocalDate(),
-                Collectors.mapping(PurchaseHistory::getImgUrl, Collectors.toList())
+                ph -> ph.getCreatedAt().toLocalDate(),
+                Collectors.mapping(
+                    ph -> HistoryDTO.builder().imgUrl(ph.getImgUrl()).id(ph.getId()).build(),
+                    Collectors.toList())
             ));
 
         InfoListDTO infoListDTO = PurchaseHistoryConverter.toInfoListDTO(groupedByDate);
