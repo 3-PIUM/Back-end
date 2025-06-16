@@ -22,18 +22,25 @@ import project.domain.item.repository.ItemRepository;
 import project.domain.itemimage.ItemImage;
 import project.domain.itemimage.enums.ImageType;
 import project.domain.itemimage.repository.ItemImageRepository;
+import project.domain.member.Member;
 import project.domain.member.repository.MemberRepository;
+import project.domain.purchasehistory.PurchaseHistory;
+import project.domain.purchasehistory.repository.PurchaseHistoryRepository;
+import project.domain.purchasehistory.service.PurchaseHistoryService;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
+import project.global.util.ImageUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +52,8 @@ public class CartService {
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
     private final ItemImageRepository itemImageRepository;
+    private final PurchaseHistoryService purchaseHistoryService;
+    private final PurchaseHistoryRepository purchaseHistoryRepository;
 
     /*
     장바구니 아이템 조회
@@ -137,7 +146,7 @@ public class CartService {
 
         // 같은 옵션인 아이템이 이미 장바구니에 존재하는 경우 두개를 하나로 합침
         List<CartItem> checkCartItem = cartItemRepository.findByCartIdAndItemIdAndItemOption(
-                cartItem.getCart().getId(),cartItem.getItem().getId(), changeOption);
+                cartItem.getCart().getId(), cartItem.getItem().getId(), changeOption);
         if (checkCartItem.size() == 2) {
             checkCartItem.get(1).updateQuantity(cartItem.getQuantity());
             cartItemRepository.delete(cartItem);
@@ -178,19 +187,25 @@ public class CartService {
         return ApiResponse.OK;
     }
 
+
     /**
      * QR 코드 생성 메소드
      */
     @Transactional
-    public ApiResponse<byte[]> generateQrCode(Long memberId) throws WriterException, IOException {
+    public ApiResponse<byte[]> generateQrCode(Long memberId, String cartItemIds) throws WriterException, IOException {
         // 존재하는 멤버인지 id로 체크
         memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
 
         // QRCodeWriter(QR 생성기) 객체 생성
         QRCodeWriter writer = new QRCodeWriter();
+
+        // url 생성
+        String baseUrl = String.format("http://localhost:8080/cart/pay/%d", memberId);
+        String qrUrl = baseUrl + "?" + cartItemIds;
+
         // `URL`을 QR 코드 형식의 비트 매트릭스로 인코딩
-        BitMatrix bitMatrix = writer.encode("http://localhost:8080/" + memberId, BarcodeFormat.QR_CODE, 200, 200);
+        BitMatrix bitMatrix = writer.encode(qrUrl, BarcodeFormat.QR_CODE, 200, 200);
 
         // Byte 매트릭스->이미지 변환하기 위한 출력 스트림 생성
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -199,6 +214,58 @@ public class CartService {
 
         // 출력 스트림의 내용을 바이트 배열로 반환
         return ApiResponse.onSuccess(outputStream.toByteArray());
+    }
+
+    /*
+    결제
+     */
+    @Transactional
+    public ApiResponse<Void> pay(Long memberId, String cartItemIds) {
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
+
+        // 결제할 상품 카트 id 문자열 -> 리스트로 변환
+        List<Long> ids = Arrays.stream(cartItemIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::valueOf)
+                .toList();
+
+        // 결제할 아이템만 장바구니에서 필터링
+        List<CartItem> cartitems = cartItemRepository.findByCartMemberId(memberId);
+        List<CartItem> payItems = cartitems.stream()
+                .filter(cartItem -> ids.contains(cartItem.getId()))
+                .toList();
+
+        // 결제할 아이템 이미지 찾기
+        List<Long> itemIds = payItems.stream()
+                .map(pi -> pi.getItem().getId())
+                .toList();
+        List<ItemImage> mainImages = itemImageRepository.findByItemIdInAndImageType(itemIds, ImageType.MAIN);
+        Map<Long, ItemImage> itemImageMap = mainImages.stream()
+                .collect(Collectors.toMap(
+                        mi -> mi.getItem().getId()
+                        , Function.identity()));
+
+        // 구매내역 등록
+        payItems.forEach(payItem -> {
+            PurchaseHistory newPH = PurchaseHistory.builder()
+                    .member(member)
+                    .itemId(payItem.getItem().getId())
+                    .itemName(payItem.getItem().getName())
+                    .price(payItem.getItem().getSalePrice())
+                    .quantity(payItem.getQuantity())
+                    .imgUrl(ImageUtil.getMainImageUrl(payItem.getItem().getId(), itemImageMap))
+                    .build();
+
+            purchaseHistoryRepository.save(newPH);
+        });
+
+        // 장바구니에서 구매된 제품 삭제
+        cartItemRepository.deleteAll(payItems);
+
+        return ApiResponse.OK;
     }
 
 

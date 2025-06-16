@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import project.domain.cart.dto.CartResponse;
 import project.domain.cart.dto.CartResponse.CartDTO;
@@ -18,6 +19,7 @@ import project.global.response.status.ErrorStatus;
 import project.global.security.annotation.LoginMember;
 
 import java.io.IOException;
+import java.util.List;
 
 import static project.domain.cart.dto.CartRequest.*;
 
@@ -107,10 +109,24 @@ public class CartController {
             description = "결제창으로 넘어가는 QR코드 이미지를 생성해줍니다."
     )
     @PostMapping("/qr")
-    public ApiResponse<byte[]> getQrCode(@LoginMember Member member) throws IOException, WriterException {
-        /*
-        generateQrcode에서 url 수정만 하면 됨
-         */
-        return cartService.generateQrCode(member.getId());
+    public ApiResponse<byte[]> getQrCode(
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "결제할 아이템 id") @RequestParam String cartItemIds
+    ) throws IOException, WriterException {
+
+        return cartService.generateQrCode(member.getId(), cartItemIds);
+    }
+
+    @Operation(
+            summary = "결제",
+            description = "장바구니를 초기화하고, 구매 내역이 업데이트 됩니다."
+    )
+    @PostMapping("/pay/{memberId}")
+    public ApiResponse<Void> pay(
+            @Parameter(description = "멤버 ID") @PathVariable Long memberId,
+            @Parameter(description = "결제할 카트 아이템 ID") @RequestParam String cartItemIds
+    ) {
+
+        return cartService.pay(memberId, cartItemIds);
     }
 }

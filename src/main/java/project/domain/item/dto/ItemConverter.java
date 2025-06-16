@@ -9,7 +9,7 @@ import project.domain.itemoption.ItemOption;
 
 import java.util.List;
 
-public class ItemConverter {
+public abstract class ItemConverter {
 
     public static ItemInfoDTO toItemInfoDTO(Item item, String mainImage, List<String> detailImages) {
         return ItemInfoDTO.builder()
