@@ -66,7 +66,7 @@ public class ItemSearchService {
             categoryId);
 
         List<ItemSearchInfoDTO> itemSearchInfoDTO = top10ItemsByCategory.stream()
-            .map(ItemSearchConverter::toItemSearchInfoDTO).toList();
+            .map(ItemSearchConverter::toItemSearchDetailInfoDTO).toList();
 
         return ApiResponse.onSuccess(itemSearchInfoDTO);
     }

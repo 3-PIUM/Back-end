@@ -13,12 +13,12 @@ public abstract class ItemSearchConverter {
                 .pageNumber(pageNumber)
                 .itemCount(items.size())
                 .itemSearchInfoDTOs(items.stream()
-                        .map(ItemSearchConverter::toItemSearchInfoDTO)
+                        .map(ItemSearchConverter::toItemSearchDetailInfoDTO)
                         .toList())
                 .build();
     }
 
-    public static ItemSearchInfoDTO toItemSearchInfoDTO(Item item) {
+    public static ItemSearchInfoDTO toItemSearchDetailInfoDTO(Item item) {
         return ItemSearchInfoDTO.builder()
             .id(item.getId())
             .itemName(item.getName())
