@@ -16,6 +16,7 @@ import project.domain.review.dto.ReviewRequest.EditReviewBodyDTO;
 import project.domain.review.dto.ReviewResponse;
 import project.domain.review.dto.ReviewResponse.ReviewDTO;
 import project.domain.review.dto.ReviewResponse.ReviewListDTO;
+import project.domain.review.dto.ReviewResponse.ReviewOptionListDTO;
 import project.domain.review.service.ReviewService;
 import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
@@ -35,7 +36,7 @@ public class ReviewController {
             description = "입력한 아이템 ID에 해당하는 아이템 리뷰 옵션을 조회합니다."
     )
     @GetMapping("/{itemId}/option")
-    public ApiResponse<ReviewResponse.ReviewOptionListDTO> getReviewOption(
+    public ApiResponse<ReviewOptionListDTO> getReviewOption(
             @Parameter(description = "아이템 ID") @PathVariable Long itemId
     ) {
         return reviewService.getReviewOption(itemId);
@@ -47,9 +48,10 @@ public class ReviewController {
     )
     @GetMapping("/{itemId}")
     public ApiResponse<ReviewListDTO> getReview(
+            @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "아이템 ID") @PathVariable Long itemId
     ) {
-        return reviewService.getReview(itemId);
+        return reviewService.getReview(member, itemId);
     }
 
     @Operation(
@@ -141,12 +143,12 @@ public class ReviewController {
             summary = "리뷰 추천수 업데이트",
             description = "리뷰 추천수를 업데이트합니다."
     )
-    @PatchMapping("/recommend/{reviewId}/{type}")
+    @PatchMapping("/recommend/{reviewId}")
     public ApiResponse<Void> updateRecommend(
-            @Parameter(description = "리뷰 ID") @PathVariable Long reviewId,
-            @Parameter(description = "증(increase)/감(decrease)") @PathVariable String type
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "리뷰 ID") @PathVariable Long reviewId
     ) {
-        return reviewService.recommendReview(reviewId, type);
+        return reviewService.recommendReview(member.getId(), reviewId);
     }
 
 }

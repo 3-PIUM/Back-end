@@ -15,7 +15,7 @@ import project.domain.item.enums.VeganType;
 import project.domain.itemimage.ItemImage;
 import project.domain.itemoption.ItemOption;
 import project.domain.itemscore.ItemScore;
-import project.domain.reviewoptionlist.ReviewOptionList;
+import project.domain.makeupreviewoptionlist.MakeupReviewOptionList;
 import project.domain.subcategory.SubCategory;
 
 import java.util.ArrayList;
@@ -46,6 +46,9 @@ public class Item extends BaseEntity {
     private SubCategory subCategory;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<MakeupReviewOptionList> makeUpReviewOptionList;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<Inventory> inventories = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
@@ -65,9 +68,6 @@ public class Item extends BaseEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<Graph> graphs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
-    private List<ReviewOptionList> reviewOptionLists = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;

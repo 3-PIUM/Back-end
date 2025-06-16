@@ -1,6 +1,7 @@
 package project.domain.review.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,6 +51,8 @@ public abstract class ReviewResponse {
         private List<String> reviewImages;
         private int recommend;
         private List<SelectOptionDTO> options;
+        @JsonProperty("isRecommend")
+        private boolean isRecommend;
         @JsonFormat(pattern = "yyyy.MM.dd HH:mm:ss")
         private LocalDateTime updatedAt;
     }

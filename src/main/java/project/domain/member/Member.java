@@ -25,6 +25,7 @@ import project.domain.member.enums.EnumUtil;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
 import project.domain.purchasehistory.PurchaseHistory;
+import project.domain.reviewrecommendstatus.ReviewRecommendStatus;
 import project.global.enums.skin.PersonalType;
 import project.domain.member.enums.Role;
 import project.global.enums.skin.SkinType;
@@ -95,6 +96,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseHistory> purchaseHistoryList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewRecommendStatus> reviewRecommendStatusList = new ArrayList<>();
 
     //TODO
     // 설문을 이용한 사용자의 피부 MBTI를 저장합니다.
