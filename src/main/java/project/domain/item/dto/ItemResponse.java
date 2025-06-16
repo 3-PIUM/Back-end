@@ -20,6 +20,7 @@ public abstract class ItemResponse {
     public static class ItemInfoDTO{
         private Long id;
         private String itemName;
+        private String brand;
         private int originalPrice;
         private int salePrice;
         private int discountRate;

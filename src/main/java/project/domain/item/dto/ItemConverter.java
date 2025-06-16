@@ -15,6 +15,7 @@ public abstract class ItemConverter {
         return ItemInfoDTO.builder()
                 .id(item.getId())
                 .itemName(item.getName())
+                .brand(item.getCompany().getName())
                 .originalPrice(item.getOriginalPrice())
                 .salePrice(item.getSalePrice())
                 .discountRate(item.getDiscountRate())

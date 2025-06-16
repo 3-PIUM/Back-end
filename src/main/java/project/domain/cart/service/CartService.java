@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,6 @@ public class CartService {
     private final ItemRepository itemRepository;
     private final MemberRepository memberRepository;
     private final ItemImageRepository itemImageRepository;
-    private final PurchaseHistoryService purchaseHistoryService;
     private final PurchaseHistoryRepository purchaseHistoryRepository;
 
     /*

@@ -23,6 +23,7 @@ public abstract class CartResponse {
     public static class CartItemDTO {
         private Long cartItemId;
         private String itemName;
+        private String brand;
         private OptionDTO optionInfo;
         private String mainImageUrl;
         private Integer originalPrice;

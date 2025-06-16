@@ -59,6 +59,7 @@ public abstract class CartConverter {
                                 CartItemDTO.builder()
                                         .cartItemId(ci.getId())
                                         .itemName(ci.getItem().getName())
+                                        .brand(ci.getItem().getCompany().getName())
                                         .optionInfo(OptionDTO.builder()
                                                 .selectOption(ci.getItemOption())
                                                 .options(ci.getItem().getItemOptions().stream()
