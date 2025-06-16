@@ -62,8 +62,6 @@ public class ItemSearchService {
             categoryId = category.getId();
         }
 
-        Pageable pageable = PageRequest.of(0, 10);
-
         List<Item> top10ItemsByCategory = itemRepository.findTop10ItemsByCategory(
             categoryId);
 
