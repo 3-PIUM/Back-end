@@ -6,11 +6,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.item.Item;
 import project.domain.item.repository.ItemRepository;
+import project.domain.makeupreviewoption.MakeupReviewOption;
+import project.domain.makeupreviewoptionlist.MakeupReviewOptionList;
+import project.domain.makeupreviewoptionlist.repository.MakeupReviewOptionListRepository;
 import project.domain.member.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.review.Review;
 import project.domain.review.dto.ReviewConverter;
-import project.domain.review.dto.ReviewRequest.*;
+import project.domain.review.dto.ReviewRequest.AddReviewBodyDTO;
+import project.domain.review.dto.ReviewRequest.AddReviewDTO;
+import project.domain.review.dto.ReviewRequest.EditReviewBodyDTO;
+import project.domain.review.dto.ReviewRequest.ImageBodyDTO;
 import project.domain.review.dto.ReviewResponse.ReviewDTO;
 import project.domain.review.dto.ReviewResponse.ReviewListDTO;
 import project.domain.review.dto.ReviewResponse.ReviewOptionListDTO;
@@ -18,16 +24,24 @@ import project.domain.review.dto.ReviewResponse.SelectOptionDTO;
 import project.domain.review.repository.ReviewRepository;
 import project.domain.reviewimage.ReviewImage;
 import project.domain.reviewimage.repository.ReviewImageRepository;
+import project.domain.reviewoption.ReviewOption;
+import project.domain.reviewoption.repository.ReviewOptionRepository;
+import project.domain.reviewrecommendstatus.ReviewRecommendStatus;
+import project.domain.reviewrecommendstatus.repository.ReviewRecommendStatusRepository;
 import project.domain.selectoption.SelectOption;
 import project.domain.selectoption.repository.SelectOptionRepository;
+import project.domain.subcategory.SubCategory;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
 import project.global.s3.util.S3Uploader;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -40,37 +54,62 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final S3Uploader s3Uploader;
     private final SelectOptionRepository selectOptionRepository;
+    private final ReviewOptionRepository reviewOptionRepository;
+    private final MakeupReviewOptionListRepository makeupReviewOptionListRepository;
+    private final ReviewRecommendStatusRepository reviewRecommendStatusRepository;
 
     /*
     리뷰 옵션 조회
      */
     public ApiResponse<ReviewOptionListDTO> getReviewOption(Long itemId) {
         Item item = isExistsItem(itemId);
+        SubCategory subCategory = item.getSubCategory();
 
-        ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item);
-        return ApiResponse.onSuccess(reviewOptionListDTO);
+        // 메이크업 제품인지 확인후 옵션 별도 처리
+        Set<String> makeupCategory = Set.of("베이스메이크업", "립메이크업", "아이메이크업");
+        if (makeupCategory.contains(subCategory.getName())) {
+            List<MakeupReviewOptionList> optionLists = makeupReviewOptionListRepository.findByItemIdWithReviewOptions(itemId);
+            List<MakeupReviewOption> options = optionLists.stream()
+                    .map(MakeupReviewOptionList::getMakeupReviewOption).toList();
+
+            ReviewOptionListDTO makeupReviewOptionListDTO = ReviewConverter.toMakeupReviewOptionListDTO(item, options);
+            return ApiResponse.onSuccess(makeupReviewOptionListDTO);
+        } else {
+            List<ReviewOption> options = reviewOptionRepository.findBySubCategoryId(subCategory.getId());
+            ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item, options);
+            return ApiResponse.onSuccess(reviewOptionListDTO);
+        }
     }
 
     /*
         리뷰 조회
          */
-    public ApiResponse<ReviewListDTO> getReview(Long itemId) {
+    public ApiResponse<ReviewListDTO> getReview(Member member, Long itemId) {
         isExistsItem(itemId);
 
         List<Review> reviewList = reviewRepository.findByItemId(itemId);
+        // 로그인 유저가 추천한 리뷰 조회
+        List<Review> recommendedReviewList = new ArrayList<>();
+        if (member != null) {
+            recommendedReviewList = reviewRepository.findBMemberRecommendedWithReviewStatus(itemId, member.getId());
+        }
+        List<Long> recommendedIds = recommendedReviewList.stream()
+                .map(Review::getId)
+                .distinct()
+                .toList();
 
         List<Long> reviewIds = reviewList.stream()
                 .map(Review::getId)
                 .toList();
 
+        // 리뷰 선택 옵션
         List<SelectOption> allSelectOptions = selectOptionRepository.findByReviewIdIn(reviewIds);
-
         Map<Long, List<SelectOption>> selectOptions = allSelectOptions.stream()
                 .collect(Collectors.groupingBy(
                         selectOption -> selectOption.getReview().getId()
                 ));
 
-        ReviewListDTO reviewListDTO = ReviewConverter.toReviewListDTO(reviewList, selectOptions);
+        ReviewListDTO reviewListDTO = ReviewConverter.toReviewListDTO(reviewList, selectOptions, recommendedIds);
         return ApiResponse.onSuccess(reviewListDTO);
     }
 
@@ -116,7 +155,7 @@ public class ReviewService {
                 selectOptionRepository.saveAll(selectOptions);
             }
 
-            ReviewDTO reviewDTO = ReviewConverter.toReviewDTO(newReview, selectOptions);
+            ReviewDTO reviewDTO = ReviewConverter.toReviewDTO(newReview, selectOptions, new ArrayList<>());
             return ApiResponse.onSuccess(reviewDTO);
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -195,12 +234,27 @@ public class ReviewService {
     리뷰 추천 +1/-1
      */
     @Transactional
-    public ApiResponse<Void> recommendReview(Long reviewId, String type) {
+    public ApiResponse<Void> recommendReview(Long memberId, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.REVIEW_NOT_FOUND));
+        Member member = isExistsMember(memberId);
 
-        int recommend = type.equals("increase") ? 1 : -1;
+        // 리뷰 추천 상태 테이블 존재하는지 체크 후 없으면 생성
+        List<ReviewRecommendStatus> rs = reviewRecommendStatusRepository.findByMemberId(memberId);
+        ReviewRecommendStatus rrs;
+        if (!rs.isEmpty()) {
+            rrs = rs.get(0);
+        } else {
+            rrs = ReviewRecommendStatus.builder()
+                    .review(review)
+                    .member(member)
+                    .isRecommend(false)
+                    .build();
+            reviewRecommendStatusRepository.save(rrs);
+        }
 
+        rrs.updateIsRecommend();
+        int recommend = rrs.isRecommend() ? 1 : -1;
         review.updateRecommend(recommend);
         reviewRepository.save(review);
 

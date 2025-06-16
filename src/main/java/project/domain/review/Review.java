@@ -8,6 +8,7 @@ import project.domain.member.Member;
 import project.domain.review.dto.ReviewRequest;
 import project.domain.review.dto.ReviewRequest.ImageBodyDTO;
 import project.domain.reviewimage.ReviewImage;
+import project.domain.reviewrecommendstatus.ReviewRecommendStatus;
 import project.domain.selectoption.SelectOption;
 
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SelectOption> selectOptions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewRecommendStatus> reviewRecommendStatusList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

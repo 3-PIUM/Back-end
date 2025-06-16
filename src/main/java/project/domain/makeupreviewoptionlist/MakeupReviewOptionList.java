@@ -1,4 +1,4 @@
-package project.domain.reviewoptionlist;
+package project.domain.makeupreviewoptionlist;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
 import project.domain.item.Item;
-import project.domain.reviewoption.ReviewOption;
+import project.domain.makeupreviewoption.MakeupReviewOption;
+import project.domain.subcategory.SubCategory;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -14,7 +15,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReviewOptionList extends BaseEntity {
+public class MakeupReviewOptionList extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -25,7 +26,7 @@ public class ReviewOptionList extends BaseEntity {
     private Item item;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "review_option_id")
-    private ReviewOption reviewOption;
+    @JoinColumn(name = "makeup_review_option_id")
+    private MakeupReviewOption makeupReviewOption;
 
 }

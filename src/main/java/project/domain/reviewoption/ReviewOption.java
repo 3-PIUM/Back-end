@@ -1,15 +1,11 @@
 package project.domain.reviewoption;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.domain.common.BaseEntity;
-import project.domain.reviewoptionlist.ReviewOptionList;
-
-import java.util.ArrayList;
-import java.util.List;
+import project.domain.subcategory.SubCategory;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -23,8 +19,9 @@ public class ReviewOption extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "reviewOption", cascade = CascadeType.ALL, fetch = LAZY)
-    private List<ReviewOptionList> reviewOptionList = new ArrayList<>();
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "sub_category_id")
+    private SubCategory subCategory;
 
     private String name;
 
@@ -34,6 +31,4 @@ public class ReviewOption extends BaseEntity {
 
     private String opt3;
 
-    @Nullable
-    private String opt4;
 }

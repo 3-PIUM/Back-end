@@ -27,4 +27,6 @@ public class ItemScore extends BaseEntity {
 
     private int score;
 
+    private String smallCategory;
+
 }
