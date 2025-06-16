@@ -88,7 +88,7 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 255)
-    private Area area = Area.KOREAN;
+    private Area area = Area.KOREA;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
