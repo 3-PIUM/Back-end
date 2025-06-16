@@ -3,10 +3,12 @@ package project.domain.item.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import project.domain.item.dto.ItemSearchResponse.ItemSearchInfoDTO;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
 import project.domain.item.service.ItemSearchService;
 import project.global.response.ApiResponse;
@@ -57,5 +59,16 @@ public class ItemSearchController {
 
         Pageable pageable = PageRequest.of(page, 20);
         return itemSearchService.getVeganItems(subCategory, pageable);
+    }
+
+    @Operation(
+        summary = "카테고리 추천 아이템 조회",
+        description = "카테고리별 추천 아이템 조회"
+    )
+    @GetMapping("/list")
+    public ApiResponse<List<ItemSearchInfoDTO>> getItemByCategory(
+        @Parameter(description = "카테고리명") @RequestParam(required = false) String category
+    ){
+        return itemSearchService.getItemsByCategoryOrderByCount(category);
     }
 }
