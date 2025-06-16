@@ -1,8 +1,8 @@
 package project.domain.member.enums;
 
 public enum Area {
-    KOREAN,
-    ENGLISH,
+    USA,
+    KOREA,
     JAPAN,
     CHINA
 }
