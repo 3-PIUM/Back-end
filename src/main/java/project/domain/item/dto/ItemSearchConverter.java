@@ -13,17 +13,21 @@ public abstract class ItemSearchConverter {
                 .pageNumber(pageNumber)
                 .itemCount(items.size())
                 .itemSearchInfoDTOs(items.stream()
-                        .map(item -> ItemSearchInfoDTO.builder()
-                                .id(item.getId())
-                                .itemName(item.getName())
-                                .itemImage(!item.getItemImages().isEmpty()
-                                        ? item.getItemImages().get(0).getUrl() : null)
-                                .originalPrice(item.getOriginalPrice())
-                                .salePrice(item.getSalePrice())
-                                .discountRate(item.getDiscountRate())
-                                .build())
+                        .map(ItemSearchConverter::toItemSearchInfoDTO)
                         .toList())
                 .build();
+    }
+
+    public static ItemSearchInfoDTO toItemSearchInfoDTO(Item item) {
+        return ItemSearchInfoDTO.builder()
+            .id(item.getId())
+            .itemName(item.getName())
+            .itemImage(!item.getItemImages().isEmpty()
+                ? item.getItemImages().get(0).getUrl() : null)
+            .originalPrice(item.getOriginalPrice())
+            .salePrice(item.getSalePrice())
+            .discountRate(item.getDiscountRate())
+            .build();
     }
 
 }
