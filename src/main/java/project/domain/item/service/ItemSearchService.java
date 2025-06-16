@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.domain.item.Item;
 import project.domain.item.dto.ItemSearchConverter;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
+import project.domain.item.enums.VeganType;
 import project.domain.item.repository.ItemRepository;
 import project.global.response.ApiResponse;
 import project.global.response.status.ErrorStatus;
@@ -46,6 +47,21 @@ public class ItemSearchService {
         }
 
         ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items.getContent(), items.getNumber());
+        return ApiResponse.onSuccess(itemSearchResultDTO);
+    }
+
+    /*
+    비건 제품 조회
+     */
+    public ApiResponse<ItemSearchResultDTO> getVeganItems(String subCategory, Pageable pageable) {
+
+        // 아이템 정보와 메인 이미지를 한번에 조회
+        Page<Item> veganItems = itemRepository.findByVeganTypeWithMainImage(VeganType.VEGAN, subCategory, pageable);
+        if (veganItems.isEmpty()) {
+            return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
+        }
+
+        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(veganItems.getContent(), veganItems.getNumber());
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 }

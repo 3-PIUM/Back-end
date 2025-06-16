@@ -6,15 +6,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import project.domain.item.Item;
+import project.domain.item.enums.VeganType;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
     @Query("""
-        SELECT DISTINCT i FROM Item i
-        LEFT JOIN FETCH i.itemImages img
-        WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
-        AND (img.imageType = 'MAIN' OR img IS NULL)
-        """)
+            SELECT DISTINCT i FROM Item i
+            LEFT JOIN FETCH i.itemImages img
+            WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
+            AND (img.imageType = 'MAIN' OR img IS NULL)
+            """)
     Page<Item> findBySubCategoryNameWithMainImage(
             @Param("subCategoryName") String subCategoryName,
             Pageable pageable
@@ -34,7 +35,20 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                 END
             """)
     Page<Item> findByKeywordWithMainImage(
-            @Param("subCategoryName") String keyword,
+            String keyword,
             Pageable pageable
     );
+
+
+    @Query("""
+            SELECT i FROM Item i
+            LEFT JOIN FETCH i.itemImages img
+            WHERE (i.veganType = :veganType)
+            AND (img.imageType = 'MAIN' OR img is null)
+            AND (i.subCategory.name = :subCategoryName)
+            """)
+    Page<Item> findByVeganTypeWithMainImage(
+            VeganType veganType,
+            String subCategoryName,
+            Pageable pageable);
 }

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +44,18 @@ public class ItemSearchController {
 
         Pageable pageable = PageRequest.of(page, 20);
         return itemSearchService.getItemsByKeyword(keyword, pageable);
+    }
+
+    @Operation(
+            summary = "(비건) 서브 카테고리 아이템 조회",
+            description = "(비건) 서브 카테고리 아이템 조회"
+    )
+    @GetMapping("/vegan/list/{subCategory}")
+    public ApiResponse<ItemSearchResultDTO> getVeganItems(
+            @Parameter(description = "서브 카테고리명") @PathVariable String subCategory,
+            @Parameter(description = "페이지 번호") @RequestParam(defaultValue = "0") int page) {
+
+        Pageable pageable = PageRequest.of(page, 20);
+        return itemSearchService.getVeganItems(subCategory, pageable);
     }
 }
