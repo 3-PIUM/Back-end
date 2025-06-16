@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import project.domain.item.Item;
 import project.domain.item.enums.VeganType;
 
+import java.util.List;
+
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
     @Query("""

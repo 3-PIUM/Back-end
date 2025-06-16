@@ -6,10 +6,13 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +24,7 @@ import project.domain.member.enums.Area;
 import project.domain.member.enums.EnumUtil;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
+import project.domain.purchasehistory.PurchaseHistory;
 import project.global.enums.skin.PersonalType;
 import project.domain.member.enums.Role;
 import project.global.enums.skin.SkinType;
@@ -89,13 +93,16 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Language lang = Language.KR;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseHistory> purchaseHistoryList = new ArrayList<>();
+
     //TODO
     // 설문을 이용한 사용자의 피부 MBTI를 저장합니다.
 
     @Builder
     private Member(String nickname, String profileImg, String email, String password,
-        LocalDate birth, Gender gender, Step pigmentType, Step moistureType, Step reactivityType,
-        SkinType skinType, PersonalType personalType, Area area, Language lang) {
+                   LocalDate birth, Gender gender, Step pigmentType, Step moistureType, Step reactivityType,
+                   SkinType skinType, PersonalType personalType, Area area, Language lang) {
         this.nickname = nickname;
         this.profileImg = profileImg;
         this.email = email;
@@ -118,21 +125,21 @@ public class Member extends BaseEntity {
         Optional.ofNullable(updateDTO.getEmail()).ifPresent(v -> this.email = v);
         Optional.ofNullable(updateDTO.getBirth()).ifPresent(v -> this.birth = v);
         Optional.ofNullable(updateDTO.getGender())
-            .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
+                .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
         Optional.ofNullable(updateDTO.getSkinType())
-            .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
+                .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
         Optional.ofNullable(updateDTO.getPigmentType())
-            .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(Step.class, v));
+                .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(Step.class, v));
         Optional.ofNullable(updateDTO.getMoistureType())
-            .ifPresent(v -> moistureType = EnumUtil.safeValueOf(Step.class, v));
+                .ifPresent(v -> moistureType = EnumUtil.safeValueOf(Step.class, v));
         Optional.ofNullable(updateDTO.getReactivityType())
-            .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(Step.class, v));
+                .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(Step.class, v));
         Optional.ofNullable(updateDTO.getPersonalType())
-            .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
+                .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
         Optional.ofNullable(updateDTO.getArea())
-            .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
+                .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
         Optional.ofNullable(updateDTO.getLanguage())
-            .ifPresent(v -> this.lang = Language.getLanguage(v));
+                .ifPresent(v -> this.lang = Language.getLanguage(v));
     }
 
     /*
@@ -147,14 +154,14 @@ public class Member extends BaseEntity {
      */
     public String createMbti() {
         if (Stream.of(this.skinType, this.pigmentType, this.moistureType, this.reactivityType)
-            .anyMatch(Objects::isNull)) {
+                .anyMatch(Objects::isNull)) {
             return "";
         }
 
         return Stream.of(skinType, pigmentType, moistureType, reactivityType)
-            .filter(Objects::nonNull)
-            .map(Enum::name)
-            .collect(Collectors.joining(", "));
+                .filter(Objects::nonNull)
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
 
     }
 }

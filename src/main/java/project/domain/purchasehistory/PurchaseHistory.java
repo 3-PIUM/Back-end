@@ -9,9 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import project.domain.common.BaseEntity;
 import project.domain.member.Member;
 
@@ -43,4 +41,13 @@ public class PurchaseHistory extends BaseEntity {
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
+    @Builder
+    private PurchaseHistory(Member member, Long itemId, String itemName, Integer price, Integer quantity, String imgUrl) {
+        this.member = member;
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+        this.imgUrl = imgUrl;
+    }
 }
