@@ -1,50 +1,61 @@
 package project.domain.mbti.dto;
 
+import static project.global.util.QuestionUtil.findEnumByCode;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import project.domain.mbti.MbtiQuestion;
 import project.domain.mbti.Step;
-import project.domain.mbti.dto.MbtiQuestionResponse.AnswerInfo;
-import project.domain.mbti.dto.MbtiQuestionResponse.QuestionInfo;
-import project.domain.mbti.dto.MbtiQuestionResponse.QuestionInfoList;
+import project.domain.mbti.dto.MbtiQuestionResponse.OptionDTO;
+import project.domain.mbti.dto.MbtiQuestionResponse.QuestionInfoDTO;
+import project.domain.mbti.dto.MbtiQuestionResponse.QuestionListDTO;
 
 public abstract class MbtiQuestionConverter {
 
-    public static QuestionInfoList toQuestionInfoList(List<MbtiQuestion> questionList) {
+    public static List<QuestionListDTO> toQuestionListDTO(List<MbtiQuestion> questions) {
+        return questions.stream()
+            .collect(Collectors.groupingBy(q -> q.getAxis().name()))
+            .entrySet().stream()
+            .map(entry -> {
+                String axisType = entry.getKey();
+                List<MbtiQuestion> groupedQuestions = entry.getValue();
 
-        Map<Integer, List<MbtiQuestion>> groupedByQuestion = questionList.stream()
-            .collect(Collectors.groupingBy(MbtiQuestion::getQuestionId));
+                return QuestionListDTO.builder().questions(toQuestionInfoDTO(groupedQuestions))
+                    .type(axisType).build();
+            })
+            .toList();
+    }
 
-        List<QuestionInfo> questionInfos = groupedByQuestion.values().stream()
-            .map(MbtiQuestionConverter::toQuestionInfo)
-            .collect(Collectors.toList());
-
-        return QuestionInfoList.builder()
-            .questions(questionInfos)
-            .build();
+    public static List<QuestionInfoDTO> toQuestionInfoDTO(List<MbtiQuestion> questions) {
+        return questions.stream()
+            .map(question -> QuestionInfoDTO.builder()
+                .id(question.getId())
+                .question(question.getQuestion())
+                .optionO(toOptionODTO(question))
+                .optionX(toOptionXDTO(question))
+                .build()).toList();
 
     }
 
-    public static QuestionInfo toQuestionInfo(List<MbtiQuestion> questions) {
-        MbtiQuestion question = questions.get(0);
-
-        List<AnswerInfo> answers = questions.stream()
-            .map(MbtiQuestionConverter::toAnswerInfo)
-            .collect(Collectors.toList());
-
-        return QuestionInfo.builder()
-            .id(question.getQuestionId())
-            .content(question.getQuestion())
-            .answers(answers)
+    public static OptionDTO toOptionODTO(MbtiQuestion question) {
+        return OptionDTO.builder()
+            .value(question.getOptionONextId() < 0 ? findEnumByCode(question.getOptionONextId())
+                : question.getOptionOText())
+            .nextQuestionId(question.getOptionONextId())
+            .isResult(question.getOptionONextId() < 0)
+            .text(question.getOptionOText())
             .build();
     }
 
-    public static AnswerInfo toAnswerInfo(MbtiQuestion question) {
-        return AnswerInfo.builder()
-            .answer(question.getAnswer())
-            .isResult(Step.checkEnd(question.getStep()))
-            .nextQuestionId(question.getNextQuestionId())
+    public static OptionDTO toOptionXDTO(MbtiQuestion question) {
+        return OptionDTO.builder()
+            .value(question.getOptionXNextId() < 0 ? findEnumByCode(question.getOptionXNextId())
+                : question.getOptionXText())
+            .nextQuestionId(question.getOptionXNextId())
+            .isResult(question.getOptionXNextId() < 0)
+            .text(question.getOptionXText())
             .build();
     }
+
 }
