@@ -240,7 +240,7 @@ public class ReviewService {
         Member member = isExistsMember(memberId);
 
         // 리뷰 추천 상태 테이블 존재하는지 체크 후 없으면 생성
-        List<ReviewRecommendStatus> rs = reviewRecommendStatusRepository.findByMemberId(memberId);
+        List<ReviewRecommendStatus> rs = reviewRecommendStatusRepository.findByReviewIdAndMemberId(reviewId, memberId);
         ReviewRecommendStatus rrs;
         if (!rs.isEmpty()) {
             rrs = rs.get(0);
