@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.common.BaseEntity;
-import project.domain.mbti.Step;
+import project.global.enums.skin.AxisType;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.enums.Area;
 import project.domain.member.enums.EnumUtil;
@@ -65,15 +65,15 @@ public class Member extends BaseEntity {
 
     // 색소축
     @Enumerated(EnumType.STRING)
-    private Step pigmentType;
+    private AxisType pigmentType;
 
     // 수분/유분
     @Enumerated(EnumType.STRING)
-    private Step moistureType;
+    private AxisType moistureType;
 
     // 반응성
     @Enumerated(EnumType.STRING)
-    private Step reactivityType;
+    private AxisType reactivityType;
 
     @Enumerated(EnumType.STRING)
     private PersonalType personalType;
@@ -105,7 +105,7 @@ public class Member extends BaseEntity {
 
     @Builder
     private Member(String nickname, String profileImg, String email, String password,
-                   LocalDate birth, Gender gender, Step pigmentType, Step moistureType, Step reactivityType,
+                   LocalDate birth, Gender gender, AxisType pigmentType, AxisType moistureType, AxisType reactivityType,
                    SkinType skinType, PersonalType personalType, Area area, Language lang) {
         this.nickname = nickname;
         this.profileImg = profileImg;
@@ -133,11 +133,11 @@ public class Member extends BaseEntity {
         Optional.ofNullable(updateDTO.getSkinType())
                 .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
         Optional.ofNullable(updateDTO.getPigmentType())
-                .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(Step.class, v));
+                .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getMoistureType())
-                .ifPresent(v -> moistureType = EnumUtil.safeValueOf(Step.class, v));
+                .ifPresent(v -> moistureType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getReactivityType())
-                .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(Step.class, v));
+                .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getPersonalType())
                 .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
         Optional.ofNullable(updateDTO.getArea())

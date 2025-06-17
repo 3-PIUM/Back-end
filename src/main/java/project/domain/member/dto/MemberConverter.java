@@ -3,7 +3,7 @@ package project.domain.member.dto;
 import static project.domain.member.enums.EnumUtil.safeValueOf;
 import static project.domain.member.enums.EnumUtil.toStringSafe;
 
-import project.domain.mbti.Step;
+import project.global.enums.skin.AxisType;
 import project.domain.member.enums.Area;
 import project.domain.member.enums.Gender;
 import project.domain.member.enums.Language;
@@ -24,9 +24,9 @@ public abstract class MemberConverter {
             .area(Area.valueOf(dto.getArea()))
             .personalType(safeValueOf(PersonalType.class, dto.getPersonalType()))
             .skinType(SkinType.getSkinType(dto.getSkinType()))
-            .pigmentType(safeValueOf(Step.class, dto.getPigmentType()))
-            .moistureType(safeValueOf(Step.class, dto.getMoistureType()))
-            .reactivityType(safeValueOf(Step.class, dto.getReactivityType()))
+            .pigmentType(safeValueOf(AxisType.class, dto.getPigmentType()))
+            .moistureType(safeValueOf(AxisType.class, dto.getMoistureType()))
+            .reactivityType(safeValueOf(AxisType.class, dto.getReactivityType()))
             .lang(Language.getLanguage(dto.getLanguage()))
             .build();
     }
