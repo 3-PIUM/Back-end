@@ -21,26 +21,23 @@ public class MbtiQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private int questionId;
-
-    @Column(nullable = false, length = 255)
     private String question;
 
-    @Column(nullable = false)
-    private String answer;
+    // 위의 질문을 골랐을 경우
+    private String optionOText;
+    private Long optionONextId;
 
-    @Column(nullable = false)
+    // 해당 질문을 골랐을 경우
+    private String optionXText;
+    private Long optionXNextId;
+
+    @Enumerated(EnumType.STRING)
+    private Language language;
+
     @Enumerated(EnumType.STRING)
     private SkinAxis axis;
 
     @Enumerated(EnumType.STRING)
     private Step step;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Language language;
-
-    private int nextQuestionId;
 
 }

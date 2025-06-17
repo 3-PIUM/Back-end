@@ -12,15 +12,25 @@ import project.domain.member.enums.Language;
 
 public interface MbtiQuestionRepository extends JpaRepository<MbtiQuestion, Long> {
 
-    List<MbtiQuestion> findByAxis(SkinAxis axis);
-
     /*
         질문의 시작을 기준으로 가져오는 쿼리
      */
-    @Query("SELECT q FROM MbtiQuestion q WHERE q.axis = :axis and q.language= :lang " +
-        "ORDER BY CASE WHEN q.step = 'START' THEN 0 ELSE 1 END, q.questionId ASC")
-    List<MbtiQuestion> findByAxisOrderByStartFirst(
-        @Param("axis") SkinAxis axis,
+    @Query("SELECT q FROM MbtiQuestion q WHERE q.language = :lang "
+        + "ORDER BY  CASE WHEN q.step = 'START' THEN 0 ELSE 1 END, q.id")
+    List<MbtiQuestion> findByAllQuestions(
+        @Param("lang") Language language);
+
+    @Query("SELECT q FROM MbtiQuestion q WHERE q.language = :lang AND q.axis != 'SKINTYPE' "
+        + "ORDER BY CASE WHEN q.step = 'START' THEN 0 ELSE 1 END, q.id")
+    List<MbtiQuestion> findByAxisQuestions(
+        @Param("lang") Language language);
+
+    /*
+       피부타입 질문의 시작을 기준으로 가져오는 쿼리
+    */
+    @Query("SELECT q FROM MbtiQuestion q WHERE q.language = :lang AND q.axis = 'SKINTYPE' "
+        + "ORDER BY CASE WHEN q.step = 'START' THEN 0 ELSE 1 END")
+    List<MbtiQuestion> findBySkinQuestion(
         @Param("lang") Language language);
 
 

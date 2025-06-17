@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SkinAxis {
 
-    SKIN_TYPE("피부타입"),
+    SKINTYPE("피부타입"),
     PIGMENT("색소"),     // 색소축
     MOISTURE("수분/유분"),    // 수분/유분 축
     REACTIVITY("반응성");   // 반응성 축

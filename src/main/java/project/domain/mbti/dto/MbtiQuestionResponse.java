@@ -8,42 +8,37 @@ import lombok.NoArgsConstructor;
 
 public abstract class MbtiQuestionResponse {
 
-    /*
-        피부 질문정보들을 담은 리스트
-     */
-    @Getter
+
     @Builder
-    @AllArgsConstructor
+    @Getter
     @NoArgsConstructor
-    public static class QuestionInfoList {
-        List<QuestionInfo> questions;
+    @AllArgsConstructor
+    public static class QuestionListDTO {
+        private String type;
+        List<QuestionInfoDTO> questions;
     }
 
-    /*
-        피부 질문 상세질문
-     */
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Getter
-    public static class QuestionInfo {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestionInfoDTO {
 
-        int id;
-        String content;
-        List<AnswerInfo> answers;
+        private Long id;
+        private String question;
+        private OptionDTO optionO;
+        private OptionDTO optionX;
     }
 
-    /*
-        해당 질문에 대한 답변
-     */
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Getter
-    public static class AnswerInfo {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OptionDTO {
 
-        int nextQuestionId;
-        String answer;
-        private Boolean isResult;
+        private Long nextQuestionId;
+        private String text;
+        private String value;
+        private boolean isResult;
     }
 }
