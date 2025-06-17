@@ -106,6 +106,7 @@ public abstract class ReviewConverter {
                                                 .selectOption(s.getSelection())
                                                 .build())
                                         .toList())
+                                .updatedAt(review.getUpdatedAt())
                                 .build())
                         .toList())
                 .build();
