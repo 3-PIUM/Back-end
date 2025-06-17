@@ -18,6 +18,7 @@ public abstract class ItemSearchResponse {
         private int salePrice;
         private int discountRate;
         private String itemImage;
+        private boolean wishStatus;
     }
 
     @Getter

@@ -90,13 +90,14 @@ public class ReviewService {
         List<Review> reviewList = reviewRepository.findByItemId(itemId);
         // 로그인 유저가 추천한 리뷰 조회
         List<Review> recommendedReviewList = new ArrayList<>();
+        List<Long> recommendedIds = new ArrayList<>();
         if (member != null) {
             recommendedReviewList = reviewRepository.findBMemberRecommendedWithReviewStatus(itemId, member.getId());
+            recommendedIds = recommendedReviewList.stream()
+                    .map(Review::getId)
+                    .distinct()
+                    .toList();
         }
-        List<Long> recommendedIds = recommendedReviewList.stream()
-                .map(Review::getId)
-                .distinct()
-                .toList();
 
         List<Long> reviewIds = reviewList.stream()
                 .map(Review::getId)

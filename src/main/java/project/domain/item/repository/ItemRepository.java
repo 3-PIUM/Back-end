@@ -13,14 +13,14 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
     @Query("""
-        SELECT DISTINCT i FROM Item i
-        LEFT JOIN FETCH i.itemImages img
-        WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
-        AND (img.imageType = 'MAIN' OR img IS NULL)
-        """)
+            SELECT DISTINCT i FROM Item i
+            LEFT JOIN FETCH i.itemImages img
+            WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
+            AND (img.imageType = 'MAIN' OR img IS NULL)
+            """)
     Page<Item> findBySubCategoryNameWithMainImage(
-        @Param("subCategoryName") String subCategoryName,
-        Pageable pageable
+            @Param("subCategoryName") String subCategoryName,
+            Pageable pageable
     );
 
     @Query("""

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.item.dto.ItemResponse.*;
 import project.domain.item.service.ItemService;
+import project.domain.member.Member;
 import project.global.response.ApiResponse;
+import project.global.security.annotation.LoginMember;
 
 @Tag(name = "상품 정보 조회 API")
 @RestController
@@ -26,9 +28,10 @@ public class ItemController {
     )
     @GetMapping("/{itemId}/info")
     public ApiResponse<ItemInfoDTO> getItemInfo(
+            @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "아이템 ID") @PathVariable Long itemId
     ) {
-        return itemService.getItemInfo(itemId);
+        return itemService.getItemInfo(member, itemId);
     }
 
 

@@ -17,6 +17,7 @@ import project.domain.itemoption.ItemOption;
 import project.domain.itemscore.ItemScore;
 import project.domain.makeupreviewoptionlist.MakeupReviewOptionList;
 import project.domain.subcategory.SubCategory;
+import project.domain.wishlist.WishList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,9 @@ public class Item extends BaseEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
     private List<Graph> graphs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = LAZY)
+    private List<WishList> wishLists = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
