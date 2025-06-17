@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ReviewRecommendStatusRepository extends JpaRepository<ReviewRecommendStatus, Long> {
 
-    List<ReviewRecommendStatus> findByMemberId(Long memberId);
+    List<ReviewRecommendStatus> findByReviewIdAndMemberId(Long reviewId, Long memberId);
 
 }
