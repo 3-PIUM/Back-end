@@ -13,7 +13,7 @@ public abstract class CartRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AddItemDTO {
-        private String itemOption;
+        private String itemOption = "default";
         @NotNull
         @Min(1)
         private Integer quantity;
