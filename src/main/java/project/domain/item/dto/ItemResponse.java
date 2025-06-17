@@ -26,6 +26,7 @@ public abstract class ItemResponse {
         private int discountRate;
         private List<String> options;
         private ImageDTO itemImages;
+        private boolean wishStatus;
     }
 
     @Getter

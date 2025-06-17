@@ -8,26 +8,27 @@ import java.util.List;
 
 public abstract class ItemSearchConverter {
 
-    public static ItemSearchResultDTO toItemSearchInfoDTO(List<Item> items, int pageNumber) {
+    public static ItemSearchResultDTO toItemSearchInfoDTO(List<Item> items, int pageNumber, List<Long> wishListIds) {
         return ItemSearchResultDTO.builder()
                 .pageNumber(pageNumber)
                 .itemCount(items.size())
                 .itemSearchInfoDTOs(items.stream()
-                        .map(ItemSearchConverter::toItemSearchDetailInfoDTO)
+                        .map(i -> toItemSearchDetailInfoDTO(i, wishListIds.contains(i.getId())))
                         .toList())
                 .build();
     }
 
-    public static ItemSearchInfoDTO toItemSearchDetailInfoDTO(Item item) {
+    public static ItemSearchInfoDTO toItemSearchDetailInfoDTO(Item item, boolean wishStatus) {
         return ItemSearchInfoDTO.builder()
-            .id(item.getId())
-            .itemName(item.getName())
-            .itemImage(!item.getItemImages().isEmpty()
-                ? item.getItemImages().get(0).getUrl() : null)
-            .originalPrice(item.getOriginalPrice())
-            .salePrice(item.getSalePrice())
-            .discountRate(item.getDiscountRate())
-            .build();
+                .id(item.getId())
+                .itemName(item.getName())
+                .itemImage(!item.getItemImages().isEmpty()
+                        ? item.getItemImages().get(0).getUrl() : null)
+                .originalPrice(item.getOriginalPrice())
+                .salePrice(item.getSalePrice())
+                .discountRate(item.getDiscountRate())
+                .wishStatus(wishStatus)
+                .build();
     }
 
 }

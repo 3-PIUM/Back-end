@@ -18,12 +18,16 @@ import project.domain.item.repository.ItemRepository;
 import project.domain.itemimage.ItemImage;
 import project.domain.itemimage.enums.ImageType;
 import project.domain.itemimage.repository.ItemImageRepository;
+import project.domain.member.Member;
+import project.domain.wishlist.WishList;
+import project.domain.wishlist.repository.WishlistRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,11 +44,16 @@ public class ItemService {
     private final containIngredientRepository containIngredientRepository;
     private final AiSummaryRepository aiSummaryRepository;
     private final GraphRepository graphRepository;
+    private final WishlistRepository wishlistRepository;
 
     // 상품 정보 조회
-    public ApiResponse<ItemInfoDTO> getItemInfo(Long itemId) {
+    public ApiResponse<ItemInfoDTO> getItemInfo(Member member, Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(()->new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
+
+        // 찜 상태
+        Optional<WishList> isWishList = wishlistRepository.findByMemberIdAndItemId(member.getId(), itemId);
+        boolean wishStatus = isWishList.isPresent();
 
         String mainImage = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.MAIN).stream()
                 .map(ItemImage::getUrl)
@@ -56,7 +65,7 @@ public class ItemService {
                 .toList();
 
 
-        ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages);
+        ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages, wishStatus);
         return ApiResponse.onSuccess(itemInfoImages);
     }
 

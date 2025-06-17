@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,9 @@ import project.domain.item.dto.ItemSearchResponse.ItemSearchInfoDTO;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
 import project.domain.item.enums.VeganType;
 import project.domain.item.repository.ItemRepository;
+import project.domain.member.Member;
+import project.domain.wishlist.WishList;
+import project.domain.wishlist.repository.WishlistRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
@@ -29,22 +33,31 @@ public class ItemSearchService {
 
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
+    private final WishlistRepository wishlistRepository;
 
     /*
         서브 카테고리 별 아이템 조회
          */
-    public ApiResponse<ItemSearchResultDTO> getItemsBySubCategory(String subCategoryName,
-        Pageable pageable) {
+    public ApiResponse<ItemSearchResultDTO> getItemsBySubCategory(
+            String subCategoryName,
+            Pageable pageable,
+            Member member
+    ) {
+        // 찜한 상품 Id
+        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
+        List<Long> wishListIds = wishLists.stream()
+                .map(w -> w.getItem().getId())
+                .toList();
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         Page<Item> items = itemRepository.findBySubCategoryNameWithMainImage(subCategoryName,
-            pageable);
+                pageable);
         if (items.isEmpty()) {
             return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
         }
 
         ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(
-            items.getContent(), items.getNumber());
+                items.getContent(), items.getNumber(), wishListIds);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 
@@ -52,21 +65,30 @@ public class ItemSearchService {
           카테고리 별 구매내역순서 아이템 조회
      */
     public ApiResponse<List<ItemSearchInfoDTO>> getItemsByCategoryOrderByCount(
-        String categoryName) {
+            Member member,
+            String categoryName) {
+        // 찜한 상품 Id
+        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
+        List<Long> wishListIds = wishLists.stream()
+                .map(w -> w.getItem().getId())
+                .toList();
+
         Long categoryId;
         if (categoryName == null || categoryName.isEmpty()) {
             categoryId = null;
         } else {
             Category category = categoryRepository.findByName(categoryName).orElseThrow(
-                () -> new GeneralException(ErrorStatus.CATEGORY_NOT_FOUND));
+                    () -> new GeneralException(ErrorStatus.CATEGORY_NOT_FOUND));
             categoryId = category.getId();
         }
 
         List<Item> top10ItemsByCategory = itemRepository.findTop10ItemsByCategory(
-            categoryId);
+                categoryId);
 
         List<ItemSearchInfoDTO> itemSearchInfoDTO = top10ItemsByCategory.stream()
-            .map(ItemSearchConverter::toItemSearchDetailInfoDTO).toList();
+                .map(ti ->
+                        ItemSearchConverter.toItemSearchDetailInfoDTO(ti, wishListIds.contains(ti.getId())))
+                .toList();
 
         return ApiResponse.onSuccess(itemSearchInfoDTO);
     }
@@ -74,7 +96,13 @@ public class ItemSearchService {
     /*
     검색 키워드에 맞는 아이템 조회
      */
-    public ApiResponse<ItemSearchResultDTO> getItemsByKeyword(String keyword, Pageable pageable) {
+    public ApiResponse<ItemSearchResultDTO> getItemsByKeyword(Member member, String keyword, Pageable pageable) {
+
+        // 찜한 상품 Id
+        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
+        List<Long> wishListIds = wishLists.stream()
+                .map(w -> w.getItem().getId())
+                .toList();
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         Page<Item> items = itemRepository.findByKeywordWithMainImage(keyword, pageable);
@@ -83,24 +111,30 @@ public class ItemSearchService {
         }
 
         ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(
-            items.getContent(), items.getNumber());
+                items.getContent(), items.getNumber(), wishListIds);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 
     /*
     비건 제품 조회
      */
-    public ApiResponse<ItemSearchResultDTO> getVeganItems(String subCategory, Pageable pageable) {
+    public ApiResponse<ItemSearchResultDTO> getVeganItems(Member member, String subCategory, Pageable pageable) {
+
+        // 찜한 상품 Id
+        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
+        List<Long> wishListIds = wishLists.stream()
+                .map(w -> w.getItem().getId())
+                .toList();
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         Page<Item> veganItems = itemRepository.findByVeganTypeWithMainImage(VeganType.VEGAN,
-            subCategory, pageable);
+                subCategory, pageable);
         if (veganItems.isEmpty()) {
             return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
         }
 
         ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(
-            veganItems.getContent(), veganItems.getNumber());
+                veganItems.getContent(), veganItems.getNumber(), wishListIds);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 }

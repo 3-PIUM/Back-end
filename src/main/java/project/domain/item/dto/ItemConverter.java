@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class ItemConverter {
 
-    public static ItemInfoDTO toItemInfoDTO(Item item, String mainImage, List<String> detailImages) {
+    public static ItemInfoDTO toItemInfoDTO(Item item, String mainImage, List<String> detailImages, boolean wishStatus) {
         return ItemInfoDTO.builder()
                 .id(item.getId())
                 .itemName(item.getName())
@@ -26,6 +26,7 @@ public abstract class ItemConverter {
                         .mainImage(mainImage)
                         .detailImages(detailImages)
                         .build())
+                .wishStatus(wishStatus)
                 .build();
     }
 
