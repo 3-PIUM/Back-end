@@ -12,6 +12,7 @@ import project.global.enums.skin.PersonalType;
 import project.global.enums.skin.SkinType;
 import project.domain.member.dto.MemberRequest.JoinDTO;
 import project.domain.member.dto.MemberResponse.DetailInfoDTO;
+import project.global.util.SkinIssueUtil;
 
 public abstract class MemberConverter {
 
@@ -28,6 +29,7 @@ public abstract class MemberConverter {
             .moistureType(safeValueOf(AxisType.class, dto.getMoistureType()))
             .reactivityType(safeValueOf(AxisType.class, dto.getReactivityType()))
             .lang(Language.getLanguage(dto.getLanguage()))
+            .skinIssue(SkinIssueUtil.generateOXListFromIndexes(dto.getSkinIssues()))
             .build();
     }
 
@@ -43,6 +45,7 @@ public abstract class MemberConverter {
             .gender(member.getGender().toString())
             .personalType(toStringSafe(member.getPersonalType()))
             .language(member.getLang().toString())
+            .skinIssue(SkinIssueUtil.generateIndexesFromOXList(member.getSkinIssue()))
             .build();
     }
 
