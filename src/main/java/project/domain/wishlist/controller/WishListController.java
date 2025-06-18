@@ -52,7 +52,7 @@ public class WishListController {
     @DeleteMapping("/{itemId}")
     public ApiResponse<DeleteItemDTO> deleteWishList(
             @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "취소할 아이테ID") @PathVariable Long itemId
+            @Parameter(description = "취소할 아이템 ID") @PathVariable Long itemId
     ) {
         return wishListService.deleteWishlist(member, itemId);
     }

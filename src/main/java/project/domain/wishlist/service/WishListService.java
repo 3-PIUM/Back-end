@@ -91,7 +91,7 @@ public class WishListService {
     public ApiResponse<DeleteItemDTO> deleteWishlist(Member member, Long itemId) {
         WishList deleteWishList = findWishList(member.getId(), itemId);
 
-        wishlistRepository.deleteById(itemId);
+        wishlistRepository.deleteById(deleteWishList.getId());
 
         Item deletedItem = deleteWishList.getItem();
         return ApiResponse.onSuccess("삭제된 아이템", WishListConverter.toDeleteItemDTO(deletedItem));
