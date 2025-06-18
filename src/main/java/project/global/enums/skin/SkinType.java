@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SkinType{
+public enum
+SkinType{
     A("건성", -1),
     O("지성", -3),
     N("복합성", -2);

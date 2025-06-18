@@ -44,7 +44,7 @@ public abstract class ItemConverter {
         return IngredientRankingDTO.builder()
                 .itemId(itemId)
                 .rankingList(containIngredient.stream()
-                        .map((ci)->
+                        .map((ci) ->
                                 ItemResponse.RankingSummaryDTO.builder()
                                         .id(ci.getId())
                                         .name(ci.getIngredient().getName())
@@ -59,11 +59,17 @@ public abstract class ItemConverter {
         return CautionIngredientsDTO.builder()
                 .itemId(itemId)
                 .cautionIngredients(cautionIngredients.stream()
-                        .map(ci->IngredientSummaryDTO.builder()
+                        .map(ci -> IngredientSummaryDTO.builder()
                                 .id(ci.getIngredient().getId())
                                 .ingredientName(ci.getIngredient().getName())
                                 .cautionSkinType(ci.getIngredient().getCautionSkinTypes().stream()
-                                        .map(cst->cst.getSkinType().getString())
+                                        .map(cst -> {
+                                            if (cst.getSkinType() != null) {
+                                                return cst.getSkinType().getString();
+                                            } else {
+                                                return null;
+                                            }
+                                        })
                                         .toList())
                                 .build())
                         .toList())
@@ -74,7 +80,7 @@ public abstract class ItemConverter {
         return AiSummaryListDTO.builder()
                 .itemId(itemId)
                 .aiSummaryList(aiSummaries.stream()
-                        .map(as->AiSummaryDTO.builder()
+                        .map(as -> AiSummaryDTO.builder()
                                 .id(as.getId())
                                 .ranking(as.getRanking())
                                 .title(as.getTitle())
@@ -88,7 +94,7 @@ public abstract class ItemConverter {
         return GraphListDTO.builder()
                 .itemId(itemId)
                 .graphList(graphs.stream()
-                        .map(gh->GraphSummaryDTO.builder()
+                        .map(gh -> GraphSummaryDTO.builder()
                                 .id(gh.getId())
                                 .name(gh.getName())
                                 .optionName(gh.getOptionName())
