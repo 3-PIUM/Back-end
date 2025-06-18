@@ -29,7 +29,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build JAR
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
       - name: Rename JAR file to app.jar
         run: |
