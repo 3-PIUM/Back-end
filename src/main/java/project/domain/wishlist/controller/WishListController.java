@@ -49,7 +49,7 @@ public class WishListController {
             summary = "찜 취소",
             description = "찜 되어 있는 아이템을 찜 취소합니다."
     )
-    @DeleteMapping("/{wishListId}")
+    @DeleteMapping("/{itemId}")
     public ApiResponse<DeleteItemDTO> deleteWishList(
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "취소할 아이테ID") @PathVariable Long itemId
