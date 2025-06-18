@@ -50,7 +50,7 @@ public abstract class MemberRequest {
         String personalType;
 
         // 피부고민을 인덱스로 받는다.
-        List<Integer> skinIssues;
+        List<Integer> skinIssue;
     }
 
     @Getter
@@ -82,7 +82,7 @@ public abstract class MemberRequest {
 
         String personalType;
 
-        List<Integer> skinIssues;
+        List<Integer> skinIssue;
     }
 
     @Getter
