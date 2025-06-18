@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 src/main/resources/application.yml
 logs/*
+!logs/.gitkeep
 
 ### STS ###
 .apt_generated
