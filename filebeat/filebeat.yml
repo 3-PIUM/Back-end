@@ -1,0 +1,13 @@
+filebeat.inputs:
+  - type: log                    # 입력 타입: 로그 파일 읽기 모드
+    enabled: true                # 이 입력 소스 활성화
+    paths:
+      - /usr/share/filebeat/logs/*.log  # 수집할 로그 파일 경로
+    fields:                     # 추가 필드 정의
+      logtype: spring-boot      # 로그 타입을 spring-boot로 태깅
+    fields_under_root: false    # 추가 필드를 루트 레벨이 아닌 fields 하위에 위치
+
+output.logstash:
+  hosts: [ "logstash:5044" ] # 수집된 로그를 logstash로 보내줄 예정이므로 다음과 같이 설정
+
+logging.level: info
