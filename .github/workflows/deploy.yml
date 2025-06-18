@@ -28,6 +28,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build JAR
+        run: ./gradlew clean build
+
+      - name: Rename JAR file to app.jar
+        run: |
+          JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
+          echo "Found JAR: $JAR_PATH"
+          cp "$JAR_PATH" app.jar
+
       - name: Create .env file
         env:
           ENV_PATH: .env
