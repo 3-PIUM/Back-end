@@ -88,10 +88,10 @@ public class WishListService {
     찜 취소
      */
     @Transactional
-    public ApiResponse<DeleteItemDTO> deleteWishlist(Long wishlistId) {
-        WishList deleteWishList = findWishList(wishlistId);
+    public ApiResponse<DeleteItemDTO> deleteWishlist(Member member, Long itemId) {
+        WishList deleteWishList = findWishList(member.getId(), itemId);
 
-        wishlistRepository.deleteById(wishlistId);
+        wishlistRepository.deleteById(itemId);
 
         Item deletedItem = deleteWishList.getItem();
         return ApiResponse.onSuccess("삭제된 아이템", WishListConverter.toDeleteItemDTO(deletedItem));
@@ -100,8 +100,8 @@ public class WishListService {
     /*
     찜 목록 찾기
      */
-    private WishList findWishList(Long wishlistId) {
-        return wishlistRepository.findById(wishlistId)
+    private WishList findWishList(Long memberId, Long itemId) {
+        return wishlistRepository.findByMemberIdAndItemId(memberId, itemId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.WISHLIST_NOT_FOUND));
     }
 }

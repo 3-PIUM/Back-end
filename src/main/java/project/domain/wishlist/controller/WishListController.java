@@ -51,8 +51,9 @@ public class WishListController {
     )
     @DeleteMapping("/{wishListId}")
     public ApiResponse<DeleteItemDTO> deleteWishList(
-            @Parameter(description = "취소할 찜 ID") @PathVariable Long wishListId
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "취소할 아이테ID") @PathVariable Long itemId
     ) {
-        return wishListService.deleteWishlist(wishListId);
+        return wishListService.deleteWishlist(member, itemId);
     }
 }
