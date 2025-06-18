@@ -25,6 +25,7 @@ public abstract class WishListConverter {
                         .salePrice(wishList.getItem().getSalePrice())
                         .discountRate(wishList.getItem().getDiscountRate())
                         .mainImageUrl(mainImage.getUrl())
+                        .wishStatus(true)
                         .build())
                 .build();
     }
@@ -34,20 +35,10 @@ public abstract class WishListConverter {
             Map<Long, ItemImage> itemImageMap
     ) {
         return wishLists.stream()
-                .map(wishList -> WishListResponseDTO.builder()
-                        .wishListId(wishList.getId())
-                        .memberId(wishList.getMember().getId())
-                        .createdAt(wishList.getCreatedAt())
-                        .item(ItemSummaryDTO.builder()
-                                .itemId(wishList.getItem().getId())
-                                .itemName(wishList.getItem().getName())
-                                .originalPrice(wishList.getItem().getOriginalPrice())
-                                .salePrice(wishList.getItem().getSalePrice())
-                                .discountRate(wishList.getItem().getDiscountRate())
-                                .mainImageUrl(ImageUtil.getMainImageUrl(wishList.getItem().getId(), itemImageMap))
-                                .build())
-                        .build())
-                .toList();
+                .map(wishList -> toWishListResponseDTO(
+                                wishList, itemImageMap.get(wishList.getItem().getId())
+                        )
+                ).toList();
 
     }
 
