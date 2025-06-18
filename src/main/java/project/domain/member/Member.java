@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.domain.common.BaseEntity;
+import project.global.converter.CustomStringListConverter;
 import project.global.enums.skin.AxisType;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.enums.Area;
@@ -29,6 +30,7 @@ import project.domain.reviewrecommendstatus.ReviewRecommendStatus;
 import project.global.enums.skin.PersonalType;
 import project.domain.member.enums.Role;
 import project.global.enums.skin.SkinType;
+import project.global.util.SkinIssueUtil;
 
 @Entity
 @NoArgsConstructor(access = PROTECTED)
@@ -94,6 +96,11 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Language lang = Language.KR;
 
+    @Convert(converter = CustomStringListConverter.class)
+    @Column(name = "skin_issue")
+    private List<String> skinIssue;
+
+
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseHistory> purchaseHistoryList = new ArrayList<>();
 
@@ -105,8 +112,10 @@ public class Member extends BaseEntity {
 
     @Builder
     private Member(String nickname, String profileImg, String email, String password,
-                   LocalDate birth, Gender gender, AxisType pigmentType, AxisType moistureType, AxisType reactivityType,
-                   SkinType skinType, PersonalType personalType, Area area, Language lang) {
+        LocalDate birth, Gender gender, AxisType pigmentType, AxisType moistureType,
+        AxisType reactivityType, List<String> skinIssue,
+        SkinType skinType, PersonalType personalType, Area area, Language lang) {
+        this.skinIssue = skinIssue;
         this.nickname = nickname;
         this.profileImg = profileImg;
         this.email = email;
@@ -128,22 +137,24 @@ public class Member extends BaseEntity {
         Optional.ofNullable(updateDTO.getNickname()).ifPresent(v -> this.nickname = v);
         Optional.ofNullable(updateDTO.getEmail()).ifPresent(v -> this.email = v);
         Optional.ofNullable(updateDTO.getBirth()).ifPresent(v -> this.birth = v);
+        Optional.ofNullable(updateDTO.getSkinIssues())
+            .ifPresent(v -> this.skinIssue = SkinIssueUtil.generateOXListFromIndexes(v));
         Optional.ofNullable(updateDTO.getGender())
-                .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
+            .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
         Optional.ofNullable(updateDTO.getSkinType())
-                .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
+            .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
         Optional.ofNullable(updateDTO.getPigmentType())
-                .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(AxisType.class, v));
+            .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getMoistureType())
-                .ifPresent(v -> moistureType = EnumUtil.safeValueOf(AxisType.class, v));
+            .ifPresent(v -> moistureType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getReactivityType())
-                .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(AxisType.class, v));
+            .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getPersonalType())
-                .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
+            .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
         Optional.ofNullable(updateDTO.getArea())
-                .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
+            .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
         Optional.ofNullable(updateDTO.getLanguage())
-                .ifPresent(v -> this.lang = Language.getLanguage(v));
+            .ifPresent(v -> this.lang = Language.getLanguage(v));
     }
 
     /*
@@ -158,14 +169,14 @@ public class Member extends BaseEntity {
      */
     public String createMbti() {
         if (Stream.of(this.skinType, this.pigmentType, this.moistureType, this.reactivityType)
-                .anyMatch(Objects::isNull)) {
+            .anyMatch(Objects::isNull)) {
             return "";
         }
 
         return Stream.of(skinType, pigmentType, moistureType, reactivityType)
-                .filter(Objects::nonNull)
-                .map(Enum::name)
-                .collect(Collectors.joining(", "));
+            .filter(Objects::nonNull)
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
 
     }
 }

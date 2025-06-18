@@ -1,6 +1,7 @@
 package project.domain.member.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +35,8 @@ public abstract class MemberResponse {
         public String area;
 
         public String language;
+
+        public List<Integer> skinIssue;
     }
 
 }

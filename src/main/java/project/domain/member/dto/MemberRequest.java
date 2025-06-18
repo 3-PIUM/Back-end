@@ -1,6 +1,7 @@
 package project.domain.member.dto;
 
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,6 +48,9 @@ public abstract class MemberRequest {
         String reactivityType;
 
         String personalType;
+
+        // 피부고민을 인덱스로 받는다.
+        List<Integer> skinIssues;
     }
 
     @Getter
@@ -77,6 +81,8 @@ public abstract class MemberRequest {
         String reactivityType;
 
         String personalType;
+
+        List<Integer> skinIssues;
     }
 
     @Getter
