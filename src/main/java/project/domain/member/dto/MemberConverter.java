@@ -29,7 +29,7 @@ public abstract class MemberConverter {
             .moistureType(safeValueOf(AxisType.class, dto.getMoistureType()))
             .reactivityType(safeValueOf(AxisType.class, dto.getReactivityType()))
             .lang(Language.getLanguage(dto.getLanguage()))
-            .skinIssue(SkinIssueUtil.generateOXListFromIndexes(dto.getSkinIssues()))
+            .skinIssue(SkinIssueUtil.generateOXListFromIndexes(dto.getSkinIssue()))
             .build();
     }
 

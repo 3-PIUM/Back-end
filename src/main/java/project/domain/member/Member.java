@@ -137,7 +137,7 @@ public class Member extends BaseEntity {
         Optional.ofNullable(updateDTO.getNickname()).ifPresent(v -> this.nickname = v);
         Optional.ofNullable(updateDTO.getEmail()).ifPresent(v -> this.email = v);
         Optional.ofNullable(updateDTO.getBirth()).ifPresent(v -> this.birth = v);
-        Optional.ofNullable(updateDTO.getSkinIssues())
+        Optional.ofNullable(updateDTO.getSkinIssue())
             .ifPresent(v -> this.skinIssue = SkinIssueUtil.generateOXListFromIndexes(v));
         Optional.ofNullable(updateDTO.getGender())
             .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
