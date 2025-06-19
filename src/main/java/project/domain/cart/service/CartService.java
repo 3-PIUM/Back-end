@@ -26,7 +26,9 @@ import project.domain.member.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.purchasehistory.PurchaseHistory;
 import project.domain.purchasehistory.repository.PurchaseHistoryRepository;
-import project.domain.purchasehistory.service.PurchaseHistoryService;
+import project.global.kafka.dto.purchase.PurchaseEventDTO;
+import project.global.kafka.service.purchase.PurchaseEventConsumer;
+import project.global.kafka.service.purchase.PurchaseLogProducer;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
@@ -52,6 +54,8 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final ItemImageRepository itemImageRepository;
     private final PurchaseHistoryRepository purchaseHistoryRepository;
+    private final PurchaseEventConsumer purchaseEventConsumer;
+    private final PurchaseLogProducer purchaseLogProducer;
 
     /*
     장바구니 아이템 조회
@@ -220,6 +224,8 @@ public class CartService {
     @Transactional
     public ApiResponse<Void> pay(Long memberId, String cartItemIds) {
 
+        long start = System.currentTimeMillis();
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
 
@@ -266,6 +272,29 @@ public class CartService {
         // 장바구니 총 금액 업데이트
         Cart cart = findCartByMember(memberId);
         updateCartTotalPrice(cart);
+
+        long end = System.currentTimeMillis();
+
+        // 구매 완료후 구매 이벤트 발행
+        PurchaseEventDTO eventDTO = PurchaseEventDTO.builder()
+                .memberId(memberId)
+                .birth(member.getBirth())
+                .gender(member.getGender())
+                .area(member.getArea())
+                .personalType(member.getPersonalType())
+                .skinType(member.getSkinType())
+                .skinIssues(member.getSkinIssue())
+                .cartItemIds(cartitems.stream()
+                        .map(ci -> ci.getItem().getId())
+                        .toList())
+                .purchaseItemIds(itemIds)
+                .success(true)
+                .timestamp(System.currentTimeMillis())
+                .processingTimeMs(end - start)
+                .build();
+
+        // 메세지 발행
+        purchaseLogProducer.sendPurchaseLog(eventDTO);
 
         return ApiResponse.OK;
     }

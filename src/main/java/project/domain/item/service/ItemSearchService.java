@@ -137,4 +137,5 @@ public class ItemSearchService {
                 veganItems.getContent(), veganItems.getNumber(), wishListIds);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
+
 }

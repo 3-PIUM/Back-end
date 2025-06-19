@@ -11,7 +11,7 @@ services:
       - xpack.security.enabled=false      # X-Pack 보안 기능 비활성화 (개발용)
       - xpack.security.transport.ssl.enabled=false  # SSL 전송 암호화 비활성화
     ulimits:
-      memlock:  # 메모리 잠금 제한 설정 (성능 향상을 위해)
+      memlock: # 메모리 잠금 제한 설정 (성능 향상을 위해)
         soft: -1  # 소프트 제한 무제한
         hard: -1  # 하드 제한 무제한
     volumes:
@@ -85,55 +85,66 @@ services:
       - elk
 
   kafka:
-    image: confluentinc/cp-kafka:7.6.0  # Confluent Kafka 이미지 (KRaft 지원)
-    hostname: kafka                     # 컨테이너 호스트명
-    container_name: kafka              # 컨테이너 이름
+    image: confluentinc/cp-kafka:7.6.0
+    hostname: kafka
+    container_name: kafka
     ports:
       - "9092:9092"                    # 외부 접속용 포트 (Spring Boot에서 사용)
       - "9101:9101"                    # JMX 모니터링 포트
+    networks:
+      - elk
+    volumes:
+      - kafka_data:/var/lib/kafka/data
     environment:
-      # === KRaft 모드 필수 설정 ===
+      # 노드 정보 설정
       KAFKA_NODE_ID: 1                 # 노드 고유 ID (클러스터 내 유일해야 함)
       KAFKA_PROCESS_ROLES: 'broker,controller'  # 이 노드가 브로커와 컨트롤러 역할 둘 다 수행
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'     # 클러스터 고유 ID (변경 가능)
-
-      # === 리스너 설정 ===
+      # 리스터 설정
       # 각 리스너의 보안 프로토콜 정의 (개발용이라 모두 PLAINTEXT)
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-
       KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
-      # 실제 바인딩될 주소들
       # - PLAINTEXT: 컨테이너 내부 통신용 (29092)
       # - CONTROLLER: KRaft 컨트롤러 통신용 (29093)
       # - PLAINTEXT_HOST: 외부 접속용 (9092)
-
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
-      # 클라이언트에게 알려줄 주소들
-      # Spring Boot는 localhost:9092로 접속
-
+      # 클라이언트에게 알려줄 주소들 -> 컨테이너 내부는 29092, 외부에서는 localhost:9092로 접속
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'      # 브로커 간 통신에 사용할 리스너
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'      # 컨트롤러 통신에 사용할 리스너
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'    # 컨트롤러 투표 참여자 (노드1이 29093 포트)
-
       # === 토픽 및 복제 설정 ===
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1          # __consumer_offsets 토픽 복제 팩터 (단일 브로커라 1)
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'            # 토픽 자동 생성 허용
-
       # === 성능 및 안정성 설정 ===
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0          # 컨슈머 그룹 리밸런싱 지연시간 (개발용 0)
-      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'          # 로그 파일 저장 경로
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'          # 로그 파일 저장 경로
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
-      # === Confluent 모니터링 설정 (선택사항) ===
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
-      KAFKA_CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
-      KAFKA_CONFLUENT_METRICS_ENABLE: 'true'
-      KAFKA_CONFLUENT_SUPPORT_CUSTOMER_ID: anonymous
-      KAFKA_CONFLUENT_CLUSTER_LINK_ENABLE: 'true'
-
+  # Kafka UI (선택사항 - 관리 편의성을 위해)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    networks:
+      - elk
+    ports:
+      - "28080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "docker-local"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
+    depends_on:
+      kafka:
+        condition: service_healthy
 
 volumes:
   elasticsearch_data: # docker 볼륨 이름
     driver: local # docker가 기본 방식으로 로컬 디스크에 데이터를 저장
+  kafka_data:
+    driver: local
 networks:
   elk: # ELK가 서로 네트워크 상에서 통신할 수 있게 도와줌
     driver: bridge # 기본 브리지 네트워크 방식 사용
