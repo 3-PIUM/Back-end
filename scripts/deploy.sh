@@ -15,5 +15,5 @@ echo "> 🔵 PULL DOCKER IMAGE FROM ECR"
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_REGISTRY
 
 echo "> 🔵 RUN APPLICATION CONTAINER"
-docker-compose pull spring
-docker-compose up -d
+docker compose pull spring
+docker compose up -d
