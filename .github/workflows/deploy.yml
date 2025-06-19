@@ -52,8 +52,8 @@ jobs:
           echo REDIS_HOST=${{ secrets.DEV_REDIS_HOST }} >> $ENV_PATH
           echo MAIL_USERNAME=${{ secrets.MAIL_USERNAME }} >> $ENV_PATH
           echo MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} >> $ENV_PATH
-          echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} >> $ENV_PATH
-          echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} >> $ENV_PATH
+          echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} >> $ENV_PATH
+          echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $ENV_PATH
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> $ENV_PATH
           
 
