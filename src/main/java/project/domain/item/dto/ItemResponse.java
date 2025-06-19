@@ -84,6 +84,7 @@ public abstract class ItemResponse {
         private String title;
         private String itemOption;
         private String content;
+        private String originalContent;
     }
 
     @Getter

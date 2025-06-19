@@ -30,6 +30,8 @@ public class AiSummary extends BaseEntity {
 
     private String content;
 
+    private String originalContent;
+
     private int ranking;
 
 }
