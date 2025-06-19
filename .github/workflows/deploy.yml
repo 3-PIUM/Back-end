@@ -30,10 +30,13 @@ jobs:
 
       - name: Build JAR
         run: ./gradlew clean build -x test --no-build-cache
+      
+      - name: 확인 - build/libs 내부 확인
+        run: ls -al build/libs
 
       - name: Rename JAR file to app.jar
         run: |
-          JAR_PATH=$(find build/libs -name "*SNAPSHOT.jar" ! -name "*plain*" | head -n 1)
+          JAR_PATH=$(find build/libs -name "*.jar" ! -name "*plain*" | head -n 1)
           echo "Found JAR: $JAR_PATH"
           cp "$JAR_PATH" app.jar
 
