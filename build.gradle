@@ -80,6 +80,7 @@ tasks.named('test') {
 }
 
 bootJar {
+    archiveFileName = 'app.jar'
     manifest {
         attributes(
                 'Main-Class': 'project.BackEndApplication'
