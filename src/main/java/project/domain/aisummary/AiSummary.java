@@ -26,6 +26,8 @@ public class AiSummary extends BaseEntity {
 
     private String title;
 
+    private String itemOption;
+
     private String content;
 
     private int ranking;

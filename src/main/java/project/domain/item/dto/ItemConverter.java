@@ -84,6 +84,7 @@ public abstract class ItemConverter {
                                 .id(as.getId())
                                 .ranking(as.getRanking())
                                 .title(as.getTitle())
+                                .itemOption(as.getItemOption())
                                 .content(as.getContent())
                                 .build())
                         .toList())
