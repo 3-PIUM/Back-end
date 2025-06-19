@@ -1,7 +1,7 @@
 services:
   spring:
     # ECR로부터 Spring Boot 이미지를 pull 받아 컨테이너 실행
-    image: 073658113926.dkr.ecr.ap-northeast-2.amazonaws.com/pium-repo:latest
+    image: 073658113926.dkr.ecr.ap-northeast-2.amazonaws.com/pium/repo:latest
     restart: always
     ports:
       - "8080:8080"
