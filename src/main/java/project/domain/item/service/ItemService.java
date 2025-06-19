@@ -72,6 +72,7 @@ public class ItemService {
         ViewEventDTO viewEventDTO = ViewEventDTO.builder()
                 .memberId(member.getId())
                 .itemId(itemId)
+                .subCategory(item.getSubCategory().getName())
                 .timestamp(System.currentTimeMillis())
                 .build();
 

@@ -38,6 +38,7 @@ services:
       # Logstash 설정 파일들을 컨테이너에 마운트 (읽기 전용)
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro  # 파이프라인 설정 파일들
+      - ./logs:/usr/share/logstash/logs:ro # 로그 파일
     ports:
       - "5044:5044"    # Beats 입력 포트 (Filebeat, Metricbeat 등)
       - "5050:5050/tcp"  # TCP 로그 입력 포트

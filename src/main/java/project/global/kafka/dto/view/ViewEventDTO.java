@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class ViewEventDTO {
     private Long memberId;
     private Long itemId;
+    private String subCategory;
     private long timestamp;
 }
