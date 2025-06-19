@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload to S3
         run: |
-          zip -r ./$GITHUB_SHA.zip ./scripts appspec.yml release-docker-compose.yml .env logstash/
+          zip -r ./$GITHUB_SHA.zip ./scripts appspec.yml release-docker-compose.yml .env logstash/ filebeat/
           aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME
 
       - name: Deploy to EC2 with CodeDeploy
