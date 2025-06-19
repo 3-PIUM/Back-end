@@ -29,16 +29,11 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build JAR
-        run: ./gradlew clean bootJar -x test
+        run: ./gradlew clean build -x test --no-build-cache
 
-      # - name: Rename JAR file to app.jar
-      #   run: |
-      #     JAR_PATH=$(find build/libs -name "*-boot.jar" | head -n 1)
-      #     echo "Found JAR: $JAR_PATH"
-      #     cp "$JAR_PATH" app.jar
       - name: Rename JAR file to app.jar
         run: |
-          JAR_PATH=$(find build/libs -name "app.jar" | head -n 1)
+          JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
           echo "Found JAR: $JAR_PATH"
           cp "$JAR_PATH" app.jar
 
