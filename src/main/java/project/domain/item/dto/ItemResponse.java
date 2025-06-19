@@ -82,6 +82,7 @@ public abstract class ItemResponse {
         private Long id;
         private int ranking;
         private String title;
+        private String itemOption;
         private String content;
     }
 
