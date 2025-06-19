@@ -33,7 +33,7 @@ jobs:
 
       - name: Rename JAR file to app.jar
         run: |
-          JAR_PATH=$(find build/libs -name "*.jar" | head -n 1)
+          JAR_PATH=$(find build/libs -name "*-boot.jar" | head -n 1)
           echo "Found JAR: $JAR_PATH"
           cp "$JAR_PATH" app.jar
 
