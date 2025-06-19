@@ -78,3 +78,12 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    archiveFileName = 'app.jar'
+    manifest {
+        attributes(
+                'Main-Class': 'project.BackEndApplication'
+        )
+    }
+}
