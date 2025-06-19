@@ -1,8 +1,10 @@
 package project.global.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Collections;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,45 +30,46 @@ import project.global.security.util.JwtUtil;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final RefreshTokenService refreshTokenService;
-        private final JwtUtil jwtUtil;
-        private final AuthenticationConfiguration authenticationConfiguration;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
-        @Bean
-        public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-            return configuration.getAuthenticationManager();
-        }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
 
-        @Bean
-        public BCryptPasswordEncoder bCryptPasswordEncoder() {
-            return new BCryptPasswordEncoder();
-        }
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-            http
+        http
                 // cors 다 해결
                 .cors((cors) -> cors
-                    .configurationSource(new CorsConfigurationSource() {
-                        @Override
-                        public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                            CorsConfiguration configuration = new CorsConfiguration();
-                            configuration.setAllowedOrigins(List.of(
-                                "http://localhost:5173", // 개발 환경
-                                "http://localhost:8080" // 개발 환경
-                            ));
+                        .configurationSource(new CorsConfigurationSource() {
+                            @Override
+                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                                CorsConfiguration configuration = new CorsConfiguration();
+                                configuration.setAllowedOrigins(List.of(
+                                        "http://localhost:5173", // 개발 환경
+                                        "http://localhost:8080", // 개발 환경
+                                        "http://Pium-LoadBalancer-1515701121.ap-northeast-2.elb.amazonaws.com" //로드 밸런서
+                                ));
 
-                            configuration.setAllowedMethods(
-                                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // 허용할 HTTP 메서드
-                            configuration.setAllowedHeaders(Collections.singletonList("*"));
-                            configuration.setMaxAge(3600L);
-                            configuration.setAllowCredentials(true);
-                            configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                                configuration.setAllowedMethods(
+                                        List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // 허용할 HTTP 메서드
+                                configuration.setAllowedHeaders(Collections.singletonList("*"));
+                                configuration.setMaxAge(3600L);
+                                configuration.setAllowCredentials(true);
+                                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
-                            return configuration;
-                        }
-                    }))
+                                return configuration;
+                            }
+                        }))
                 //csrf disable
                 .csrf(AbstractHttpConfigurer::disable)
 
@@ -78,23 +81,23 @@ public class SecurityConfig {
 
                 //경로별 인가 작업
                 .authorizeHttpRequests(authorize -> authorize
-                    //TODO
-                    // 관리자,사용자별로 접근 권한이 있는 사용자를 지정
-                    // 인증이 되지 않으면 접근을 하지 못하도록
-                    .anyRequest().permitAll()
+                        //TODO
+                        // 관리자,사용자별로 접근 권한이 있는 사용자를 지정
+                        // 인증이 되지 않으면 접근을 하지 못하도록
+                        .anyRequest().permitAll()
                 )
 
                 //session 설정
                 .sessionManagement((session) -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .addFilterBefore(new JwtAuthFilter(jwtUtil), LoginFilter.class)
                 .addFilterAt(
-                    new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenService),
-                    UsernamePasswordAuthenticationFilter.class)
+                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenService),
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new project.global.security.filter.LogoutFilter(jwtUtil, refreshTokenService),
-                    LogoutFilter.class);
-            return http.build();
-        }
+                        LogoutFilter.class);
+        return http.build();
+    }
 
 }
