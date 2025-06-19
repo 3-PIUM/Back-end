@@ -38,7 +38,9 @@ jobs:
       #     cp "$JAR_PATH" app.jar
       - name: Rename JAR file to app.jar
         run: |
-          cp build/libs/app.jar app.jar
+          JAR_PATH=$(find build/libs -name "app.jar" | head -n 1)
+          echo "Found JAR: $JAR_PATH"
+          cp "$JAR_PATH" app.jar
 
       - name: Create .env file
         env:
