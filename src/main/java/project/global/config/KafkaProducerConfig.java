@@ -74,7 +74,7 @@ public class KafkaProducerConfig {
         return template;
     }
 
-    // 장바구니 로그용 Prodcuer(처리량 우선)
+    // 장바구니 로그용 Prodcuer(신뢰+처리량 밸런스)
     @Bean("cartProducerFactory")
     public ProducerFactory<String, String> cartProducerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -85,7 +85,7 @@ public class KafkaProducerConfig {
         // 처리량 최우선 설정
         props.put(ProducerConfig.ACKS_CONFIG, "all"); // 모든 replica가 확인
         props.put(ProducerConfig.RETRIES_CONFIG, 5); // 5번만 재시도
-        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 32768); // 메세지가 64KB 쌓이면 전송
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 32768); // 메세지가 32KB 쌓이면 전송
         props.put(ProducerConfig.LINGER_MS_CONFIG, 20); // 20ms가 지나면 메세지가 32KB 쌓이지 않아도 전송
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4"); // 빠른 압축
         props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 67108864); // 버퍼 크기 64MB
@@ -100,4 +100,5 @@ public class KafkaProducerConfig {
         template.setDefaultTopic("cart-events");
         return template;
     }
+
 }

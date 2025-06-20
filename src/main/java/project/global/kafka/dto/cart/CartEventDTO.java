@@ -1,4 +1,4 @@
-package project.global.kafka.dto.purchase;
+package project.global.kafka.dto.cart;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseEventDTO {
+public class CartEventDTO {
     private Long memberId;
     private LocalDate birth;
     private Gender gender;
@@ -24,7 +24,6 @@ public class PurchaseEventDTO {
     private SkinType skinType;
     private List<String> skinIssues;
     private PersonalType personalType;
-    private List<Long> cartItemIds;
-    private List<Long> purchaseItemIds;
+    private Long itemId;
     private long eventTime;
 }

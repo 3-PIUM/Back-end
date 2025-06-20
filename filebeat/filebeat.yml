@@ -2,8 +2,8 @@ filebeat.inputs:
   - type: log                    # 입력 타입: 로그 파일 읽기 모드
     enabled: true                # 이 입력 소스 활성화
     paths:
-      - /usr/share/filebeat/logs/*.log  # 수집할 로그 파일 경로
-    fields:                     # 추가 필드 정의
+      - /usr/share/filebeat/logs/application.log  # 수집할 로그 파일 경로
+    fields: # 추가 필드 정의
       log_type: spring-boot      # 로그 타입을 spring-boot로 태깅
     fields_under_root: false    # 추가 필드를 루트 레벨이 아닌 fields 하위에 위치
 
@@ -35,12 +35,27 @@ filebeat.inputs:
     scan_frequency: 10s
     close_inactive: 5m
 
+  # 장바구니 이벤트 로그
+  - type: log
+    enabled: true
+    paths:
+      - /usr/share/filebeat/logs/events/cart-events.log
+    fields:
+      event_type: cart
+      log_type: event
+    fields_under_root: true
+    json.keys_under_root: true
+    json.add_error_key: true
+    scan_frequency: 10s
+    close_inactive: 5m
+
   # 에러 로그들
   - type: log
     enabled: true
     paths:
       - /usr/share/filebeat/logs/errors/purchase-errors.log
       - /usr/share/filebeat/logs/errors/view-errors.log
+      - /usr/share/filebeat/logs/errors/cart-errors.log
     fields:
       log_type: error
     fields_under_root: true
@@ -48,13 +63,6 @@ filebeat.inputs:
     json.add_error_key: true
     scan_frequency: 10s
     close_inactive: 5m
-
-# 프로세서 설정
-processors:
-  - add_host_metadata:
-      when.not.contains.tags: forwarded
-  - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
 
 output.logstash:
   hosts: [ "logstash:5044" ] # 수집된 로그를 logstash로 보내줄 예정이므로 다음과 같이 설정

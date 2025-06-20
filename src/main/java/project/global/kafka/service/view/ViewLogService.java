@@ -42,7 +42,7 @@ public class ViewLogService {
         return ViewLogDocument.builder()
                 .memberId(viewEventDTO.getMemberId())
                 .itemId(viewEventDTO.getItemId())
-                .timestamp(viewEventDTO.getTimestamp())
+                .timestamp(viewEventDTO.getEventTime())
                 .kafkaMetadata(KafkaMetadata.builder()
                         .topic(topic)
                         .partition(partition)
@@ -55,7 +55,7 @@ public class ViewLogService {
 
     private String generateDocumentId(ViewEventDTO dto, String topic) {
         return String.format("%s_%d_%d_%d",
-                topic, dto.getTimestamp(), dto.getMemberId(), dto.getItemId());
+                topic, dto.getEventTime(), dto.getMemberId(), dto.getItemId());
     }
 }
 

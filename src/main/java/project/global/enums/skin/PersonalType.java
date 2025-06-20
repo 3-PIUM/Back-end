@@ -1,8 +1,8 @@
 package project.global.enums.skin;
 
 public enum PersonalType {
-    봄웜,
-    여름쿨,
-    가을웜,
-    겨울쿨
+    봄웜톤,
+    여름쿨톤,
+    가을웜톤,
+    겨울쿨톤
 }

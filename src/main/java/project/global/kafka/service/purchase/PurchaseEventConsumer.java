@@ -76,18 +76,20 @@ public class PurchaseEventConsumer {
             Map<String, Object> logData = new HashMap<>();
             logData.put("@timestamp", java.time.Instant.now().toString());
             logData.put("event_type", "purchase");
+            logData.put("event_date", dto.getEventTime());
             logData.put("member_id", dto.getMemberId());
             logData.put("birth", dto.getBirth());
             logData.put("gender", dto.getGender());
             logData.put("area", dto.getArea());
             logData.put("personal_type", dto.getPersonalType());
+            logData.put("skin_type", dto.getSkinType());
+            logData.put("skin_issues", dto.getSkinIssues());
             logData.put("cart_item_ids", dto.getCartItemIds());
             logData.put("purchase_item_ids", dto.getPurchaseItemIds());
             logData.put("kafka_topic", topic);
             logData.put("kafka_partition", partition);
             logData.put("kafka_offset", offset);
             logData.put("kafka_key", key);
-            logData.put("environment", System.getProperty("spring.profiles.active", "unknown"));
 
             return objectMapper.writeValueAsString(logData);
         } catch (Exception e) {
@@ -99,7 +101,7 @@ public class PurchaseEventConsumer {
     private void handleConsumerError(String eventData, String topic, int partition,
                                      long offset, String key, Exception e) {
         try {
-            var errorLog = new java.util.HashMap<String, Object>();
+            Map<String, Object> errorLog = new HashMap<>();
             errorLog.put("@timestamp", java.time.Instant.now().toString());
             errorLog.put("event_type", "purchase_error");
             errorLog.put("error_message", e.getMessage());

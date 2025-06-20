@@ -78,7 +78,7 @@ services:
     user: root
     volumes:
       - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro # Filebeat 설정파일
-      - ./logs:/usr/share/filebeat/logs:ro # Spring Boot 로그 파일 (애플리케이션과 공유)
+      - ./logs:/usr/share/filebeat/logs # Spring Boot 로그 파일 (애플리케이션과 공유)
     depends_on:
       - elasticsearch
       - logstash

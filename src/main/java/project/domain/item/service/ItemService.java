@@ -73,7 +73,7 @@ public class ItemService {
                 .memberId(member.getId())
                 .itemId(itemId)
                 .subCategory(item.getSubCategory().getName())
-                .timestamp(System.currentTimeMillis())
+                .eventTime(System.currentTimeMillis())
                 .build();
 
         viewLogProducer.sendViewLog(viewEventDTO);

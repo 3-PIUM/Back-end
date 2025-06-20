@@ -26,8 +26,9 @@ import project.domain.member.Member;
 import project.domain.member.repository.MemberRepository;
 import project.domain.purchasehistory.PurchaseHistory;
 import project.domain.purchasehistory.repository.PurchaseHistoryRepository;
+import project.global.kafka.dto.cart.CartEventDTO;
 import project.global.kafka.dto.purchase.PurchaseEventDTO;
-import project.global.kafka.service.purchase.PurchaseEventConsumer;
+import project.global.kafka.service.cart.CartLogProducer;
 import project.global.kafka.service.purchase.PurchaseLogProducer;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
@@ -54,8 +55,8 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final ItemImageRepository itemImageRepository;
     private final PurchaseHistoryRepository purchaseHistoryRepository;
-    private final PurchaseEventConsumer purchaseEventConsumer;
     private final PurchaseLogProducer purchaseLogProducer;
+    private final CartLogProducer cartLogProducer;
 
     /*
     장바구니 아이템 조회
@@ -88,8 +89,8 @@ public class CartService {
     장바구니 추가
      */
     @Transactional
-    public ApiResponse<CartItemDTO> addItemToCart(Long memberId, Long itemId, AddItemDTO addItemDTO) {
-        Cart cart = findCartByMember(memberId); // 카트 정보 조회
+    public ApiResponse<CartItemDTO> addItemToCart(Member member, Long itemId, AddItemDTO addItemDTO) {
+        Cart cart = findCartByMember(member.getId()); // 카트 정보 조회
         Item addItem = findItemById(itemId); // 추가할 아이템 정보 조회
 
         // 카트에 이미 존재하는지 확인
@@ -110,6 +111,22 @@ public class CartService {
 
         List<ItemImage> itemImages = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.MAIN);
         ItemImage mainImage = itemImages != null ? itemImages.get(0) : null;
+
+
+        // 장바구니 로그 전송
+        CartEventDTO cartEventDTO = CartEventDTO.builder()
+                .memberId(member.getId())
+                .birth(member.getBirth())
+                .gender(member.getGender())
+                .area(member.getArea())
+                .skinType(member.getSkinType())
+                .skinIssues(member.getSkinIssue())
+                .personalType(member.getPersonalType())
+                .itemId(itemId)
+                .eventTime(System.currentTimeMillis())
+                .build();
+
+        cartLogProducer.sendCartLog(cartEventDTO);
 
         CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem, mainImage);
         return ApiResponse.onSuccess("장바구니에 추가된 아이템", cartItemDTO);
@@ -224,8 +241,6 @@ public class CartService {
     @Transactional
     public ApiResponse<Void> pay(Long memberId, String cartItemIds) {
 
-        long start = System.currentTimeMillis();
-
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
 
@@ -273,7 +288,6 @@ public class CartService {
         Cart cart = findCartByMember(memberId);
         updateCartTotalPrice(cart);
 
-        long end = System.currentTimeMillis();
 
         // 구매 완료후 구매 이벤트 발행
         PurchaseEventDTO eventDTO = PurchaseEventDTO.builder()
@@ -288,9 +302,7 @@ public class CartService {
                         .map(ci -> ci.getItem().getId())
                         .toList())
                 .purchaseItemIds(itemIds)
-                .success(true)
-                .timestamp(System.currentTimeMillis())
-                .processingTimeMs(end - start)
+                .eventTime(System.currentTimeMillis())
                 .build();
 
         // 메세지 발행
