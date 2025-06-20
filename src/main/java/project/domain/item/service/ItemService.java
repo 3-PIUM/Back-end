@@ -21,6 +21,8 @@ import project.domain.itemimage.repository.ItemImageRepository;
 import project.domain.member.Member;
 import project.domain.wishlist.WishList;
 import project.domain.wishlist.repository.WishlistRepository;
+import project.global.kafka.dto.view.ViewEventDTO;
+import project.global.kafka.service.view.ViewLogProducer;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
@@ -45,6 +47,7 @@ public class ItemService {
     private final AiSummaryRepository aiSummaryRepository;
     private final GraphRepository graphRepository;
     private final WishlistRepository wishlistRepository;
+    private final ViewLogProducer viewLogProducer;
 
     // 상품 정보 조회
     public ApiResponse<ItemInfoDTO> getItemInfo(Member member, Long itemId) {
@@ -63,6 +66,16 @@ public class ItemService {
         List<String> detailImages = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.DETAIL).stream()
                 .map(ItemImage::getUrl)
                 .toList();
+
+
+        // 조회 이벤트 발행(Kafka)
+        ViewEventDTO viewEventDTO = ViewEventDTO.builder()
+                .memberId(member.getId())
+                .itemId(itemId)
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        viewLogProducer.sendViewLog(viewEventDTO);
 
 
         ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages, wishStatus);
