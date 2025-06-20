@@ -49,7 +49,7 @@ public class CartController {
     public ApiResponse<CartItemDTO> addItemToCart(@Parameter(hidden = true) @LoginMember Member member,
                                                   @Parameter(description = "추가할 아이템의 ID") @PathVariable Long itemId,
                                                   @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO) {
-        return cartService.addItemToCart(member.getId(), itemId, addItemDTO);
+        return cartService.addItemToCart(member, itemId, addItemDTO);
     }
 
     @Operation(

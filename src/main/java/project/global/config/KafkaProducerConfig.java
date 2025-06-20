@@ -73,4 +73,32 @@ public class KafkaProducerConfig {
         template.setDefaultTopic("view-events");
         return template;
     }
+
+    // 장바구니 로그용 Prodcuer(신뢰+처리량 밸런스)
+    @Bean("cartProducerFactory")
+    public ProducerFactory<String, String> cartProducerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+
+        // 처리량 최우선 설정
+        props.put(ProducerConfig.ACKS_CONFIG, "all"); // 모든 replica가 확인
+        props.put(ProducerConfig.RETRIES_CONFIG, 5); // 5번만 재시도
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 32768); // 메세지가 32KB 쌓이면 전송
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 20); // 20ms가 지나면 메세지가 32KB 쌓이지 않아도 전송
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4"); // 빠른 압축
+        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 67108864); // 버퍼 크기 64MB
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 3); // 하나의 브로커가 동시에 3개 메세지를 받을 수 있음
+
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+    @Bean("cartKafkaTemplate")
+    public KafkaTemplate<String, String> cartKafkaTemplate() {
+        KafkaTemplate<String, String> template = new KafkaTemplate<>(cartProducerFactory());
+        template.setDefaultTopic("cart-events");
+        return template;
+    }
+
 }

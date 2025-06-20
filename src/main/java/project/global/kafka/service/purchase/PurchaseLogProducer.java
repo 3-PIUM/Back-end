@@ -71,33 +71,7 @@ public class PurchaseLogProducer {
 
     private void sendFailureAlert(PurchaseEventDTO event, Throwable ex) {
         // 중요한 구매 로그 실패이므로 즉시 알림
-        log.error("🚨 [긴급] 구매 이벤트 발행 실패: userId={}, error={}",
+        log.error("구매 이벤트 발행 실패: userId={}, error={}",
                 event.getMemberId(), ex.getMessage());
     }
-
-//    private void recordFailureMetric(PurchaseEventDTO event) {
-//        // 모니터링 시스템에 실패 메트릭 기록
-//        log.info("구매 로그 실패 메트릭 기록: userId={}, orderId={}, purchaseItemIds={}",
-//                event.getUserId(), event.getPurchaseHistoryId(), event.getPurchaseIds());
-//
-//        // TODO: Micrometer, Prometheus 등 메트릭 시스템 연동
-//        // meterRegistry.counter("purchase.log.failure",
-//        //     "userId", event.getUserId(),
-//        //     "productId", event.getProductId()).increment();
-//    }
-
-//    private void saveToBackupStorage(PurchaseEventDTO event) {
-//        // 최후의 수단: 파일 또는 DB에 백업 저장
-//        try {
-//            log.error("백업 저장소에 구매 로그 저장: userId={}, orderId={}",
-//                    event.getUserId(), event.getPurchaseHistoryId());
-//
-//            // TODO: 파일 시스템 또는 DB에 저장
-//            // backupService.savePurchaseEvent(event);
-//
-//        } catch (Exception e) {
-//            log.error("백업 저장도 실패 - 데이터 유실 위험: userId={}, orderId={}",
-//                    event.getUserId(), event.getPurchaseHistoryId(), e);
-//        }
-//    }
 }
