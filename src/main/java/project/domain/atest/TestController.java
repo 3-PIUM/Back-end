@@ -77,7 +77,7 @@ public class TestController {
             summary = "blue/green 헬스체크용"
     )
     @GetMapping("/health")
-    public ApiResponse<Void> health() {
-        return ApiResponse.OK;
+    public String health() {
+        return "ok";
     }
 }
