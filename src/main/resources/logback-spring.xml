@@ -1,27 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %5level --- [%thread] %logger : %msg%n</pattern>
-        </encoder>
-    </appender>
+    <!-- 기본 로그 설정 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/application.log</file>
+    <!-- 환경별 로그 레벨 설정 -->
+    <springProfile name="dev">
+        <root level="DEBUG"/>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="INFO"/>
+    </springProfile>
+
+    <!-- 구매 이벤트 전용 로그 파일 -->
+    <appender name="PURCHASE_EVENT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/events/purchase-events.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>./logs/application.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap>
+            <fileNamePattern>logs/events/purchase/purchase-events.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %5level --- [%thread] %logger{36} : %msg%n</pattern>
+            <pattern>%msg%n</pattern>
         </encoder>
     </appender>
 
+    <!-- 구매 에러 전용 로그 파일 -->
+    <appender name="PURCHASE_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/errors/purchase-errors.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/errors/purchase/purchase-errors.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </root>
+    <!-- 조회 이벤트 전용 로그 파일 -->
+    <appender name="VIEW_EVENT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/events/view-events.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/events/view/view-events.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>1GB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 조회 에러 전용 로그 파일 -->
+    <appender name="VIEW_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/errors/view-errors.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/errors/view/view-errors.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 장바구니 이벤트 전용 로그 파일 -->
+    <appender name="CART_EVENT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/events/cart-events.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/events/cart/cart-events.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>800MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>8GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 장바구니 에러 전용 로그 파일 -->
+    <appender name="CART_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/errors/cart-errors.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/errors/cart/cart-errors.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 로거 설정 -->
+    <logger name="PURCHASE_EVENT" level="DEBUG" additivity="false">
+        <appender-ref ref="PURCHASE_EVENT_FILE"/>
+    </logger>
+
+    <logger name="PURCHASE_ERROR" level="ERROR" additivity="false">
+        <appender-ref ref="PURCHASE_ERROR_FILE"/>
+    </logger>
+
+    <logger name="VIEW_EVENT" level="DEBUG" additivity="false">
+        <appender-ref ref="VIEW_EVENT_FILE"/>
+    </logger>
+
+    <logger name="VIEW_ERROR" level="ERROR" additivity="false">
+        <appender-ref ref="VIEW_ERROR_FILE"/>
+    </logger>
+
+    <logger name="CART_EVENT" level="DEBUG" additivity="false">
+        <appender-ref ref="CART_EVENT_FILE"/>
+    </logger>
+
+    <logger name="CART_ERROR" level="ERROR" additivity="false">
+        <appender-ref ref="CART_ERROR_FILE"/>
+    </logger>
 </configuration>

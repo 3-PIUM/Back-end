@@ -51,10 +51,7 @@ public class PurchaseLogService {
                 .skinIssues(purchaseEventDTO.getSkinIssues())
                 .cartItemIds(purchaseEventDTO.getCartItemIds())
                 .purchaseItemIds(purchaseEventDTO.getPurchaseItemIds())
-                .success(purchaseEventDTO.isSuccess())
-                .errorMessage(purchaseEventDTO.getErrorMessage())
-                .timestamp(purchaseEventDTO.getTimestamp())
-                .processingTimeMs(purchaseEventDTO.getProcessingTimeMs())
+                .timestamp(purchaseEventDTO.getEventTime())
                 .kafkaMetadata(KafkaMetadata.builder()
                         .topic(topic)
                         .partition(partition)
@@ -67,7 +64,7 @@ public class PurchaseLogService {
 
     private String generateDocumentId(PurchaseEventDTO dto, String topic, long partition, long offset) {
         return String.format("purchase_%s_%d_%d_%d_%d",
-                topic, partition, offset, dto.getTimestamp(), dto.getMemberId());
+                topic, partition, offset, dto.getEventTime(), dto.getMemberId());
     }
 
     private void saveToBackupStorage(PurchaseEventDTO dto, String topic, int partition, long offset, Exception e) {

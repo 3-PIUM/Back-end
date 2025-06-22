@@ -26,8 +26,5 @@ public class PurchaseEventDTO {
     private PersonalType personalType;
     private List<Long> cartItemIds;
     private List<Long> purchaseItemIds;
-    private boolean success;
-    private String errorMessage;
-    private long timestamp;
-    private long processingTimeMs;
+    private long eventTime;
 }
