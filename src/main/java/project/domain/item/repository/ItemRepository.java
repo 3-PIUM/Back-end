@@ -9,29 +9,34 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query("""
-            SELECT DISTINCT i FROM Item i
-            LEFT JOIN FETCH i.itemImages img
-            WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
-            AND (img.imageType = 'MAIN' OR img IS NULL)
-            """)
-    List<Item> findBySubCategoryNameWithMainImage(
-            @Param("subCategoryName") String subCategoryName
-    );
-
-    @Query("""
-            SELECT DISTINCT i FROM Item i
-            LEFT JOIN FETCH i.itemImages img
-            INNER JOIN i.itemScores s
-            WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
-            AND s.name = :skinIssue
-            AND (img.imageType = 'MAIN' OR img IS NULL)
-            ORDER BY s.score DESC
-            """)
-    List<Item> findBySubCategoryNameAndSkinIssueWithMainImage(
-            @Param("subCategoryName") String subCategoryName,
-            @Param("skinIssue") String skinIssue
-    );
+//    @Query("""
+//            SELECT DISTINCT i FROM Item i
+//            LEFT JOIN FETCH i.itemImages img
+//            WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
+//            AND (img.imageType = 'MAIN' OR img IS NULL)
+//            ORDER BY (
+//                    SELECT SUM(s.score)
+//                    FROM ItemScore s
+//                    WHERE s.item = i
+//                ) DESC
+//            """)
+//    List<Item> findBySubCategoryNameWithMainImage(
+//            @Param("subCategoryName") String subCategoryName
+//    );
+//
+//    @Query("""
+//            SELECT DISTINCT i FROM Item i
+//            LEFT JOIN FETCH i.itemImages img
+//            INNER JOIN i.itemScores s
+//            WHERE UPPER(i.subCategory.name) = UPPER(:subCategoryName)
+//            AND s.name = :skinIssue
+//            AND (img.imageType = 'MAIN' OR img IS NULL)
+//            ORDER BY s.score DESC
+//            """)
+//    List<Item> findBySubCategoryNameAndSkinIssueWithMainImage(
+//            @Param("subCategoryName") String subCategoryName,
+//            @Param("skinIssue") String skinIssue
+//    );
 
     @Query("""
             SELECT DISTINCT i FROM Item i
@@ -50,31 +55,36 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             String keyword
     );
 
-    @Query("""
-            SELECT i FROM Item i
-            LEFT JOIN FETCH i.itemImages img
-            WHERE (i.veganType = 'VEGAN')
-            AND (img.imageType = 'MAIN' OR img is null)
-            AND (i.subCategory.name = :subCategoryName)
-            """)
-    List<Item> findByVeganTypeWithMainImage(
-            @Param("subCategoryName") String subCategoryName
-    );
-
-    @Query("""
-            SELECT i FROM Item i
-            LEFT JOIN FETCH i.itemImages img
-            INNER JOIN i.itemScores s
-            WHERE (i.veganType = 'VEGAN')
-            AND s.name = :skinIssue
-            AND (img.imageType = 'MAIN' OR img is null)
-            AND (i.subCategory.name = :subCategoryName)
-            ORDER BY s.score DESC
-            """)
-    List<Item> findByVeganItemsAndSkinIssueWithMainImage(
-            @Param("subCategoryName") String subCategoryName,
-            @Param("skinIssue")String skinIssue
-    );
+//    @Query("""
+//            SELECT i FROM Item i
+//            LEFT JOIN FETCH i.itemImages img
+//            WHERE (i.veganType = 'VEGAN')
+//            AND (img.imageType = 'MAIN' OR img is null)
+//            AND (i.subCategory.name = :subCategoryName)
+//            ORDER BY (
+//                    SELECT SUM(s2.score)
+//                    FROM ItemScore s2
+//                    WHERE s2.item = i
+//                ) DESC
+//            """)
+//    List<Item> findByVeganTypeWithMainImage(
+//            @Param("subCategoryName") String subCategoryName
+//    );
+//
+//    @Query("""
+//            SELECT i FROM Item i
+//            LEFT JOIN FETCH i.itemImages img
+//            INNER JOIN i.itemScores s
+//            WHERE (i.veganType = 'VEGAN')
+//            AND s.name = :skinIssue
+//            AND (img.imageType = 'MAIN' OR img is null)
+//            AND (i.subCategory.name = :subCategoryName)
+//            ORDER BY s.score DESC
+//            """)
+//    List<Item> findByVeganItemsAndSkinIssueWithMainImage(
+//            @Param("subCategoryName") String subCategoryName,
+//            @Param("skinIssue")String skinIssue
+//    );
 
     /*
         구매내역 순으로 10개의 아이템 추천

@@ -31,9 +31,10 @@ public class ItemSearchController {
     public ApiResponse<ItemSearchResultDTO> getItemsBySubCategory(
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "서브 카테고리명") @PathVariable String subCategory,
-            @Parameter(description = "피부 고민") @RequestParam(defaultValue = "") String skinIssue
+            @Parameter(description = "피부 고민") @RequestParam(defaultValue = "") String skinIssue,
+            @Parameter(description = "정렬 타입") @RequestParam(defaultValue = "") String priceSort
     ) {
-        return itemSearchService.getItemsBySubCategory(subCategory, member, skinIssue);
+        return itemSearchService.getItemsBySubCategory(subCategory, member, skinIssue, priceSort);
     }
 
     @Operation(
@@ -56,10 +57,11 @@ public class ItemSearchController {
     public ApiResponse<ItemSearchResultDTO> getVeganItems(
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "서브 카테고리명") @PathVariable String subCategory,
-            @Parameter(description = "피부 고민") @RequestParam(defaultValue = "") String skinIssue
+            @Parameter(description = "피부 고민") @RequestParam(defaultValue = "") String skinIssue,
+            @Parameter(description = "정렬타입") @RequestParam(defaultValue = "") String priceSort
     ) {
 
-        return itemSearchService.getVeganItems(member, subCategory, skinIssue);
+        return itemSearchService.getVeganItems(member, subCategory, skinIssue, priceSort);
     }
 
     @Operation(
