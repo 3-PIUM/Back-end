@@ -140,6 +140,20 @@ services:
       KAFKA_CONFLUENT_SUPPORT_CUSTOMER_ID: anonymous
       KAFKA_CONFLUENT_CLUSTER_LINK_ENABLE: 'true'
 
+  # Kafka UI (선택사항 - 관리 편의성을 위해)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    networks:
+      - elk
+    ports:
+      - "28080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "docker-local"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
+    depends_on:
+      kafka:
+        condition: service_healthy
 
 volumes:
   elasticsearch_data: # docker 볼륨 이름
