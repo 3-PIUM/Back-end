@@ -85,6 +85,38 @@ services:
     networks:
       - elk
 
+  # S3 백업 전용 컨테이너 (스크립트 기반 - 안정적)
+  backup:
+    image: alpine:latest
+    container_name: backup
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_BUCKET=${S3_LOG_BUCKET}
+      - S3_PREFIX=${S3_LOG_PREFIX}
+    volumes:
+      - ./logs:/logs
+    restart: unless-stopped
+    command: |
+      sh -c '
+       apk add --no-cache aws-cli dcron
+      
+        # 한 번에 모든 크론 작업 설정
+        # 1분마다 .gz 파일 체크 후 s3업로드(테스트)
+        # 새벽 2시마다 7일이상 지난 파일 정리
+        # 디스크 사용량 80% 이상시 긴급 정리 (매시간 체크)
+        echo "*/1 * * * * find /logs -name \"*.gz\" -exec aws s3 cp {} s3://'"$$S3_BUCKET"'/'"$$S3_PREFIX"'/\$(date +%Y/%m/%d)/ \; -delete
+        0 2 * * * find /logs -name \"*.log\" -mtime +7 -delete; find /logs -type d -empty -delete  
+        0 * * * * [ \$(df /logs | awk \"NR==2 {print \\\$5}\" | sed \"s/%//\") -gt 80 ] && find /logs -name \"*.log\" -mtime +3 -delete" | crontab -
+      
+        echo "All cron jobs configured:"
+        crontab -l
+      
+        crond && tail -f /dev/null
+      '
+    networks:
+      - elk
+
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     hostname: kafka
