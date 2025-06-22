@@ -8,9 +8,8 @@ import java.util.List;
 
 public abstract class ItemSearchConverter {
 
-    public static ItemSearchResultDTO toItemSearchInfoDTO(List<Item> items, int pageNumber, List<Long> wishListIds) {
+    public static ItemSearchResultDTO toItemSearchInfoDTO(List<Item> items, List<Long> wishListIds) {
         return ItemSearchResultDTO.builder()
-                .pageNumber(pageNumber)
                 .itemCount(items.size())
                 .itemSearchInfoDTOs(items.stream()
                         .map(i -> toItemSearchDetailInfoDTO(i, wishListIds.contains(i.getId())))

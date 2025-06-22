@@ -25,7 +25,6 @@ public abstract class ItemSearchResponse {
     @Builder
     @AllArgsConstructor
     public static class ItemSearchResultDTO {
-        private int pageNumber;
         private int itemCount;
         private List<ItemSearchInfoDTO> itemSearchInfoDTOs;
     }
