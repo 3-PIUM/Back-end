@@ -12,8 +12,9 @@ public class ChatResponseDTO {
     @Data
     public static class Item {
 
-        private Long item_id;
-        private String item_name;
-        private String item_image;
+        private Long itemId;
+        private String itemName;
+        private String itemImage;
+        private Integer discountPrice;
     }
 }

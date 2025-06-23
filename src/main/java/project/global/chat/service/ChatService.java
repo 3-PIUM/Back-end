@@ -11,12 +11,12 @@ import reactor.core.publisher.Mono;
 @Service
 public class ChatService {
 
-    private final WebClient webClient = WebClient.create("http://your-ml-api:8000");
+    private final WebClient webClient = WebClient.create("http://52.79.241.142:8000");
 
     public Mono<ChatResponseDTO> sendToFastApi(ChatRequestDTO request, Member member) {
-        request.setMemberId(member.getId());
+        request.setSession_id(member.getEmail());
         return webClient.post()
-            .uri("http://fastapi/chat")
+            .uri("http://52.79.241.142:8000/chat")
             .bodyValue(request)
             .retrieve()
             .bodyToMono(ChatResponseDTO.class);

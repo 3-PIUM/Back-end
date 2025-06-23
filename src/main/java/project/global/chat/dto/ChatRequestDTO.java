@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChatRequestDTO {
-    private Long memberId;
+    private String session_id;
     private String message;
     private String lang;
     private List<Long> item_ids;
