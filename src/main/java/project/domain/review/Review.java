@@ -35,6 +35,7 @@ public class Review extends BaseEntity {
     private List<SelectOption> selectOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ReviewRecommendStatus> reviewRecommendStatusList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
