@@ -72,7 +72,8 @@ public class ItemDynamicSort {
     private static void setDynamicOptions(String skinIssue, String priceSort, JPAQuery<Item> query, QItem item, QItemScore score) {
         if (StringUtils.hasText(skinIssue)) {
             query.innerJoin(item.itemScores, score)
-                    .where(score.name.eq(skinIssue));
+                    .where(score.name.eq(skinIssue),
+                            score.score.ne(0));
         }
 
         // 정렬 조건 동적 추가
