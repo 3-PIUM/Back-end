@@ -12,6 +12,7 @@ import project.domain.member.Member;
 import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -39,14 +40,26 @@ public class ItemSearchController {
 
     @Operation(
             summary = "검색 키워드 관련 아이템 조회",
-            description = "검색 키워드와 유사한 아이템 정보를 20개씩 조회합니다."
+            description = "검색 키워드와 유사한 아이템 정보를 조회합니다."
     )
     @GetMapping("/search/list/{keyword}")
-    public ApiResponse<ItemSearchResultDTO> getItemsByKeyword(
+    public ApiResponse<ItemSearchResultDTO> searchByKeyword(
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "검색 키워드") @PathVariable String keyword
     ) {
-        return itemSearchService.getItemsByKeyword(member, keyword);
+        return itemSearchService.searchByKeyword(member, keyword);
+    }
+
+    @Operation(
+            summary = "(향상된 버전) 검색 키워드 관련 아이템 조회",
+            description = "검색 키워드와 유사한 아이템 정보를 조회합니다."
+    )
+    @GetMapping("/advancedSearch/list/{keyword}")
+    public ApiResponse<ItemSearchResultDTO> advancedSearchByKeyword(
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "검색 키워드") @PathVariable String keyword
+    ) throws IOException {
+        return itemSearchService.AdvancedSearchByKeyword(member, keyword);
     }
 
     @Operation(

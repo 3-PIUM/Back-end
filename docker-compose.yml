@@ -28,6 +28,34 @@ services:
       timeout: 10s
       retries: 3
 
+  item-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: item-elasticsearch
+    environment:
+      - node.name=item-es
+      - cluster.name=item-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"  # 로그용보다 작게 설정
+      - xpack.security.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - item_elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    networks:
+      - elk
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Logstash 서비스 - 로그 수집, 변환, 전송 파이프라인
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.0  # Logstash 8.11.0 이미지 사용
@@ -102,10 +130,10 @@ services:
        apk add --no-cache aws-cli dcron
       
         # 한 번에 모든 크론 작업 설정
-        # 1분마다 .gz 파일 체크 후 s3업로드(테스트)
+        # 30분마다 .gz 파일 체크 후 s3업로드(테스트)
         # 새벽 2시마다 7일이상 지난 파일 정리
         # 디스크 사용량 80% 이상시 긴급 정리 (매시간 체크)
-        echo "*/1 * * * * find /logs -name \"*.gz\" -exec aws s3 cp {} s3://'"$$S3_BUCKET"'/'"$$S3_PREFIX"'/\$(date +%Y/%m/%d)/ \; -delete
+        echo "*/30 * * * * find /logs -name \"*.gz\" -exec aws s3 cp {} s3://'"$$S3_BUCKET"'/'"$$S3_PREFIX"'/\$(date +%Y/%m/%d)/ \; -delete
         0 2 * * * find /logs -name \"*.log\" -mtime +7 -delete; find /logs -type d -empty -delete  
         0 * * * * [ \$(df /logs | awk \"NR==2 {print \\\$5}\" | sed \"s/%//\") -gt 80 ] && find /logs -name \"*.log\" -mtime +3 -delete" | crontab -
       
@@ -177,6 +205,8 @@ volumes:
   elasticsearch_data: # docker 볼륨 이름
     driver: local # docker가 기본 방식으로 로컬 디스크에 데이터를 저장
   kafka_data:
+    driver: local
+  item_elasticsearch_data:
     driver: local
 networks:
   elk: # ELK가 서로 네트워크 상에서 통신할 수 있게 도와줌
