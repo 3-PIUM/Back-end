@@ -4,13 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.domain.item.dto.ItemResponse.*;
 import project.domain.item.service.ItemService;
 import project.domain.member.Member;
+import project.global.redis.service.ItemViewRedis;
 import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
 
@@ -21,6 +19,7 @@ import project.global.security.annotation.LoginMember;
 public class ItemController {
 
     private final ItemService itemService;
+    private final ItemViewRedis itemViewRedis;
 
     @Operation(
             summary = "상품 정보 조회",
@@ -31,9 +30,33 @@ public class ItemController {
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "아이템 ID") @PathVariable Long itemId
     ) {
+        // 조회수 증가
+        itemViewRedis.incrementViewCount(itemId);
+
         return itemService.getItemInfo(member, itemId);
     }
 
+    @Operation(
+            summary = "상품 조회수 감소"
+    )
+    @PostMapping("view/{itemId}/decrease")
+    public ApiResponse<Void> decrementItemViewCount(
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId
+    ) {
+        // 조회수 감소
+        itemViewRedis.decrementViewCount(itemId);
+
+        return ApiResponse.OK;
+    }
+
+    @Operation(
+            summary = "특정 상품 조회수 조회(실시간)"
+    )
+    @GetMapping("/{itemId}/view-count")
+    public ApiResponse<Long> getViewCount(@PathVariable Long itemId) {
+        Long viewCount = itemViewRedis.getViewCount(itemId);
+        return ApiResponse.onSuccess(viewCount);
+    }
 
     @Operation(
             summary = "성분 스코어 개수 조회",

@@ -3,6 +3,7 @@ package project.domain.item.dto;
 import project.domain.item.Item;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchInfoDTO;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
+import project.domain.item.dto.ItemSearchResponse.Top10ItemsInfoDTO;
 
 import java.util.List;
 
@@ -30,4 +31,17 @@ public abstract class ItemSearchConverter {
                 .build();
     }
 
+    public static List<Top10ItemsInfoDTO> toTop10ItemsInfoDTOs(List<Item> items) {
+        return items.stream()
+                .map(i -> Top10ItemsInfoDTO.builder()
+                        .itemId(i.getId())
+                        .itemName(i.getName())
+                        .itemImage(!i.getItemImages().isEmpty()
+                                ? i.getItemImages().get(0).getUrl() : null)
+                        .originalPrice(i.getOriginalPrice())
+                        .salePrice(i.getSalePrice())
+                        .discountRate(i.getDiscountRate())
+                        .build())
+                .toList();
+    }
 }

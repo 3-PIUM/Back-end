@@ -13,12 +13,14 @@ import project.domain.item.Item;
 import project.domain.item.dto.ItemSearchConverter;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchInfoDTO;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
+import project.domain.item.dto.ItemSearchResponse.Top10ItemsInfoDTO;
 import project.domain.item.repository.ItemDynamicSort;
 import project.domain.item.repository.ItemRepository;
 import project.domain.member.Member;
 import project.domain.wishlist.WishList;
 import project.domain.wishlist.repository.WishlistRepository;
 import project.global.elasticsearch.document.ItemDocument;
+import project.domain.popularitem.dto.PopularItemDTO;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
@@ -221,6 +223,17 @@ public class ItemSearchService {
         ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(
                 veganItems, wishListIds);
         return ApiResponse.onSuccess(itemSearchResultDTO);
+    }
+
+    public ApiResponse<List<Top10ItemsInfoDTO>> getTop10Items(List<PopularItemDTO> top10Items) {
+        List<Long> itemIds = top10Items.stream()
+                .map(PopularItemDTO::getItemId)
+                .toList();
+
+        List<Item> items = itemRepository.findItemByItemIdsWithMainImage(itemIds);
+
+        List<Top10ItemsInfoDTO> top10ItemsInfoDTOs = ItemSearchConverter.toTop10ItemsInfoDTOs(items);
+        return ApiResponse.onSuccess(top10ItemsInfoDTOs);
     }
 
 }
