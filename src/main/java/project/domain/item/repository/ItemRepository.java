@@ -55,6 +55,18 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             String keyword
     );
 
+    /*
+        검색 키워드에 맞는 아이템 정보 조회(ElasticSearch 전용)
+     */
+    @Query(value = """
+            SELECT DISTINCT i FROM Item i
+            LEFT JOIN FETCH i.itemImages img
+            WHERE i.id IN :itemIds
+            AND (img.imageType = 'MAIN' OR img IS NULL)
+            """)
+    List<Item> findItemByItemIdsWithMainImage(@Param("itemIds") List<Long> itemIds);
+
+
 //    @Query("""
 //            SELECT i FROM Item i
 //            LEFT JOIN FETCH i.itemImages img
@@ -98,4 +110,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                 LIMIT 10
             """, nativeQuery = true)
     List<Item> findTop10ItemsByCategory(@Param("categoryId") Long categoryId);
+
+
 }
