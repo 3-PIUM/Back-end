@@ -77,6 +77,14 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
 
+    //WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // STOMP 메시지 브로커
+    implementation 'org.springframework:spring-messaging'
+    // WebClient (FastAPI HTTP 호출)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // (Optional) JSON 직렬화 Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // 테스트 관련 코드
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
