@@ -7,8 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchInfoDTO;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
+import project.domain.item.dto.ItemSearchResponse.Top10ItemsInfoDTO;
 import project.domain.item.service.ItemSearchService;
 import project.domain.member.Member;
+import project.domain.popularitem.dto.PopularItemDTO;
+import project.global.redis.service.ItemViewRedis;
 import project.global.response.ApiResponse;
 import project.global.security.annotation.LoginMember;
 
@@ -23,10 +26,22 @@ import java.util.List;
 public class ItemSearchController {
 
     private final ItemSearchService itemSearchService;
+    private final ItemViewRedis itemViewRedis;
+
+    @Operation(
+            summary = "현재 인기 있는 상품 TOP 10 조회",
+            description = "1시간 간격으로 업데이트 됩니다."
+    )
+    @GetMapping("/top10")
+    public ApiResponse<List<Top10ItemsInfoDTO>> getTop10Items() {
+        List<PopularItemDTO> top10PopularItems = itemViewRedis.getTop10PopularItems();
+        return itemSearchService.getTop10Items(top10PopularItems);
+    }
+
 
     @Operation(
             summary = "서브 카테고리 아이템 조회",
-            description = "입력한 서브 카테고리에 해당하는 아이템들을 500개씩 조회합니다."
+            description = "입력한 서브 카테고리에 해당하는 아이템들을 조회합니다."
     )
     @GetMapping("/list/{subCategory}")
     public ApiResponse<ItemSearchResultDTO> getItemsBySubCategory(
