@@ -7,9 +7,9 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET_NAME: pium-deploy-bucket
-  CODE_DEPLOY_APPLICATION_NAME: pium-dev
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: pium-deploy-group
+  S3_BUCKET_NAME: piumbucket
+  CODE_DEPLOY_APPLICATION_NAME: pium-deploy
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: pium-deploy
 
 permissions:
   contents: read
@@ -55,6 +55,8 @@ jobs:
           echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} >> $ENV_PATH
           echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} >> $ENV_PATH
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> $ENV_PATH
+          echo S3_AWS_ACCESS_KEY=${{ secrets.S3_AWS_ACCESS_KEY }} >> $ENV_PATH
+          echo S3_AWS_SECRET_KEY=${{ secrets.S3_AWS_SECRET_KEY }} >> $ENV_PATH
           
 
       - name: Configure AWS credentials
