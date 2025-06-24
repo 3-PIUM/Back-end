@@ -46,6 +46,7 @@ public abstract class ReviewResponse {
     public static class ReviewDTO {
         private Long reviewId;
         private Long memberId;
+        private String memberName;
         private String content;
         private Double rating;
         private List<String> reviewImages;

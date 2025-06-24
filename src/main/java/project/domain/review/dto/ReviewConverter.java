@@ -93,6 +93,7 @@ public abstract class ReviewConverter {
                         .map(review -> ReviewDTO.builder()
                                 .reviewId(review.getId())
                                 .memberId(review.getMember().getId())
+                                .memberName(review.getMember().getNickname())
                                 .rating(review.getRating())
                                 .content(review.getContent())
                                 .reviewImages(review.getReviewImages().stream()
