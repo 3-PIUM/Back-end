@@ -178,8 +178,6 @@ volumes:
     driver: local # docker가 기본 방식으로 로컬 디스크에 데이터를 저장
   kafka_data:
     driver: local
-  item_elasticsearch_data:
-    driver: local
 networks:
   elk: # ELK가 서로 네트워크 상에서 통신할 수 있게 도와줌
     driver: bridge # 기본 브리지 네트워크 방식 사용
