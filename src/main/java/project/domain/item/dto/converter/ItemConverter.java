@@ -1,9 +1,10 @@
-package project.domain.item.dto;
+package project.domain.item.dto.converter;
 
 import project.domain.aisummary.AiSummary;
 import project.domain.containingredient.ContainIngredient;
 import project.domain.graph.Graph;
 import project.domain.item.Item;
+import project.domain.item.dto.ItemResponse;
 import project.domain.item.dto.ItemResponse.*;
 import project.domain.itemoption.ItemOption;
 

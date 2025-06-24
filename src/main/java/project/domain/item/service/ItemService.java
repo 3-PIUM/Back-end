@@ -12,7 +12,7 @@ import project.domain.graph.Graph;
 import project.domain.graph.repository.GraphRepository;
 import project.domain.ingredient.enums.Risk;
 import project.domain.item.Item;
-import project.domain.item.dto.ItemConverter;
+import project.domain.item.dto.converter.ItemConverter;
 import project.domain.item.dto.ItemResponse.*;
 import project.domain.item.repository.ItemRepository;
 import project.domain.itemimage.ItemImage;
