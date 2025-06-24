@@ -15,24 +15,16 @@ import org.springframework.context.annotation.Primary;
 @Slf4j
 public class ElasticSearchConfig {
 
-    @Value("${elasticsearch.search.uris}")
-    private String searchUri;
-
-    @Value("${elasticsearch.logs.uris}")
-    private String logsUri;
+    @Value("${elasticsearch.host.uris}")
+    private String uri;
 
     // 상품 검색용 Elasticsearch 클라이언트 Bean 등록
-    @Bean(name = "searchElasticsearchClient")
+    @Bean(name = "elasticsearchClient")
     @Primary
-    public ElasticsearchClient searchElasticsearchClient() {
-        return createElasticsearchClient(searchUri);
+    public ElasticsearchClient elasticsearchClient() {
+        return createElasticsearchClient(uri);
     }
 
-    // 로그 분석용 Elasticsearch 클라이언트 Bean 등록
-    @Bean(name = "logsElasticsearchClient")
-    public ElasticsearchClient logsElasticsearchClient() {
-        return createElasticsearchClient(logsUri);
-    }
 
     // 주어진 URL로 Elasticsearch 클라이언트를 생성하는 공통 메서드
     private ElasticsearchClient createElasticsearchClient(String url) {
