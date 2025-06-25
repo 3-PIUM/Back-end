@@ -1,4 +1,4 @@
-package project.global.redis.service;
+package project.global.redis.service.popular;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,9 +6,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.global.redis.dto.ItemViewCountDTO;
 import project.domain.popularitem.PopularItem;
 import project.domain.popularitem.repository.PopularItemRepository;
+import project.global.redis.dto.ItemViewCountDTO;
 
 import java.time.Duration;
 import java.util.*;
@@ -18,11 +18,11 @@ import java.util.*;
 @Slf4j
 public class PopularItemsBatchService {
 
-    private static final String POPULAR_ITEMS_KEY = "now:popular:items";
+    private static final String POPULAR_ITEMS_KEY = "popular_items";
     private final RedisTemplate<String, Object> redisTemplate;
     private final PopularItemRepository popularItemRepository;
 
-    // 1시간마다 인기 상품 계산 및 업데이트
+    // 1시간마다 인기 상품 계산 및 업데이트(누적 조회수 이용)
     @Scheduled(fixedRate = 60 * 60 * 1000)
     @Transactional
     public void calculatePopularItems() {
@@ -53,6 +53,7 @@ public class PopularItemsBatchService {
             log.error("인기 상품 배치 처리 중 오류 발생");
         }
     }
+
 
     // Redis에서 모든 조회수 조회
     private List<ItemViewCountDTO> getAllViewCounts() {
