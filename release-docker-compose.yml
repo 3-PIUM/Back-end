@@ -5,8 +5,21 @@ services:
     restart: always
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+#    env_file:
+#      - .env
+    environment:
+      SPRING_DB_ENDPOINT: ${SPRING_DB_ENDPOINT}
+      SPRING_DB_USERNAME: ${SPRING_DB_USERNAME}
+      SPRING_DB_PASSWORD: ${SPRING_DB_PASSWORD}
+      SPRING_REDIS_ENDPOINT: ${SPRING_REDIS_ENDPOINT}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      SPRING_AWS_ACCESS_KEY: ${SPRING_AWS_ACCESS_KEY}
+      SPRING_AWS_SECRET_KEY: ${SPRING_AWS_SECRET_KEY}
+      SPRING_S3_AWS_ACCESS_KEY: ${SPRING_S3_AWS_ACCESS_KEY}
+      SPRING_S3_AWS_SECRET_KEY: ${SPRING_S3_AWS_SECRET_KEY}
+      SPRING_JWT_SECRET_KEY: ${SPRING_JWT_SECRET_KEY}
+      SPRING_PROFILES_ACTIVE: prod
     container_name: pium-spring
     depends_on:
       kafka:
