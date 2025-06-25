@@ -19,11 +19,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Create application.yml from secret
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+
+      - name: Check application.yml content
+        run: |
+          echo "application.yml 내용 일부:"
+          head -n 20 src/main/resources/application.yml
+          echo "redis 설정 확인:"
+          grep 'redis' src/main/resources/application.yml || echo "redis 키워드 없음"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -33,6 +46,14 @@ jobs:
       
       - name: 확인 - build/libs 내부 확인
         run: ls -al build/libs
+
+      - name: Check application.yml inside built jar
+        run: |
+          JAR_PATH=$(find build/libs -name "*.jar" ! -name "*plain*" | head -n 1)
+          echo "Found JAR: $JAR_PATH"
+          unzip -l "$JAR_PATH" | grep application.yml || echo "application.yml not found in jar"
+          echo "application.yml content inside jar (first 20 lines):"
+          unzip -p "$JAR_PATH" application.yml | head -n 20 || echo "application.yml not found in jar"
 
       - name: Rename JAR file to app.jar
         run: |
@@ -52,12 +73,11 @@ jobs:
           echo REDIS_HOST=${{ secrets.DEV_REDIS_HOST }} >> $ENV_PATH
           echo MAIL_USERNAME=${{ secrets.MAIL_USERNAME }} >> $ENV_PATH
           echo MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} >> $ENV_PATH
-          echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} >> $ENV_PATH
-          echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} >> $ENV_PATH
+          echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} >> $ENV_PATH
+          echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> $ENV_PATH
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> $ENV_PATH
-          echo S3_AWS_ACCESS_KEY=${{ secrets.S3_AWS_ACCESS_KEY }} >> $ENV_PATH
-          echo S3_AWS_SECRET_KEY=${{ secrets.S3_AWS_SECRET_KEY }} >> $ENV_PATH
-          
+          echo S3_AWS_ACCESS_KEY=${{ secrets.S3_AWS_ACCESS_KEY_ID }} >> $ENV_PATH
+          echo S3_AWS_SECRET_KEY=${{ secrets.S3_AWS_SECRET_ACCESS_KEY }} >> $ENV_PATH
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
