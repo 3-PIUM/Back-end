@@ -27,6 +27,7 @@ public class ChatController {
         @LoginMember Member member,
         @RequestBody ChatRequestDTO request) {
         ChatResponseDTO response = chatService.sendToFastApi(request, member).block();
-        return ApiResponse.onSuccess(response);
+        ChatResponseDTO imgUrl = chatService.getImgUrl(response);
+        return ApiResponse.onSuccess(imgUrl);
     }
 }
