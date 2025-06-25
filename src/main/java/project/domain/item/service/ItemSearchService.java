@@ -131,9 +131,10 @@ public class ItemSearchService {
     /*
     개선된 검색 키워드에 맞는 아이템 조회(ElasticSearch 활용)
      */
-    public ApiResponse<ItemSearchResultDTO> AdvancedSearchByKeyword(Member member, String keyword) throws IOException {
+    public ApiResponse<ItemSearchResultDTO> AdvancedSearchByKeyword(Member member, String keyword, Integer size) throws IOException {
         SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index("items")
+                .size(size)
                 .query(q -> q
                         .bool(b -> b
                                 // 상품명 정확 매칭 (최우선)

@@ -72,9 +72,10 @@ public class ItemSearchController {
     @GetMapping("/advancedSearch/list/{keyword}")
     public ApiResponse<ItemSearchResultDTO> advancedSearchByKeyword(
             @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "검색 키워드") @PathVariable String keyword
+            @Parameter(description = "검색 키워드") @PathVariable String keyword,
+            @Parameter(description = "검색 키워드") @RequestParam(defaultValue = "10") Integer size
     ) throws IOException {
-        return itemSearchService.AdvancedSearchByKeyword(member, keyword);
+        return itemSearchService.AdvancedSearchByKeyword(member, keyword, size);
     }
 
     @Operation(
