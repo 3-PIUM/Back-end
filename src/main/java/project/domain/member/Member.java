@@ -17,7 +17,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.domain.cart.Cart;
 import project.domain.common.BaseEntity;
+import project.domain.review.Review;
+import project.domain.wishlist.WishList;
 import project.global.converter.CustomStringListConverter;
 import project.global.enums.skin.AxisType;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
@@ -100,12 +103,20 @@ public class Member extends BaseEntity {
     @Column(name = "skin_issue")
     private List<String> skinIssue;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WishList> wishList;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cart> cartList;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseHistory> purchaseHistoryList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewRecommendStatus> reviewRecommendStatusList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviewList;
 
     //TODO
     // 설문을 이용한 사용자의 피부 MBTI를 저장합니다.
