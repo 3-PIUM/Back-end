@@ -26,17 +26,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Create application.yml from secret
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+#      - name: Create application.yml from secret
+#        run: |
+#          mkdir -p src/main/resources
+#          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
 
-      - name: Check application.yml content
-        run: |
-          echo "application.yml 내용 일부:"
-          head -n 20 src/main/resources/application.yml
-          echo "redis 설정 확인:"
-          grep 'redis' src/main/resources/application.yml || echo "redis 키워드 없음"
+#      - name: Check application.yml content
+#        run: |
+#          echo "application.yml 내용 일부:"
+#          head -n 20 src/main/resources/application.yml
+#          echo "redis 설정 확인:"
+#          grep 'redis' src/main/resources/application.yml || echo "redis 키워드 없음"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -47,13 +47,13 @@ jobs:
       - name: 확인 - build/libs 내부 확인
         run: ls -al build/libs
 
-      - name: Check application.yml inside built jar
-        run: |
-          JAR_PATH=$(find build/libs -name "*.jar" ! -name "*plain*" | head -n 1)
-          echo "Found JAR: $JAR_PATH"
-          unzip -l "$JAR_PATH" | grep application.yml || echo "application.yml not found in jar"
-          echo "application.yml content inside jar (first 20 lines):"
-          unzip -p "$JAR_PATH" application.yml | head -n 20 || echo "application.yml not found in jar"
+#      - name: Check application.yml inside built jar
+#        run: |
+#          JAR_PATH=$(find build/libs -name "*.jar" ! -name "*plain*" | head -n 1)
+#          echo "Found JAR: $JAR_PATH"
+#          unzip -l "$JAR_PATH" | grep application.yml || echo "application.yml not found in jar"
+#          echo "application.yml content inside jar (first 20 lines):"
+#          unzip -p "$JAR_PATH" application.yml | head -n 20 || echo "application.yml not found in jar"
 
       - name: Rename JAR file to app.jar
         run: |
