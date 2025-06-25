@@ -32,6 +32,7 @@ public abstract class WishListResponse {
     public static class ItemSummaryDTO {
         private Long itemId;
         private String itemName;
+        private String brand;
         private String mainImageUrl;
         private Integer originalPrice;
         private Integer salePrice;
