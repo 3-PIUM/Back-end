@@ -10,13 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import project.domain.category.Category;
 import project.domain.category.repository.CategoryRepository;
 import project.domain.item.Item;
-import project.domain.item.dto.converter.ItemSearchConverter;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchInfoDTO;
 import project.domain.item.dto.ItemSearchResponse.ItemSearchResultDTO;
+import project.domain.item.dto.converter.ItemSearchConverter;
 import project.domain.item.repository.ItemDynamicSort;
 import project.domain.item.repository.ItemRepository;
 import project.domain.member.Member;
-import project.domain.wishlist.WishList;
 import project.domain.wishlist.repository.WishlistRepository;
 import project.global.elasticsearch.document.ItemDocument;
 import project.global.response.ApiResponse;
@@ -24,6 +23,7 @@ import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,10 +48,8 @@ public class ItemSearchService {
             String priceSort
     ) {
         // 찜한 상품 Id
-        List<Long> wishListIds = wishlistRepository.findByMemberId(member.getId())
-                .stream()
-                .map(w -> w.getItem().getId())
-                .toList();
+        List<Long> wishListIds = getWishListIds(member);
+
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         List<Item> items = itemDynamicSort.findItemsWithDSL(
@@ -80,10 +78,7 @@ public class ItemSearchService {
             Member member,
             String categoryName) {
         // 찜한 상품 Id
-        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
-        List<Long> wishListIds = wishLists.stream()
-                .map(w -> w.getItem().getId())
-                .toList();
+        List<Long> wishListIds = getWishListIds(member);
 
         Long categoryId;
         if (categoryName == null || categoryName.isEmpty()) {
@@ -111,10 +106,7 @@ public class ItemSearchService {
     public ApiResponse<ItemSearchResultDTO> searchByKeyword(Member member, String keyword) {
 
         // 찜한 상품 Id
-        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
-        List<Long> wishListIds = wishLists.stream()
-                .map(w -> w.getItem().getId())
-                .toList();
+        List<Long> wishListIds = getWishListIds(member);
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         List<Item> items = itemRepository.findByKeywordWithMainImage(keyword);
@@ -178,10 +170,7 @@ public class ItemSearchService {
         }
 
         // 찜한 상품 Id
-        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
-        List<Long> wishListIds = wishLists.stream()
-                .map(w -> w.getItem().getId())
-                .toList();
+        List<Long> wishListIds = getWishListIds(member);
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(itemIds);
@@ -201,10 +190,7 @@ public class ItemSearchService {
             Member member, String subCategory, String skinIssue, String priceSort) {
 
         // 찜한 상품 Id
-        List<WishList> wishLists = wishlistRepository.findByMemberId(member.getId());
-        List<Long> wishListIds = wishLists.stream()
-                .map(w -> w.getItem().getId())
-                .toList();
+        List<Long> wishListIds = getWishListIds(member);
 
         // 아이템 정보와 메인 이미지를 한번에 조회
         List<Item> veganItems = itemDynamicSort.findVeganItemsWithDSL(
@@ -224,4 +210,15 @@ public class ItemSearchService {
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 
+    private List<Long> getWishListIds(Member member) {
+        List<Long> wishListIds = new ArrayList<>();
+        if (member != null) {
+            List<Long> fetchedIds = wishlistRepository.findByMemberId(member.getId())
+                    .stream()
+                    .map(w -> w.getItem().getId())
+                    .toList();
+            wishListIds.addAll(fetchedIds);
+        }
+        return wishListIds;
+    }
 }

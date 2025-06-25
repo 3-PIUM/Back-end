@@ -70,7 +70,7 @@ public class ItemService {
 
         // 조회 이벤트 발행(Kafka)
         ViewEventDTO viewEventDTO = ViewEventDTO.builder()
-                .memberId(member.getId())
+                .memberId(member != null ? member.getId() : null)
                 .itemId(itemId)
                 .subCategory(item.getSubCategory().getName())
                 .eventTime(System.currentTimeMillis())
