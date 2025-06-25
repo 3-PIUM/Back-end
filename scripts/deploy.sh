@@ -7,14 +7,14 @@
 #!/bin/bash
 REPOSITORY=/home/ec2-user/pium
 CONTAINER_NAME=pium-spring
-ECR_REGISTRY=073658113926.dkr.ecr.ap-northeast-2.amazonaws.com
+ECR_REGISTRY=063355381577.dkr.ecr.ap-northeast-2.amazonaws.com
 
 cd $REPOSITORY
 
 # docker-compose.yml이 없으면 복사해서 이름 변경
-if [ ! -f docker-compose.yml ] && [ -f release-docker-compose.yml ]; then
-  echo "> 📝 Rename release-docker-compose.yml -> docker-compose.yml"
-  mv release-docker-compose.yml docker-compose.yml
+if [ -f release-docker-compose.yml ]; then
+  echo "> 📝 Copy release-docker-compose.yml → docker-compose.yml (overwrite)"
+  cp -f release-docker-compose.yml docker-compose.yml
 fi
 
 echo "> 🔵 PULL DOCKER IMAGE FROM ECR"

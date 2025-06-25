@@ -1,5 +1,6 @@
 package project.global.security.util;
 
+import lombok.extern.slf4j.Slf4j;
 import project.domain.member.Member;
 import project.domain.member.repository.MemberRepository;
 import project.global.security.annotation.LoginMember;
@@ -13,6 +14,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @RequiredArgsConstructor
+@Slf4j
 public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
     private final MemberRepository memberRepository;
 
@@ -33,8 +35,9 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
         }
 
         String email = authentication.getName(); // JwtAuthFilter에서 설정한 email
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("인증된 사용자를 찾을 수 없습니다."));
+        log.info(email);
+        return memberRepository.findByEmail(email).orElse(null);
+//                .orElseThrow(() -> new IllegalArgumentException("인증된 사용자를 찾을 수 없습니다."));
 
     }
 }
