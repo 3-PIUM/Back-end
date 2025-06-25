@@ -73,8 +73,8 @@ services:
     image: alpine:latest
     container_name: backup
     environment:
-      - AWS_ACCESS_KEY_ID=${S3_AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${S3_AWS_SECRET_ACCESS_KEY}
+      - AWS_ACCESS_KEY_ID=${S3_AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${S3_AWS_SECRET_KEY}
       - S3_BUCKET= pium-image-bucket
       - S3_PREFIX= elk-logs
     volumes:
@@ -135,7 +135,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0          # 컨슈머 그룹 리밸런싱 지연시간 (개발용 0)
       KAFKA_LOG_DIRS: '/var/lib/kafka/data'          # 로그 파일 저장 경로
     healthcheck:
-      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092" ]
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka:29092" ]
       interval: 30s
       timeout: 10s
       retries: 5
