@@ -7,7 +7,7 @@ services:
       - cluster.name=docker-cluster
       - discovery.type=single-node        # 단일 노드 모드로 실행 (개발/테스트용)
       - bootstrap.memory_lock=true        # 메모리 스와핑 방지를 위한 설정
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"     # JVM 힙 메모리 최소/최대 1GB로 설정
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"     # 운영환경에서는 JVM 힙 메모리 최소/최대 1GB로 설정
       - xpack.security.enabled=false      # X-Pack 보안 기능 비활성화 (개발용)
       - xpack.security.transport.ssl.enabled=false  # SSL 전송 암호화 비활성화
     ulimits:

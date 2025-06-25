@@ -2,6 +2,7 @@ package project.domain.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.List;
@@ -29,29 +30,4 @@ public abstract class ItemSearchResponse {
         private List<ItemSearchInfoDTO> itemSearchInfoDTOs;
     }
 
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    public static class PopularItemsInfoDTO {
-        private Long itemId;
-        private String itemName;
-        private int originalPrice;
-        private int salePrice;
-        private int discountRate;
-        private String itemImage;
-        private Integer ranking;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    public static class TrendItemsInfoDTO {
-        private Long itemId;
-        private String itemName;
-        private int originalPrice;
-        private int salePrice;
-        private int discountRate;
-        private String itemImage;
-        private Integer ranking;
-    }
 }

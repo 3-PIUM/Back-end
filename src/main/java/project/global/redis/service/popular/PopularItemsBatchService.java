@@ -22,8 +22,8 @@ public class PopularItemsBatchService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final PopularItemRepository popularItemRepository;
 
-    // 1시간마다 인기 상품 계산 및 업데이트(누적 조회수 이용)
-    @Scheduled(fixedRate = 60 * 60 * 1000)
+    // 매 시 정각마다 인기 상품 계산 및 업데이트(누적 조회수 이용)
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void calculatePopularItems() {
         log.info("인기 상품 배치 처리 시작");
