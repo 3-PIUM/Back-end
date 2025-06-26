@@ -31,7 +31,7 @@ public class ItemOption extends BaseEntity {
     private String jpName;
 
     public String getName(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language == Language.JP) {
             return jpName;
         } else if (language == Language.EN) {

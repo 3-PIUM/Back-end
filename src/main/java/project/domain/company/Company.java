@@ -33,7 +33,7 @@ public class Company extends BaseEntity {
     private List<Item> items = new ArrayList<>();
 
     public String getName(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language == Language.EN) {
             return enName;
         } else if (language == Language.JP) {

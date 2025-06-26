@@ -52,7 +52,7 @@ public class AiSummary extends BaseEntity {
     private int ranking;
 
     public String getTitle(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language == Language.JP) {
             return jpTitle;
         } else if (language == Language.KR) {
@@ -63,7 +63,7 @@ public class AiSummary extends BaseEntity {
     }
 
     public String getItemOption(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language.equals(Language.EN)) {
             return this.enItemOption;
         } else if (language.equals(Language.JP)) {
@@ -74,7 +74,7 @@ public class AiSummary extends BaseEntity {
     }
 
     public String getContent(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language.equals(Language.EN)) {
             return this.enContent;
         } else if (language.equals(Language.JP)) {
@@ -85,7 +85,7 @@ public class AiSummary extends BaseEntity {
     }
 
     public String getOriginalContent(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language.equals(Language.EN)) {
             return this.enOriginalContent;
         } else if (language.equals(Language.JP)) {

@@ -61,7 +61,7 @@ public class Ingredient extends BaseEntity {
     private String jpEffect;
 
     public String getName(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language.equals(Language.EN)) {
             return enName;
         } else if (language.equals(Language.JP)) {
@@ -72,7 +72,7 @@ public class Ingredient extends BaseEntity {
     }
 
     public String getEffect(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language.equals(Language.EN)) {
             return enEffect;
         } else if (language.equals(Language.JP)) {
@@ -83,7 +83,7 @@ public class Ingredient extends BaseEntity {
     }
 
     public String getRiskCategory(String lang) {
-        Language language = Language.valueOf(lang);
+        Language language = Language.valueOf(lang.toUpperCase());
         if (language.equals(Language.EN)) {
             return enRiskCategory;
         } else if (language.equals(Language.JP)) {
