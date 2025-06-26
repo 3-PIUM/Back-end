@@ -70,4 +70,48 @@ public abstract class ItemRecommendResponse {
         private String title;
         private List<PopularWeekItemSummaryDTO> popularItems;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class AreaPopularItemSummaryDTO {
+        private Long itemId;
+        private String itemName;
+        private int originalPrice;
+        private int salePrice;
+        private int discountRate;
+        private String itemImage;
+        private boolean wishStatus;
+    }
+
+    @Data
+    @Builder
+    public static class AreaPopularItemsInfoDTO {
+        private String title;
+        private List<AreaPopularItemSummaryDTO> popularItems;
+    }
+
+    @Data
+    @Builder
+    public static class RelatedPurchaseItemDTO {
+        private Long itemId;
+        private String itemName;
+        private int originalPrice;
+        private int salePrice;
+        private int discountRate;
+        private String itemImage;
+        private boolean wishStatus;
+    }
+
+    @Data
+    @Builder
+    public static class RelatedViewItemDTO {
+        private Long itemId;
+        private String itemName;
+        private int originalPrice;
+        private int salePrice;
+        private int discountRate;
+        private String itemImage;
+        private boolean wishStatus;
+    }
 }
