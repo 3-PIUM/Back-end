@@ -24,8 +24,8 @@ public class TrendItemBatchService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final TrendItemRepository trendItemRepository;
 
-    // 1시간마다 인기 급상승 상품 계산 및 업데이트(매시 조회수 이용)
-    @Scheduled(fixedRate = 60 * 60 * 1000)
+    // 매 시 정각마다 인기 급상승 상품 계산 및 업데이트(매시 조회수 이용)
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void calculateTrendItems() {
         log.info("인기 급상승 상품 배치 처리 시작");
