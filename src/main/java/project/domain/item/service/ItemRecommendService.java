@@ -29,7 +29,7 @@ public class ItemRecommendService {
     private final WishlistRepository wishlistRepository;
 
     // 누적 조회수로 찾은 인기 상품 top10
-    public ApiResponse<PopularItemsInfoDTO> getPopularItems(Member member, List<PopularItemDTO> popularItems) {
+    public ApiResponse<PopularItemsInfoDTO> getPopularItems(Member member, List<PopularItemDTO> popularItems, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         List<Long> popularIds = popularItems.stream()
@@ -41,12 +41,12 @@ public class ItemRecommendService {
 
         PopularItemsInfoDTO top10ItemsInfoDTOs =
                 ItemRecommendConverter.toPopularItemsInfoDTOs(
-                        title, items, popularItems, wishListIds);
+                        title, items, popularItems, wishListIds, lang);
         return ApiResponse.onSuccess(top10ItemsInfoDTOs);
     }
 
     // 최근 3시간 조회수*가중치로 찾은 인기 급상승 상품 top10
-    public ApiResponse<TrendItemsInfoDTO> getTrendItems(Member member, List<TrendItemDTO> trendItems) {
+    public ApiResponse<TrendItemsInfoDTO> getTrendItems(Member member, List<TrendItemDTO> trendItems, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         List<Long> trendIds = trendItems.stream()
@@ -58,12 +58,12 @@ public class ItemRecommendService {
 
         TrendItemsInfoDTO trendItemsInfoDTOs =
                 ItemRecommendConverter.toTrendItemsInfoDTOs(
-                        title, items, trendItems, wishListIds);
+                        title, items, trendItems, wishListIds, lang);
         return ApiResponse.onSuccess(trendItemsInfoDTOs);
     }
 
     // 매주 월요일 정각에 구매 전환율을 계산하여 찾은 인기 상품 20개
-    public ApiResponse<PopularWeekItemsInfoDTO> getPopularWeekItems(Member member, List<PopularWeekItemDTO> popularWeekItems) {
+    public ApiResponse<PopularWeekItemsInfoDTO> getPopularWeekItems(Member member, List<PopularWeekItemDTO> popularWeekItems, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         List<Long> popularWeekIds = popularWeekItems.stream()
@@ -74,7 +74,7 @@ public class ItemRecommendService {
         String title = "위클리 베스트";
 
         PopularWeekItemsInfoDTO popularWeekItemsInfoDTO = ItemRecommendConverter.toPopularWeekItemsInfoDTOs(
-                title, items, popularWeekItems, wishListIds);
+                title, items, popularWeekItems, wishListIds, lang);
         return ApiResponse.onSuccess(popularWeekItemsInfoDTO);
     }
 

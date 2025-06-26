@@ -16,6 +16,7 @@ import project.domain.item.dto.converter.ItemSearchConverter;
 import project.domain.item.repository.ItemDynamicSort;
 import project.domain.item.repository.ItemRepository;
 import project.domain.member.Member;
+import project.domain.member.enums.Language;
 import project.domain.wishlist.repository.WishlistRepository;
 import project.global.elasticsearch.document.ItemDocument;
 import project.global.response.ApiResponse;
@@ -45,7 +46,8 @@ public class ItemSearchService {
             String subCategoryName,
             Member member,
             String skinIssue,
-            String priceSort
+            String priceSort,
+            String lang
     ) {
         // 찜한 상품 Id
         List<Long> wishListIds = getWishListIds(member);
@@ -67,7 +69,7 @@ public class ItemSearchService {
             return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
         }
 
-        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items, wishListIds);
+        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items, wishListIds, lang);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 
@@ -76,7 +78,8 @@ public class ItemSearchService {
      */
     public ApiResponse<List<ItemSearchInfoDTO>> getItemsByCategoryOrderByCount(
             Member member,
-            String categoryName) {
+            String categoryName,
+            String lang) {
         // 찜한 상품 Id
         List<Long> wishListIds = getWishListIds(member);
 
@@ -94,7 +97,7 @@ public class ItemSearchService {
 
         List<ItemSearchInfoDTO> itemSearchInfoDTO = top10ItemsByCategory.stream()
                 .map(ti ->
-                        ItemSearchConverter.toItemSearchDetailInfoDTO(ti, wishListIds.contains(ti.getId())))
+                        ItemSearchConverter.toItemSearchDetailInfoDTO(ti, wishListIds.contains(ti.getId()), lang))
                 .toList();
 
         return ApiResponse.onSuccess(itemSearchInfoDTO);
@@ -103,27 +106,34 @@ public class ItemSearchService {
     /*
     검색 키워드에 맞는 아이템 조회
      */
-    public ApiResponse<ItemSearchResultDTO> searchByKeyword(Member member, String keyword) {
-
-        // 찜한 상품 Id
-        List<Long> wishListIds = getWishListIds(member);
-
-        // 아이템 정보와 메인 이미지를 한번에 조회
-        List<Item> items = itemRepository.findByKeywordWithMainImage(keyword);
-        if (items.isEmpty()) {
-            return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
-        }
-
-        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items, wishListIds);
-        return ApiResponse.onSuccess(itemSearchResultDTO);
-    }
+//    public ApiResponse<ItemSearchResultDTO> searchByKeyword(Member member, String keyword, String lang) {
+//
+//        // 찜한 상품 Id
+//        List<Long> wishListIds = getWishListIds(member);
+//
+//        // 아이템 정보와 메인 이미지를 한번에 조회
+//        List<Item> items = itemRepository.findByKeywordWithMainImage(keyword);
+//        if (items.isEmpty()) {
+//            return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
+//        }
+//
+//        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items, wishListIds, lang);
+//        return ApiResponse.onSuccess(itemSearchResultDTO);
+//    }
 
     /*
     개선된 검색 키워드에 맞는 아이템 조회(ElasticSearch 활용)
      */
-    public ApiResponse<ItemSearchResultDTO> AdvancedSearchByKeyword(Member member, String keyword, Integer size) throws IOException {
+    public ApiResponse<ItemSearchResultDTO> AdvancedSearchByKeyword(Member member, String keyword, Integer size, String lang) throws IOException {
+        Language value = Language.valueOf(lang.toUpperCase());
+        String index = switch (value) {
+            case KR -> "items";
+            case EN -> "items_en";
+            case JP -> "items_jp";
+        };
+
         SearchRequest searchRequest = SearchRequest.of(s -> s
-                .index("items")
+                .index(index)
                 .size(size)
                 .query(q -> q
                         .bool(b -> b
@@ -178,7 +188,7 @@ public class ItemSearchService {
             return ApiResponse.onFailure(ErrorStatus.ITEM_NOT_FOUND, null);
         }
 
-        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items, wishListIds);
+        ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(items, wishListIds, lang);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 
@@ -187,7 +197,7 @@ public class ItemSearchService {
     비건 제품 조회
      */
     public ApiResponse<ItemSearchResultDTO> getVeganItems(
-            Member member, String subCategory, String skinIssue, String priceSort) {
+            Member member, String subCategory, String skinIssue, String priceSort, String lang) {
 
         // 찜한 상품 Id
         List<Long> wishListIds = getWishListIds(member);
@@ -206,7 +216,7 @@ public class ItemSearchService {
 //        }
 
         ItemSearchResultDTO itemSearchResultDTO = ItemSearchConverter.toItemSearchInfoDTO(
-                veganItems, wishListIds);
+                veganItems, wishListIds, lang);
         return ApiResponse.onSuccess(itemSearchResultDTO);
     }
 

@@ -13,14 +13,14 @@ import java.util.Map;
 
 public abstract class WishListConverter {
 
-    public static WishListResponseDTO toWishListResponseDTO(WishList wishList, ItemImage mainImage) {
+    public static WishListResponseDTO toWishListResponseDTO(WishList wishList, ItemImage mainImage, String lang) {
         return WishListResponseDTO.builder()
                 .wishListId(wishList.getId())
                 .memberId(wishList.getMember().getId())
                 .createdAt(wishList.getCreatedAt())
                 .item(ItemSummaryDTO.builder()
                         .itemId(wishList.getItem().getId())
-                        .itemName(wishList.getItem().getName())
+                        .itemName(wishList.getItem().getName(lang))
                         .brand(wishList.getItem().getCompany().getName())
                         .originalPrice(wishList.getItem().getOriginalPrice())
                         .salePrice(wishList.getItem().getSalePrice())
@@ -33,20 +33,21 @@ public abstract class WishListConverter {
 
     public static List<WishListResponseDTO> toWishListResponseDTOList(
             List<WishList> wishLists,
-            Map<Long, ItemImage> itemImageMap
+            Map<Long, ItemImage> itemImageMap,
+            String lang
     ) {
         return wishLists.stream()
                 .map(wishList -> toWishListResponseDTO(
-                                wishList, itemImageMap.get(wishList.getItem().getId())
+                                wishList, itemImageMap.get(wishList.getItem().getId()),lang
                         )
                 ).toList();
 
     }
 
-    public static DeleteItemDTO toDeleteItemDTO(Item item) {
+    public static DeleteItemDTO toDeleteItemDTO(Item item, String lang) {
         return DeleteItemDTO.builder()
                 .itemId(item.getId())
-                .itemName(item.getName())
+                .itemName(item.getName(lang))
                 .build();
     }
 }

@@ -27,6 +27,7 @@ import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
 import project.global.response.status.ErrorStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,13 +51,16 @@ public class ItemService {
     private final ViewLogProducer viewLogProducer;
 
     // 상품 정보 조회
-    public ApiResponse<ItemInfoDTO> getItemInfo(Member member, Long itemId) {
+    public ApiResponse<ItemInfoDTO> getItemInfo(Member member, Long itemId, String lang) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
 
         // 찜 상태
-        Optional<WishList> isWishList = wishlistRepository.findByMemberIdAndItemId(member.getId(), itemId);
-        boolean wishStatus = isWishList.isPresent();
+        boolean wishStatus = false;
+        if (member != null) {
+            Optional<WishList> isWishList = wishlistRepository.findByMemberIdAndItemId(member.getId(), itemId);
+            wishStatus = isWishList.isPresent();
+        }
 
         String mainImage = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.MAIN).stream()
                 .map(ItemImage::getUrl)
@@ -79,7 +83,7 @@ public class ItemService {
         viewLogProducer.sendViewLog(viewEventDTO);
 
 
-        ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages, wishStatus);
+        ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages, wishStatus, lang);
         return ApiResponse.onSuccess(itemInfoImages);
     }
 
@@ -140,11 +144,23 @@ public class ItemService {
 
 
     // 피부 타입 그래프 조회
-    public ApiResponse<GraphListDTO> getGraphData(Long itemId) {
+    public ApiResponse<GraphListDTO> getGraphData(Long itemId, String lang) {
         List<Graph> graphs = graphRepository.findByItemId(itemId);
 
-        GraphListDTO graphListDTO = ItemConverter.toGraphListDTO(itemId, graphs);
+        GraphListDTO graphListDTO = ItemConverter.toGraphListDTO(itemId, graphs, lang);
         return ApiResponse.onSuccess(graphListDTO);
+    }
+
+    private List<Long> getWishListIds(Member member) {
+        List<Long> wishListIds = new ArrayList<>();
+        if (member != null) {
+            List<Long> fetchedIds = wishlistRepository.findByMemberId(member.getId())
+                    .stream()
+                    .map(w -> w.getItem().getId())
+                    .toList();
+            wishListIds.addAll(fetchedIds);
+        }
+        return wishListIds;
     }
 
 }

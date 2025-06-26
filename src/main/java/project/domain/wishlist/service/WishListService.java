@@ -36,7 +36,7 @@ public class WishListService {
     /*
         찜 목록 조회
          */
-    public ApiResponse<List<WishListResponseDTO>> getWishList(Long memberId) {
+    public ApiResponse<List<WishListResponseDTO>> getWishList(Long memberId, String lang) {
         List<WishList> wishLists = wishlistRepository.findByMemberId(memberId);
 
         List<Long> itemIds = wishLists.stream()
@@ -53,14 +53,14 @@ public class WishListService {
                         , Function.identity()
                 ));
 
-        return ApiResponse.onSuccess(WishListConverter.toWishListResponseDTOList(wishLists, itemImageMap));
+        return ApiResponse.onSuccess(WishListConverter.toWishListResponseDTOList(wishLists, itemImageMap, lang));
     }
 
     /*
     찜 등록
      */
     @Transactional
-    public ApiResponse<WishListResponseDTO> addWishList(Member member, Long itemId) {
+    public ApiResponse<WishListResponseDTO> addWishList(Member member, Long itemId, String lang) {
         // item 정보 확인
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
@@ -80,7 +80,7 @@ public class WishListService {
 
 
             return ApiResponse.onSuccess("찜 목록에 추가된 아이템",
-                    WishListConverter.toWishListResponseDTO(newWishList, itemImage));
+                    WishListConverter.toWishListResponseDTO(newWishList, itemImage, lang));
         }
     }
 
@@ -88,13 +88,13 @@ public class WishListService {
     찜 취소
      */
     @Transactional
-    public ApiResponse<DeleteItemDTO> deleteWishlist(Member member, Long itemId) {
+    public ApiResponse<DeleteItemDTO> deleteWishlist(Member member, Long itemId, String lang) {
         WishList deleteWishList = findWishList(member.getId(), itemId);
 
         wishlistRepository.deleteById(deleteWishList.getId());
 
         Item deletedItem = deleteWishList.getItem();
-        return ApiResponse.onSuccess("삭제된 아이템", WishListConverter.toDeleteItemDTO(deletedItem));
+        return ApiResponse.onSuccess("삭제된 아이템", WishListConverter.toDeleteItemDTO(deletedItem,lang));
     }
 
     /*

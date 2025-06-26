@@ -33,22 +33,24 @@ public class ItemSearchController {
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "서브 카테고리명") @PathVariable String subCategory,
             @Parameter(description = "피부 고민") @RequestParam(defaultValue = "") String skinIssue,
-            @Parameter(description = "정렬 타입") @RequestParam(defaultValue = "") String priceSort
+            @Parameter(description = "정렬 타입") @RequestParam(defaultValue = "") String priceSort,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return itemSearchService.getItemsBySubCategory(subCategory, member, skinIssue, priceSort);
+        return itemSearchService.getItemsBySubCategory(subCategory, member, skinIssue, priceSort, lang);
     }
 
-    @Operation(
-            summary = "검색 키워드 관련 아이템 조회",
-            description = "검색 키워드와 유사한 아이템 정보를 조회합니다."
-    )
-    @GetMapping("/search/list/{keyword}")
-    public ApiResponse<ItemSearchResultDTO> searchByKeyword(
-            @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "검색 키워드") @PathVariable String keyword
-    ) {
-        return itemSearchService.searchByKeyword(member, keyword);
-    }
+//    @Operation(
+//            summary = "검색 키워드 관련 아이템 조회",
+//            description = "검색 키워드와 유사한 아이템 정보를 조회합니다."
+//    )
+//    @GetMapping("/search/list/{keyword}")
+//    public ApiResponse<ItemSearchResultDTO> searchByKeyword(
+//            @Parameter(hidden = true) @LoginMember Member member,
+//            @Parameter(description = "검색 키워드") @PathVariable String keyword,
+//            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
+//    ) {
+//        return itemSearchService.searchByKeyword(member, keyword, lang);
+//    }
 
     @Operation(
             summary = "(향상된 버전) 검색 키워드 관련 아이템 조회",
@@ -58,9 +60,10 @@ public class ItemSearchController {
     public ApiResponse<ItemSearchResultDTO> advancedSearchByKeyword(
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "검색 키워드") @PathVariable String keyword,
-            @Parameter(description = "검색 키워드") @RequestParam(defaultValue = "10") Integer size
+            @Parameter(description = "검색 키워드") @RequestParam(defaultValue = "10") Integer size,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) throws IOException {
-        return itemSearchService.AdvancedSearchByKeyword(member, keyword, size);
+        return itemSearchService.AdvancedSearchByKeyword(member, keyword, size, lang);
     }
 
     @Operation(
@@ -72,10 +75,11 @@ public class ItemSearchController {
             @Parameter(hidden = true) @LoginMember Member member,
             @Parameter(description = "서브 카테고리명") @PathVariable String subCategory,
             @Parameter(description = "피부 고민") @RequestParam(defaultValue = "") String skinIssue,
-            @Parameter(description = "정렬타입") @RequestParam(defaultValue = "") String priceSort
+            @Parameter(description = "정렬타입") @RequestParam(defaultValue = "") String priceSort,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
 
-        return itemSearchService.getVeganItems(member, subCategory, skinIssue, priceSort);
+        return itemSearchService.getVeganItems(member, subCategory, skinIssue, priceSort, lang);
     }
 
     @Operation(
@@ -85,9 +89,10 @@ public class ItemSearchController {
     @GetMapping("/list")
     public ApiResponse<List<ItemSearchInfoDTO>> getItemByCategory(
             @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "카테고리명") @RequestParam(required = false) String category
+            @Parameter(description = "카테고리명") @RequestParam(required = false) String category,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return itemSearchService.getItemsByCategoryOrderByCount(member, category);
+        return itemSearchService.getItemsByCategoryOrderByCount(member, category, lang);
     }
 
 }

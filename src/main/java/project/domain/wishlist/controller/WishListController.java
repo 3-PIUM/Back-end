@@ -28,9 +28,10 @@ public class WishListController {
     )
     @GetMapping("/items")
     public ApiResponse<List<WishListResponseDTO>> getWishList(
-            @Parameter(hidden = true) @LoginMember Member member
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return wishListService.getWishList(member.getId());
+        return wishListService.getWishList(member.getId(), lang);
     }
 
     @Operation(
@@ -40,9 +41,10 @@ public class WishListController {
     @PostMapping("/{itemId}")
     public ApiResponse<WishListResponseDTO> addWishList(
             @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "추가할 아이템 ID") @PathVariable Long itemId
+            @Parameter(description = "추가할 아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return wishListService.addWishList(member, itemId);
+        return wishListService.addWishList(member, itemId, lang);
     }
 
     @Operation(
@@ -52,8 +54,9 @@ public class WishListController {
     @DeleteMapping("/{itemId}")
     public ApiResponse<DeleteItemDTO> deleteWishList(
             @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "취소할 아이템 ID") @PathVariable Long itemId
+            @Parameter(description = "취소할 아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return wishListService.deleteWishlist(member, itemId);
+        return wishListService.deleteWishlist(member, itemId, lang);
     }
 }

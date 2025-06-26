@@ -19,17 +19,17 @@ import java.util.stream.Stream;
 
 public abstract class ReviewConverter {
 
-    public static ReviewOptionListDTO toMakeupReviewOptionListDTO(Item item, List<MakeupReviewOption> reviewOptions) {
+    public static ReviewOptionListDTO toMakeupReviewOptionListDTO(Item item, List<MakeupReviewOption> reviewOptions, String lang) {
         return ReviewOptionListDTO.builder()
                 .id(item.getId())
                 .reviewOptionList(reviewOptions.stream()
                         .map(r -> ReviewOptionDTO.builder()
-                                .name(r.getName())
+                                .name(r.getName(lang))
                                 .options(Stream.of(
-                                                r.getOpt1(),
-                                                r.getOpt2(),
-                                                r.getOpt3(),
-                                                r.getOpt4()
+                                                r.getOpt1(lang),
+                                                r.getOpt2(lang),
+                                                r.getOpt3(lang),
+                                                r.getOpt4(lang)
                                         )
                                         .filter(Objects::nonNull)
                                         .filter(opt -> !opt.trim().isEmpty())
@@ -39,17 +39,17 @@ public abstract class ReviewConverter {
                 .build();
     }
 
-    public static ReviewOptionListDTO toReviewOptionListDTO(Item item, List<ReviewOption> reviewOptions) {
+    public static ReviewOptionListDTO toReviewOptionListDTO(Item item, List<ReviewOption> reviewOptions, String lang) {
         return ReviewOptionListDTO.builder()
                 .id(item.getId())
                 .reviewOptionList(
                         reviewOptions.stream()
                                 .map(r -> ReviewOptionDTO.builder()
-                                        .name(r.getName())
+                                        .name(r.getName(lang))
                                         .options(Stream.of(
-                                                        r.getOpt1(),
-                                                        r.getOpt2(),
-                                                        r.getOpt3()
+                                                        r.getOpt1(lang),
+                                                        r.getOpt2(lang),
+                                                        r.getOpt3(lang)
                                                 ).toList()
                                         ).build())
                                 .toList()

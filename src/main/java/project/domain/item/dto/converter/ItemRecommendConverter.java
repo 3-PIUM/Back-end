@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public abstract class ItemRecommendConverter {
 
     public static PopularItemsInfoDTO toPopularItemsInfoDTOs(
-            String title, List<Item> items, List<PopularItemDTO> popularItems, List<Long> wishListIds) {
+            String title, List<Item> items, List<PopularItemDTO> popularItems, List<Long> wishListIds, String lang) {
         // items를 Map으로 변환 (빠른 조회를 위해)
         Map<Long, Item> itemMap = items.stream()
                 .collect(Collectors.toMap(Item::getId, item -> item));
@@ -32,7 +32,7 @@ public abstract class ItemRecommendConverter {
 
                             return PopularItemSummaryDTO.builder()
                                     .itemId(item.getId())
-                                    .itemName(item.getName())
+                                    .itemName(item.getName(lang))
                                     .itemImage(!item.getItemImages().isEmpty()
                                             ? item.getItemImages().get(0).getUrl() : null)
                                     .originalPrice(item.getOriginalPrice())
@@ -47,7 +47,7 @@ public abstract class ItemRecommendConverter {
     }
 
     public static TrendItemsInfoDTO toTrendItemsInfoDTOs(
-            String title, List<Item> items, List<TrendItemDTO> trendItems, List<Long> wishListIds) {
+            String title, List<Item> items, List<TrendItemDTO> trendItems, List<Long> wishListIds, String lang) {
         // items를 Map으로 변환
         Map<Long, Item> itemMap = items.stream()
                 .collect(Collectors.toMap(Item::getId, item -> item));
@@ -64,7 +64,7 @@ public abstract class ItemRecommendConverter {
 
                             return TrendItemSummaryDTO.builder()
                                     .itemId(item.getId())
-                                    .itemName(item.getName())
+                                    .itemName(item.getName(lang))
                                     .itemImage(!item.getItemImages().isEmpty()
                                             ? item.getItemImages().get(0).getUrl() : null)
                                     .originalPrice(item.getOriginalPrice())
@@ -79,7 +79,7 @@ public abstract class ItemRecommendConverter {
     }
 
     public static PopularWeekItemsInfoDTO toPopularWeekItemsInfoDTOs(
-            String title, List<Item> items, List<PopularWeekItemDTO> popularWeekItems, List<Long> wishListIds) {
+            String title, List<Item> items, List<PopularWeekItemDTO> popularWeekItems, List<Long> wishListIds, String lang) {
         // items를 Map으로 변환
         Map<Long, Item> itemMap = items.stream()
                 .collect(Collectors.toMap(Item::getId, item -> item));
@@ -96,7 +96,7 @@ public abstract class ItemRecommendConverter {
 
                             return PopularWeekItemSummaryDTO.builder()
                                     .itemId(item.getId())
-                                    .itemName(item.getName())
+                                    .itemName(item.getName(lang))
                                     .itemImage(!item.getItemImages().isEmpty()
                                             ? item.getItemImages().get(0).getUrl() : null)
                                     .originalPrice(item.getOriginalPrice())

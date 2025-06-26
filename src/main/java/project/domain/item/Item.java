@@ -16,6 +16,7 @@ import project.domain.itemimage.ItemImage;
 import project.domain.itemoption.ItemOption;
 import project.domain.itemscore.ItemScore;
 import project.domain.makeupreviewoptionlist.MakeupReviewOptionList;
+import project.domain.member.enums.Language;
 import project.domain.subcategory.SubCategory;
 import project.domain.wishlist.WishList;
 
@@ -74,7 +75,11 @@ public class Item extends BaseEntity {
     private List<WishList> wishLists = new ArrayList<>();
 
     @Column(nullable = false)
-    private String name;
+    private String krName;
+    @Column(nullable = false)
+    private String enName;
+    @Column(nullable = false)
+    private String jpName;
 
     private int originalPrice = 0;
 
@@ -87,5 +92,14 @@ public class Item extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private VeganType veganType;
+
+    public String getName(String lang) {
+        Language value = Language.valueOf(lang.toUpperCase());
+        return switch (value) {
+            case KR -> this.krName;
+            case EN -> this.enName;
+            case JP -> this.jpName;
+        };
+    }
 
 }

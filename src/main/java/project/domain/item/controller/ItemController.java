@@ -28,12 +28,13 @@ public class ItemController {
     @GetMapping("/{itemId}/info")
     public ApiResponse<ItemInfoDTO> getItemInfo(
             @Parameter(hidden = true) @LoginMember Member member,
-            @Parameter(description = "아이템 ID") @PathVariable Long itemId
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
         // 조회수 증가
         itemViewRedis.incrementViewCount(itemId);
 
-        return itemService.getItemInfo(member, itemId);
+        return itemService.getItemInfo(member, itemId, lang);
     }
 
     @Operation(
@@ -111,9 +112,10 @@ public class ItemController {
     )
     @GetMapping("/{itemId}/graph")
     public ApiResponse<GraphListDTO> getGraphData(
-            @Parameter(description = "아이템 ID") @PathVariable Long itemId
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return itemService.getGraphData(itemId);
+        return itemService.getGraphData(itemId, lang);
     }
 
 }

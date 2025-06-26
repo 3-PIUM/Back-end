@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.domain.item.dto.ItemRecommendResponse;
 import project.domain.item.dto.ItemRecommendResponse.PopularItemsInfoDTO;
@@ -41,10 +42,11 @@ public class ItemRecommendController {
     )
     @GetMapping("/popular")
     public ApiResponse<PopularItemsInfoDTO> getPopularItems(
-            @Parameter(hidden = true) @LoginMember Member member
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
         List<PopularItemDTO> popularItems = popularCacheService.getTop10PopularItems();
-        return itemRecommendService.getPopularItems(member, popularItems);
+        return itemRecommendService.getPopularItems(member, popularItems, lang);
     }
 
     @Operation(
@@ -53,10 +55,11 @@ public class ItemRecommendController {
     )
     @GetMapping("/trend")
     public ApiResponse<TrendItemsInfoDTO> getTrendItems(
-            @Parameter(hidden = true) @LoginMember Member member
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
         List<TrendItemDTO> trendItems = trendCacheService.getTrendItems();
-        return itemRecommendService.getTrendItems(member, trendItems);
+        return itemRecommendService.getTrendItems(member, trendItems, lang);
     }
 
     @Operation(
@@ -65,9 +68,10 @@ public class ItemRecommendController {
     )
     @GetMapping("/popularWeek")
     public ApiResponse<PopularWeekItemsInfoDTO> getPopularWeekItems(
-            @Parameter(hidden = true) @LoginMember Member member
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
         List<PopularWeekItemDTO> popularWeekItems = popularWeekCacheService.getPopularWeekItems();
-        return itemRecommendService.getPopularWeekItems(member, popularWeekItems);
+        return itemRecommendService.getPopularWeekItems(member, popularWeekItems, lang);
     }
 }

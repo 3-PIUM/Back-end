@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.Member;
 import project.domain.review.dto.ReviewRequest.AddReviewBodyDTO;
 import project.domain.review.dto.ReviewRequest.EditReviewBodyDTO;
-import project.domain.review.dto.ReviewResponse;
 import project.domain.review.dto.ReviewResponse.ReviewDTO;
 import project.domain.review.dto.ReviewResponse.ReviewListDTO;
 import project.domain.review.dto.ReviewResponse.ReviewOptionListDTO;
@@ -37,9 +36,10 @@ public class ReviewController {
     )
     @GetMapping("/{itemId}/option")
     public ApiResponse<ReviewOptionListDTO> getReviewOption(
-            @Parameter(description = "아이템 ID") @PathVariable Long itemId
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
-        return reviewService.getReviewOption(itemId);
+        return reviewService.getReviewOption(itemId, lang);
     }
 
     @Operation(

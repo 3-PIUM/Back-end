@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class CartConverter {
-    public static SummaryCartItemDTO toSummaryCartItemDTO(CartItem cartItem) {
+    public static SummaryCartItemDTO toSummaryCartItemDTO(CartItem cartItem, String lang) {
         Item item = cartItem.getItem();
         return SummaryCartItemDTO.builder()
                 .itemId(cartItem.getId())
-                .itemName(item.getName())
+                .itemName(item.getName(lang))
                 .option(cartItem.getItemOption())
                 .originalPrice(item.getOriginalPrice())
                 .salePrice(item.getSalePrice())
@@ -28,11 +28,11 @@ public abstract class CartConverter {
                 .build();
     }
 
-    public static CartItemDTO toCartItemDTO(CartItem cartItem, ItemImage mainImage) {
+    public static CartItemDTO toCartItemDTO(CartItem cartItem, ItemImage mainImage, String lang) {
         Item item = cartItem.getItem();
         return CartItemDTO.builder()
                 .cartItemId(cartItem.getId())
-                .itemName(item.getName())
+                .itemName(item.getName(lang))
                 .optionInfo(OptionDTO.builder()
                         .selectOption(cartItem.getItemOption())
                         .options(cartItem.getItem().getItemOptions().stream()
@@ -50,7 +50,8 @@ public abstract class CartConverter {
     public static CartDTO toCartDTO(
             Cart cart,
             List<CartItem> cartItems,
-            Map<Long, ItemImage> itemImages
+            Map<Long, ItemImage> itemImages,
+            String lang
     ) {
         return CartDTO.builder()
                 .cartId(cart.getId())
@@ -58,7 +59,7 @@ public abstract class CartConverter {
                         .map(ci ->
                                 CartItemDTO.builder()
                                         .cartItemId(ci.getId())
-                                        .itemName(ci.getItem().getName())
+                                        .itemName(ci.getItem().getName(lang))
                                         .brand(ci.getItem().getCompany().getName())
                                         .optionInfo(OptionDTO.builder()
                                                 .selectOption(ci.getItemOption())

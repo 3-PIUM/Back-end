@@ -7,15 +7,16 @@ import project.domain.item.Item;
 import project.domain.item.dto.ItemResponse;
 import project.domain.item.dto.ItemResponse.*;
 import project.domain.itemoption.ItemOption;
+import project.domain.member.enums.Language;
 
 import java.util.List;
 
 public abstract class ItemConverter {
 
-    public static ItemInfoDTO toItemInfoDTO(Item item, String mainImage, List<String> detailImages, boolean wishStatus) {
+    public static ItemInfoDTO toItemInfoDTO(Item item, String mainImage, List<String> detailImages, boolean wishStatus, String lang) {
         return ItemInfoDTO.builder()
                 .id(item.getId())
-                .itemName(item.getName())
+                .itemName(item.getName(lang))
                 .brand(item.getCompany().getName())
                 .originalPrice(item.getOriginalPrice())
                 .salePrice(item.getSalePrice())
@@ -93,14 +94,14 @@ public abstract class ItemConverter {
                 .build();
     }
 
-    public static GraphListDTO toGraphListDTO(Long itemId, List<Graph> graphs) {
+    public static GraphListDTO toGraphListDTO(Long itemId, List<Graph> graphs, String lang) {
         return GraphListDTO.builder()
                 .itemId(itemId)
                 .graphList(graphs.stream()
                         .map(gh -> GraphSummaryDTO.builder()
                                 .id(gh.getId())
-                                .name(gh.getName())
-                                .optionName(gh.getOptionName())
+                                .name(gh.getName(lang))
+                                .optionName(gh.getOptionName(lang))
                                 .percentage(gh.getPercentage())
                                 .build())
                         .toList())

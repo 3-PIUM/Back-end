@@ -36,8 +36,10 @@ public class CartController {
             description = "로그인된 사용자의 장바구니 아이템 목록을 조회합니다."
     )
     @GetMapping("/items")
-    public ApiResponse<CartDTO> getCartItems(@Parameter(hidden = true) @LoginMember Member member) {
-        return cartService.getCartItems(member.getId());
+    public ApiResponse<CartDTO> getCartItems(@Parameter(hidden = true) @LoginMember Member member,
+                                             @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
+    ) {
+        return cartService.getCartItems(member.getId(), lang);
     }
 
 
@@ -48,8 +50,9 @@ public class CartController {
     @PostMapping("/items/{itemId}")
     public ApiResponse<CartItemDTO> addItemToCart(@Parameter(hidden = true) @LoginMember Member member,
                                                   @Parameter(description = "추가할 아이템의 ID") @PathVariable Long itemId,
-                                                  @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO) {
-        return cartService.addItemToCart(member, itemId, addItemDTO);
+                                                  @Parameter(description = "추가할 수량") @RequestBody AddItemDTO addItemDTO,
+                                                  @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang) {
+        return cartService.addItemToCart(member, itemId, addItemDTO, lang);
     }
 
     @Operation(
@@ -91,8 +94,10 @@ public class CartController {
     )
     @DeleteMapping("/items/{cartItemId}")
     public ApiResponse<SummaryCartItemDTO> removeCartItem(@Parameter(hidden = true) @LoginMember Member member,
-                                                          @Parameter(description = "삭제할 CartItem ID") @PathVariable Long cartItemId) {
-        return cartService.removeCartItem(member.getId(), cartItemId);
+                                                          @Parameter(description = "삭제할 CartItem ID") @PathVariable Long cartItemId,
+                                                          @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
+    ) {
+        return cartService.removeCartItem(member.getId(), cartItemId, lang);
     }
 
     @Operation(
@@ -124,9 +129,10 @@ public class CartController {
     @PostMapping("/pay/{memberId}")
     public ApiResponse<Void> pay(
             @Parameter(description = "멤버 ID") @PathVariable Long memberId,
-            @Parameter(description = "결제할 카트 아이템 ID") @RequestParam String cartItemIds
+            @Parameter(description = "결제할 카트 아이템 ID") @RequestParam String cartItemIds,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
     ) {
 
-        return cartService.pay(memberId, cartItemIds);
+        return cartService.pay(memberId, cartItemIds, lang);
     }
 }

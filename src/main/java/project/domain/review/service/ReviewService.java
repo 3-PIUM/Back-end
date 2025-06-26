@@ -60,7 +60,7 @@ public class ReviewService {
     /*
     리뷰 옵션 조회
      */
-    public ApiResponse<ReviewOptionListDTO> getReviewOption(Long itemId) {
+    public ApiResponse<ReviewOptionListDTO> getReviewOption(Long itemId, String lang) {
         Item item = isExistsItem(itemId);
         SubCategory subCategory = item.getSubCategory();
 
@@ -71,11 +71,11 @@ public class ReviewService {
             List<MakeupReviewOption> options = optionLists.stream()
                     .map(MakeupReviewOptionList::getMakeupReviewOption).toList();
 
-            ReviewOptionListDTO makeupReviewOptionListDTO = ReviewConverter.toMakeupReviewOptionListDTO(item, options);
+            ReviewOptionListDTO makeupReviewOptionListDTO = ReviewConverter.toMakeupReviewOptionListDTO(item, options,lang);
             return ApiResponse.onSuccess(makeupReviewOptionListDTO);
         } else {
             List<ReviewOption> options = reviewOptionRepository.findBySubCategoryId(subCategory.getId());
-            ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item, options);
+            ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item, options,lang);
             return ApiResponse.onSuccess(reviewOptionListDTO);
         }
     }

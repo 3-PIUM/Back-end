@@ -38,22 +38,22 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 //            @Param("skinIssue") String skinIssue
 //    );
 
-    @Query("""
-            SELECT DISTINCT i FROM Item i
-            LEFT JOIN FETCH i.itemImages img
-            WHERE UPPER(i.name) LIKE UPPER(CONCAT('%', :keyword, '%'))
-            AND (img.imageType = 'MAIN' OR img IS NULL)
-            ORDER BY
-                CASE
-                    WHEN UPPER(i.name) = UPPER(:keyword) THEN 1
-                    WHEN UPPER(i.name) LIKE UPPER(CONCAT(:keyword, '%')) THEN 2
-                    WHEN UPPER(i.name) LIKE UPPER(CONCAT('%', :keyword, '%')) THEN 3
-                    ELSE 4
-                END
-            """)
-    List<Item> findByKeywordWithMainImage(
-            String keyword
-    );
+//    @Query("""
+//            SELECT DISTINCT i FROM Item i
+//            LEFT JOIN FETCH i.itemImages img
+//            WHERE UPPER(i.name) LIKE UPPER(CONCAT('%', :keyword, '%'))
+//            AND (img.imageType = 'MAIN' OR img IS NULL)
+//            ORDER BY
+//                CASE
+//                    WHEN UPPER(i.name) = UPPER(:keyword) THEN 1
+//                    WHEN UPPER(i.name) LIKE UPPER(CONCAT(:keyword, '%')) THEN 2
+//                    WHEN UPPER(i.name) LIKE UPPER(CONCAT('%', :keyword, '%')) THEN 3
+//                    ELSE 4
+//                END
+//            """)
+//    List<Item> findByKeywordWithMainImage(
+//            String keyword
+//    );
 
     /*
         검색 키워드에 맞는 아이템 정보 조회(ElasticSearch 전용)

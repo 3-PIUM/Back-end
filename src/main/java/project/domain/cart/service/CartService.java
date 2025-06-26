@@ -61,7 +61,7 @@ public class CartService {
     /*
     장바구니 아이템 조회
      */
-    public ApiResponse<CartDTO> getCartItems(Long memberId) {
+    public ApiResponse<CartDTO> getCartItems(Long memberId, String lang) {
         Cart cart = findCartByMember(memberId);
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
 
@@ -81,7 +81,7 @@ public class CartService {
                 ));
 
 
-        CartDTO cartDTO = CartConverter.toCartDTO(cart, cartItems, itemImageMap);
+        CartDTO cartDTO = CartConverter.toCartDTO(cart, cartItems, itemImageMap, lang);
         return ApiResponse.onSuccess(cartDTO);
     }
 
@@ -89,7 +89,7 @@ public class CartService {
     장바구니 추가
      */
     @Transactional
-    public ApiResponse<CartItemDTO> addItemToCart(Member member, Long itemId, AddItemDTO addItemDTO) {
+    public ApiResponse<CartItemDTO> addItemToCart(Member member, Long itemId, AddItemDTO addItemDTO, String lang) {
         Cart cart = findCartByMember(member.getId()); // 카트 정보 조회
         Item addItem = findItemById(itemId); // 추가할 아이템 정보 조회
 
@@ -128,7 +128,7 @@ public class CartService {
 
         cartLogProducer.sendCartLog(cartEventDTO);
 
-        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem, mainImage);
+        CartItemDTO cartItemDTO = CartConverter.toCartItemDTO(cartItem, mainImage, lang);
         return ApiResponse.onSuccess("장바구니에 추가된 아이템", cartItemDTO);
     }
 
@@ -178,7 +178,7 @@ public class CartService {
     장바구니 아이템 삭제
      */
     @Transactional
-    public ApiResponse<SummaryCartItemDTO> removeCartItem(Long memberId, Long cartItemId) {
+    public ApiResponse<SummaryCartItemDTO> removeCartItem(Long memberId, Long cartItemId, String lang) {
         Cart cart = findCartByMember(memberId); // 카트 정보 조회
 
         // 카트에 해당 아이템이 존재하는지 체크
@@ -191,7 +191,7 @@ public class CartService {
         // 총액 업데이트
         updateCartTotalPrice(cart);
 
-        SummaryCartItemDTO cartItemDTO = CartConverter.toSummaryCartItemDTO(cartItem);
+        SummaryCartItemDTO cartItemDTO = CartConverter.toSummaryCartItemDTO(cartItem, lang);
         return ApiResponse.onSuccess("장바구니에서 삭제된 아이템", cartItemDTO);
     }
 
@@ -239,7 +239,7 @@ public class CartService {
     결제
      */
     @Transactional
-    public ApiResponse<Void> pay(Long memberId, String cartItemIds) {
+    public ApiResponse<Void> pay(Long memberId, String cartItemIds, String lang) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND_BY_ID));
@@ -272,7 +272,7 @@ public class CartService {
             PurchaseHistory newPH = PurchaseHistory.builder()
                     .member(member)
                     .itemId(payItem.getItem().getId())
-                    .itemName(payItem.getItem().getName())
+                    .itemName(payItem.getItem().getName(lang))
                     .price(payItem.getItem().getSalePrice())
                     .quantity(payItem.getQuantity())
                     .discountRate(payItem.getItem().getDiscountRate())
