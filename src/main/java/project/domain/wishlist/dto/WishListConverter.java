@@ -21,7 +21,7 @@ public abstract class WishListConverter {
                 .item(ItemSummaryDTO.builder()
                         .itemId(wishList.getItem().getId())
                         .itemName(wishList.getItem().getName(lang))
-                        .brand(wishList.getItem().getCompany().getName())
+                        .brand(wishList.getItem().getCompany().getName(lang))
                         .originalPrice(wishList.getItem().getOriginalPrice())
                         .salePrice(wishList.getItem().getSalePrice())
                         .discountRate(wishList.getItem().getDiscountRate())

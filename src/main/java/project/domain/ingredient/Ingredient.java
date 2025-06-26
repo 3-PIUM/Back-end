@@ -12,6 +12,7 @@ import project.domain.ingredient.enums.Risk;
 
 import java.util.ArrayList;
 import java.util.List;
+import project.domain.member.enums.Language;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -30,16 +31,65 @@ public class Ingredient extends BaseEntity {
     @OneToMany(mappedBy = "ingredient")
     private List<CautionSkinType> cautionSkinTypes = new ArrayList<>();
 
-    private String name;
-
     @Enumerated(EnumType.STRING)
     private Risk risk; // SAFE, CAUTION, DANGER, NONE
 
+    private int ranking; // 1~2: 1, 3~4: 2, ..., 9~10: 5
+
+    private String krName;
+
     @Nullable
-    private String riskCategory;
+    private String krRiskCategory;
 
     @Column(length = 500)
-    private String effect;
+    private String krEffect;
 
-    private int ranking; // 1~2: 1, 3~4: 2, ..., 9~10: 5
+    private String enName;
+
+    @Nullable
+    private String enRiskCategory;
+
+    @Column(length = 500)
+    private String enEffect;
+
+    private String jpName;
+
+    @Nullable
+    private String jpRiskCategory;
+
+    @Column(length = 500)
+    private String jpEffect;
+
+    public String getName(String lang) {
+        Language language = Language.valueOf(lang);
+        if (language.equals(Language.EN)) {
+            return enName;
+        } else if (language.equals(Language.JP)) {
+            return jpName;
+        } else {
+            return krName;
+        }
+    }
+
+    public String getEffect(String lang) {
+        Language language = Language.valueOf(lang);
+        if (language.equals(Language.EN)) {
+            return enEffect;
+        } else if (language.equals(Language.JP)) {
+            return jpEffect;
+        } else {
+            return krEffect;
+        }
+    }
+
+    public String getRiskCategory(String lang) {
+        Language language = Language.valueOf(lang);
+        if (language.equals(Language.EN)) {
+            return enRiskCategory;
+        } else if (language.equals(Language.JP)) {
+            return jpRiskCategory;
+        } else {
+            return krRiskCategory;
+        }
+    }
 }

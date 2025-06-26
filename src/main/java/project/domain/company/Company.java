@@ -11,6 +11,7 @@ import project.domain.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
+import project.domain.member.enums.Language;
 
 @Entity
 @Getter
@@ -22,8 +23,23 @@ public class Company extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String krName;
+
+    private String enName;
+
+    private String jpName;
 
     @OneToMany(mappedBy = "company")
     private List<Item> items = new ArrayList<>();
+
+    public String getName(String lang) {
+        Language language = Language.valueOf(lang);
+        if (language == Language.EN) {
+            return enName;
+        } else if (language == Language.JP) {
+            return jpName;
+        } else {
+            return krName;
+        }
+    }
 }

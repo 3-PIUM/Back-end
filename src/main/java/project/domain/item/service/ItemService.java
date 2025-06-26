@@ -53,37 +53,39 @@ public class ItemService {
     // 상품 정보 조회
     public ApiResponse<ItemInfoDTO> getItemInfo(Member member, Long itemId, String lang) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
 
         // 찜 상태
         boolean wishStatus = false;
         if (member != null) {
-            Optional<WishList> isWishList = wishlistRepository.findByMemberIdAndItemId(member.getId(), itemId);
+            Optional<WishList> isWishList = wishlistRepository.findByMemberIdAndItemId(
+                member.getId(), itemId);
             wishStatus = isWishList.isPresent();
         }
 
-        String mainImage = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.MAIN).stream()
-                .map(ItemImage::getUrl)
-                .findFirst()
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MAIN_IMAGE_NOT_FOUND));
+        String mainImage = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.MAIN)
+            .stream()
+            .map(ItemImage::getUrl)
+            .findFirst()
+            .orElseThrow(() -> new GeneralException(ErrorStatus.MAIN_IMAGE_NOT_FOUND));
 
-        List<String> detailImages = itemImageRepository.findByItemIdAndImageType(itemId, ImageType.DETAIL).stream()
-                .map(ItemImage::getUrl)
-                .toList();
-
+        List<String> detailImages = itemImageRepository.findByItemIdAndImageType(itemId,
+                ImageType.DETAIL).stream()
+            .map(ItemImage::getUrl)
+            .toList();
 
         // 조회 이벤트 발행(Kafka)
         ViewEventDTO viewEventDTO = ViewEventDTO.builder()
-                .memberId(member != null ? member.getId() : null)
-                .itemId(itemId)
-                .subCategory(item.getSubCategory().getName())
-                .eventTime(System.currentTimeMillis())
-                .build();
+            .memberId(member != null ? member.getId() : null)
+            .itemId(itemId)
+            .subCategory(item.getSubCategory().getName())
+            .eventTime(System.currentTimeMillis())
+            .build();
 
         viewLogProducer.sendViewLog(viewEventDTO);
 
-
-        ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages, wishStatus, lang);
+        ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages,
+            wishStatus, lang);
         return ApiResponse.onSuccess(itemInfoImages);
     }
 
@@ -92,53 +94,60 @@ public class ItemService {
     public ApiResponse<RiskCountDTO> getRiskCount(Long itemId) {
 
         // 포함된 성분 저장
-        List<ContainIngredient> containIngredients = containIngredientRepository.findByItemId(itemId);
+        List<ContainIngredient> containIngredients = containIngredientRepository.findByItemId(
+            itemId);
 
         // 각 성분 스코어 개수 저장
         Map<Risk, Long> riskCounts = containIngredients.stream()
-                .map(ci -> ci.getIngredient().getRisk())
-                .collect(Collectors.groupingBy(
-                        Function.identity(),
-                        Collectors.counting()
-                ));
+            .map(ci -> ci.getIngredient().getRisk())
+            .collect(Collectors.groupingBy(
+                Function.identity(),
+                Collectors.counting()
+            ));
 
         int dangerCount = riskCounts.getOrDefault(Risk.DANGER, 0L).intValue();
         int cautionCount = riskCounts.getOrDefault(Risk.CAUTION, 0L).intValue();
         int safeCount = riskCounts.getOrDefault(Risk.SAFE, 0L).intValue();
         int noneCount = riskCounts.getOrDefault(Risk.NONE, 0L).intValue();
 
-        RiskCountDTO riskCountDTO = ItemConverter.toRiskCountDTO(itemId, safeCount, cautionCount, dangerCount, noneCount);
+        RiskCountDTO riskCountDTO = ItemConverter.toRiskCountDTO(itemId, safeCount, cautionCount,
+            dangerCount, noneCount);
         return ApiResponse.onSuccess(riskCountDTO);
     }
 
     // 포함 성분 조회
-    public ApiResponse<IngredientRankingDTO> getContainIngredients(Long itemId) {
-        List<ContainIngredient> containIngredients = containIngredientRepository.findByItemId(itemId);
+    public ApiResponse<IngredientRankingDTO> getContainIngredients(Long itemId, String lang) {
+        List<ContainIngredient> containIngredients = containIngredientRepository.findByItemId(
+            itemId);
 
-        IngredientRankingDTO ingredientScoreDTO = ItemConverter.toIngredientScoreDTO(itemId, containIngredients);
+        IngredientRankingDTO ingredientScoreDTO = ItemConverter.toIngredientScoreDTO(itemId,
+            containIngredients, lang);
         return ApiResponse.onSuccess(ingredientScoreDTO);
     }
 
 
     // 민감 주의 성분 조회
-    public ApiResponse<CautionIngredientsDTO> getCautionIngredients(Long itemId) {
-        List<ContainIngredient> containIngredients = containIngredientRepository.findByItemId(itemId);
+    public ApiResponse<CautionIngredientsDTO> getCautionIngredients(Long itemId, String lang) {
+        List<ContainIngredient> containIngredients = containIngredientRepository.findByItemId(
+            itemId);
 
         List<ContainIngredient> cautionIngredients = containIngredients.stream()
-                .filter(ci -> ci.getIngredient().getRiskCategory() != null)
-                .toList();
+            .filter(ci -> ci.getIngredient().getRiskCategory(lang) != null)
+            .toList();
 
-        CautionIngredientsDTO cautionIngredientsDTO = ItemConverter.toCautionIngredientsDTO(itemId, cautionIngredients);
+        CautionIngredientsDTO cautionIngredientsDTO = ItemConverter.toCautionIngredientsDTO(itemId,
+            cautionIngredients, lang);
         return ApiResponse.onSuccess(cautionIngredientsDTO);
     }
 
 
     // 피부 타입 별 AI 요약 조회
-    public ApiResponse<AiSummaryListDTO> getAiSummary(Long itemId) {
+    public ApiResponse<AiSummaryListDTO> getAiSummary(Long itemId, String lang) {
 
         List<AiSummary> aiSummaries = aiSummaryRepository.findByItemIdOrderByRankingAsc(itemId);
 
-        AiSummaryListDTO aiSummaryListDTO = ItemConverter.toAiSummaryListDTO(itemId, aiSummaries);
+        AiSummaryListDTO aiSummaryListDTO = ItemConverter.toAiSummaryListDTO(itemId, aiSummaries,
+            lang);
         return ApiResponse.onSuccess(aiSummaryListDTO);
     }
 
@@ -155,9 +164,9 @@ public class ItemService {
         List<Long> wishListIds = new ArrayList<>();
         if (member != null) {
             List<Long> fetchedIds = wishlistRepository.findByMemberId(member.getId())
-                    .stream()
-                    .map(w -> w.getItem().getId())
-                    .toList();
+                .stream()
+                .map(w -> w.getItem().getId())
+                .toList();
             wishListIds.addAll(fetchedIds);
         }
         return wishListIds;
