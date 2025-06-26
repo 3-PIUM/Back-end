@@ -6,6 +6,7 @@ import static lombok.AccessLevel.PROTECTED;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -118,14 +119,11 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviewList;
 
-    //TODO
-    // 설문을 이용한 사용자의 피부 MBTI를 저장합니다.
-
     @Builder
     private Member(String nickname, String profileImg, String email, String password,
-        LocalDate birth, Gender gender, AxisType pigmentType, AxisType moistureType,
-        AxisType reactivityType, List<String> skinIssue,
-        SkinType skinType, PersonalType personalType, Area area, Language lang) {
+                   LocalDate birth, Gender gender, AxisType pigmentType, AxisType moistureType,
+                   AxisType reactivityType, List<String> skinIssue,
+                   SkinType skinType, PersonalType personalType, Area area, Language lang) {
         this.skinIssue = skinIssue;
         this.nickname = nickname;
         this.profileImg = profileImg;
@@ -149,23 +147,23 @@ public class Member extends BaseEntity {
         Optional.ofNullable(updateDTO.getEmail()).ifPresent(v -> this.email = v);
         Optional.ofNullable(updateDTO.getBirth()).ifPresent(v -> this.birth = v);
         Optional.ofNullable(updateDTO.getSkinIssue())
-            .ifPresent(v -> this.skinIssue = SkinIssueUtil.generateOXListFromIndexes(v));
+                .ifPresent(v -> this.skinIssue = SkinIssueUtil.generateOXListFromIndexes(v));
         Optional.ofNullable(updateDTO.getGender())
-            .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
+                .ifPresent(v -> this.gender = EnumUtil.safeValueOf(Gender.class, v));
         Optional.ofNullable(updateDTO.getSkinType())
-            .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
+                .ifPresent(v -> this.skinType = SkinType.getSkinType(v));
         Optional.ofNullable(updateDTO.getPigmentType())
-            .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(AxisType.class, v));
+                .ifPresent(v -> this.pigmentType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getMoistureType())
-            .ifPresent(v -> moistureType = EnumUtil.safeValueOf(AxisType.class, v));
+                .ifPresent(v -> moistureType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getReactivityType())
-            .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(AxisType.class, v));
+                .ifPresent(v -> reactivityType = EnumUtil.safeValueOf(AxisType.class, v));
         Optional.ofNullable(updateDTO.getPersonalType())
-            .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
+                .ifPresent(v -> this.personalType = EnumUtil.safeValueOf(PersonalType.class, v));
         Optional.ofNullable(updateDTO.getArea())
-            .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
+                .ifPresent(v -> this.area = EnumUtil.safeValueOf(Area.class, v));
         Optional.ofNullable(updateDTO.getLanguage())
-            .ifPresent(v -> this.lang = Language.getLanguage(v));
+                .ifPresent(v -> this.lang = Language.getLanguage(v));
     }
 
     /*
@@ -180,14 +178,25 @@ public class Member extends BaseEntity {
      */
     public String createMbti() {
         if (Stream.of(this.skinType, this.pigmentType, this.moistureType, this.reactivityType)
-            .anyMatch(Objects::isNull)) {
+                .anyMatch(Objects::isNull)) {
             return "";
         }
 
         return Stream.of(skinType, pigmentType, moistureType, reactivityType)
-            .filter(Objects::nonNull)
-            .map(Enum::name)
-            .collect(Collectors.joining(", "));
+                .filter(Objects::nonNull)
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
 
+    }
+
+    // 생년월일로 연령대 조회
+    public String getAgeGroup() {
+        int age = Period.between(this.birth, LocalDate.now()).getYears();
+
+        if (age < 20) return "10대";
+        else if (age < 30) return "20대";
+        else if (age < 40) return "30대";
+        else if (age < 50) return "40대";
+        else return "50대이상";
     }
 }

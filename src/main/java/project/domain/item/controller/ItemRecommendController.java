@@ -4,14 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.domain.item.dto.ItemRecommendResponse;
-import project.domain.item.dto.ItemRecommendResponse.PopularItemsInfoDTO;
-import project.domain.item.dto.ItemRecommendResponse.PopularWeekItemsInfoDTO;
-import project.domain.item.dto.ItemRecommendResponse.TrendItemsInfoDTO;
+import project.domain.item.dto.ItemRecommendResponse.*;
 import project.domain.item.service.ItemRecommendService;
 import project.domain.member.Member;
 import project.domain.popularitem.dto.PopularItemDTO;
@@ -73,5 +68,40 @@ public class ItemRecommendController {
     ) {
         List<PopularWeekItemDTO> popularWeekItems = popularWeekCacheService.getPopularWeekItems();
         return itemRecommendService.getPopularWeekItems(member, popularWeekItems, lang);
+    }
+
+    @Operation(
+            summary = "국가별 TOP 30 조회"
+    )
+    @GetMapping("/areaPopular")
+    public ApiResponse<AreaPopularItemsInfoDTO> getAreaPopularItems(
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
+    ) {
+        return itemRecommendService.getAreaPopularItems(member, lang);
+    }
+
+    @Operation(
+            summary = "장바구니 담은 상품과 주로 함께 구매된 상품 조회"
+    )
+    @GetMapping("/relatedPurchaseItems/{itemId}")
+    public ApiResponse<List<RelatedPurchaseItemDTO>> getRelatedPurchaseItems(
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
+    ) {
+        return itemRecommendService.getRelatedPurchaseItems(member, itemId, lang);
+    }
+
+    @Operation(
+            summary = "다른 고객이 보고 있는 상품과 함께 본 상품 조회"
+    )
+    @GetMapping("/relatedViewItems/{itemId}")
+    public ApiResponse<List<RelatedViewItemDTO>> getRelatedViewItems(
+            @Parameter(hidden = true) @LoginMember Member member,
+            @Parameter(description = "아이템 ID") @PathVariable Long itemId,
+            @Parameter(description = "설정 언어") @RequestParam(defaultValue = "KR") String lang
+    ) {
+        return itemRecommendService.getRelatedViewItems(member, itemId, lang);
     }
 }

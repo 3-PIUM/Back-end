@@ -1,12 +1,15 @@
 package project.domain.item.dto.converter;
 
+import project.domain.areapopularitem.AreaPopularItem;
 import project.domain.item.Item;
 import project.domain.item.dto.ItemRecommendResponse;
 import project.domain.item.dto.ItemRecommendResponse.*;
 import project.domain.popularitem.dto.PopularItemDTO;
 import project.domain.popularweekitem.dto.PopularWeekItemResponse;
 import project.domain.popularweekitem.dto.PopularWeekItemResponse.PopularWeekItemDTO;
+import project.domain.relatedpurchaseitem.RelatedPurchaseItem;
 import project.domain.trenditem.dto.TrendItemDTO;
+import project.domain.wishlist.WishList;
 
 import java.util.List;
 import java.util.Map;
@@ -107,5 +110,67 @@ public abstract class ItemRecommendConverter {
                         })
                         .toList())
                 .build();
+    }
+
+    public static AreaPopularItemsInfoDTO toAreaPopularItemsInfoDTOs(
+            String title, List<Item> items, List<AreaPopularItem> areaPopularItems, List<Long> wishListIds, String lang) {
+        // items를 Map으로 변환
+        Map<Long, Item> itemMap = items.stream()
+                .collect(Collectors.toMap(Item::getId, item -> item));
+
+        return AreaPopularItemsInfoDTO.builder()
+                .title(title)
+                .popularItems(areaPopularItems.stream()
+                        .map(popularWeekItem -> {
+                            Item item = itemMap.get(popularWeekItem.getItemId());
+                            if (item == null) {
+                                return null; // 해당 아이템이 없으면 null
+                            }
+
+                            return AreaPopularItemSummaryDTO.builder()
+                                    .itemId(item.getId())
+                                    .itemName(item.getName(lang))
+                                    .itemImage(!item.getItemImages().isEmpty()
+                                            ? item.getItemImages().get(0).getUrl() : null)
+                                    .originalPrice(item.getOriginalPrice())
+                                    .salePrice(item.getSalePrice())
+                                    .discountRate(item.getDiscountRate())
+                                    .wishStatus(wishListIds.contains(popularWeekItem.getItemId()))
+                                    .build();
+                        })
+                        .toList())
+                .build();
+    }
+
+    public static List<RelatedPurchaseItemDTO> toRelatedPurchaseItemDTOs(
+            List<Item> items, List<Long> wishListIds, String lang) {
+        return items.stream()
+                .map(i -> RelatedPurchaseItemDTO.builder()
+                        .itemId(i.getId())
+                        .itemName(i.getName(lang))
+                        .itemImage(!i.getItemImages().isEmpty()
+                                ? i.getItemImages().get(0).getUrl() : null)
+                        .originalPrice(i.getOriginalPrice())
+                        .salePrice(i.getSalePrice())
+                        .discountRate(i.getDiscountRate())
+                        .wishStatus(wishListIds.contains(i.getId()))
+                        .build())
+                .toList();
+    }
+
+    public static List<RelatedViewItemDTO> toRelatedViewItemDTOs(
+            List<Item> items, List<Long> wishListIds, String lang) {
+        return items.stream()
+                .map(i -> RelatedViewItemDTO.builder()
+                        .itemId(i.getId())
+                        .itemName(i.getName(lang))
+                        .itemImage(!i.getItemImages().isEmpty()
+                                ? i.getItemImages().get(0).getUrl() : null)
+                        .originalPrice(i.getOriginalPrice())
+                        .salePrice(i.getSalePrice())
+                        .discountRate(i.getDiscountRate())
+                        .wishStatus(wishListIds.contains(i.getId()))
+                        .build())
+                .toList();
     }
 }
