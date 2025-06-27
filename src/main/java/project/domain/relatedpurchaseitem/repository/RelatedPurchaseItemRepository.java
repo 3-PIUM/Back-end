@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import project.domain.relatedpurchaseitem.RelatedPurchaseItem;
-import project.global.enums.skin.SkinType;
 
 import java.util.List;
 
@@ -26,4 +25,10 @@ public interface RelatedPurchaseItemRepository extends JpaRepository<RelatedPurc
             @Param("customerSegment") String customerSegment
     );
 
+    @Query(value = """
+            SELECT related_item_id FROM related_purchase_item
+            ORDER BY RAND()
+            LIMIT 9
+            """, nativeQuery = true)
+    List<Long> find9RandomItemIds();
 }

@@ -157,6 +157,9 @@ public class ItemRecommendService {
 
         List<Long> relatedPurchaseItemIds = relatedPurchaseItemRepository
                 .find9RandomItemIdsBySkinTypeAndCustomerSegment(itemId, mem.getSkinType().toString(), customerSegment);
+        if (relatedPurchaseItemIds.isEmpty()) {
+            relatedPurchaseItemIds = relatedPurchaseItemRepository.find9RandomItemIds();
+        }
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(relatedPurchaseItemIds);
 
@@ -177,6 +180,10 @@ public class ItemRecommendService {
 
         List<Long> relatedViewItemIds = relatedViewItemRepository
                 .find12RandomRelatedItemIdsByItemIdAndCustomerSegment(itemId, customerSegment);
+        if (relatedViewItemIds.isEmpty()) {
+            relatedViewItemIds = relatedPurchaseItemRepository.find9RandomItemIds();
+        }
+
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(relatedViewItemIds);
 
