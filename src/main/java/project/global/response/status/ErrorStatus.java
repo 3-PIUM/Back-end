@@ -22,6 +22,7 @@ public enum ErrorStatus {
         "만료된 토큰입니다."),
     AUTHENTICATION_TYPE_IS_NOT_BEARER(HttpStatus.BAD_REQUEST, "JWT4003",
         "잘못된 토큰 타입입니다."),
+    ADMIN_NOT_VAILD(HttpStatus.BAD_REQUEST, "ADMIN400","관리자 계정이 아닙니다."),
 
     /*
      * mbti 설문 검사
