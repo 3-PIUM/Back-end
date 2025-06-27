@@ -14,10 +14,10 @@ permissions:
     mode: 755
 
 hooks:
-  BeforeInstall:
-    - location: scripts/docker-clean.sh
-      timeout: 300
-      runas: ec2-user
+#  BeforeInstall:
+#    - location: scripts/docker-clean.sh
+#      timeout: 300
+#      runas: ec2-user
 
   AfterInstall:
     - location: scripts/deploy.sh
