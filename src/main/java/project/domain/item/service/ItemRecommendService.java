@@ -47,16 +47,12 @@ public class ItemRecommendService {
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(popularIds);
 
-        Area area;
-        String title = "베스트 오브 베스트";
-        if (member != null) {
-            area = member.getArea();
-            title = switch (area) {
-                case KOREA -> "베스트 오브 베스트";
-                case USA, CHINA -> "BEST OF BEST";
-                case JAPAN -> "ベスト・オブ・ベスト";
-            };
-        }
+        String value = lang.toUpperCase();
+        String title = switch (value) {
+            case "EN" -> "BEST OF BEST";
+            case "JP" -> "ベスト・オブ・ベスト";
+            default -> "베스트 오브 베스트";
+        };
 
         PopularItemsInfoDTO top10ItemsInfoDTOs =
                 ItemRecommendConverter.toPopularItemsInfoDTOs(
@@ -74,16 +70,12 @@ public class ItemRecommendService {
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(trendIds);
 
-        Area area;
-        String title = "지금 주목할만한 인기 상품";
-        if (member != null) {
-            area = member.getArea();
-            title = switch (area) {
-                case KOREA -> "지금 주목할만한 인기 상품";
-                case USA, CHINA -> "Trending Items to Watch Now";
-                case JAPAN -> "今注目の人気商品";
-            };
-        }
+        String value = lang.toUpperCase();
+        String title = switch (value) {
+            case "EN" -> "Trending Items to Watch Now";
+            case "JP" -> "今注目の人気商品";
+            default -> "지금 주목할만한 인기 상품";
+        };
 
         TrendItemsInfoDTO trendItemsInfoDTOs =
                 ItemRecommendConverter.toTrendItemsInfoDTOs(
@@ -101,16 +93,12 @@ public class ItemRecommendService {
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(popularWeekIds);
 
-        Area area;
-        String title = "위클리 베스트";
-        if (member != null) {
-            area = member.getArea();
-            title = switch (area) {
-                case KOREA -> "베스트 오브 베스트";
-                case USA, CHINA -> "WEEKLY OF BEST";
-                case JAPAN -> "ウィークリーベスト";
-            };
-        }
+        String value = lang.toUpperCase();
+        String title = switch (value) {
+            case "EN" -> "WEEKLY OF BEST";
+            case "JP" -> "ウィークリーベスト";
+            default -> "위클리 베스트";
+        };
 
         PopularWeekItemsInfoDTO popularWeekItemsInfoDTO = ItemRecommendConverter.toPopularWeekItemsInfoDTOs(
                 title, items, popularWeekItems, wishListIds, lang);
@@ -119,17 +107,14 @@ public class ItemRecommendService {
 
     // 국가별 추천 상품 Top 30 - 데이터는 ML에서 처리해줌
     public ApiResponse<AreaPopularItemsInfoDTO> getAreaPopularItems(Member member, String lang) {
-        Area area = Area.KOREA;
-        String title = "지금 한국에서 가장 핫한 제품";
-        if (member != null) {
-            area = member.getArea();
-            title = switch (area) {
-                case KOREA -> "지금 한국에서 가장 핫한 제품";
-                case USA -> "Hottest Products in the U.S. Right Now";
-                case JAPAN -> "今、日本で最も話題の製品";
-                case CHINA -> "Hottest Products in the China Right Now";
-            };
-        }
+        Area area = member == null ? Area.KOREA : member.getArea();
+
+        String value = lang.toUpperCase();
+        String title = switch (value) {
+            case "EN" -> "Hottest Products in the U.S. Right Now";
+            case "JP" -> "今、日本で最も話題の製品";
+            default -> "지금 한국에서 가장 핫한 제품";
+        };
 
         List<Long> wishListIds = getWishListIds(member);
 
