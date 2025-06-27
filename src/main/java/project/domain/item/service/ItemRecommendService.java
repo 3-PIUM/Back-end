@@ -173,7 +173,7 @@ public class ItemRecommendService {
         Member mem = member != null ? member : memberRepository.findRandom();
 
         // 고객층 - FEMALE_10대_CHINA
-        String customerSegment = mem.getGender().toString() + "_" + mem.getAgeGroup() + mem.getArea().toString();
+        String customerSegment = mem.getGender().toString() + "_" + mem.getAgeGroup() + "_" + mem.getArea().toString();
 
         List<Long> relatedViewItemIds = relatedViewItemRepository
                 .find12RandomRelatedItemIdsByItemIdAndCustomerSegment(itemId, customerSegment);
