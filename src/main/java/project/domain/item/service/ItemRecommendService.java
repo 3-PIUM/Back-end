@@ -7,17 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 import project.domain.areapopularitem.AreaPopularItem;
 import project.domain.areapopularitem.repository.AreaPopularItemRepository;
 import project.domain.item.Item;
-import project.domain.item.dto.ItemRecommendResponse;
 import project.domain.item.dto.ItemRecommendResponse.*;
 import project.domain.item.dto.converter.ItemRecommendConverter;
 import project.domain.item.repository.ItemRepository;
 import project.domain.member.Member;
 import project.domain.member.enums.Area;
-import project.domain.member.enums.Gender;
 import project.domain.member.repository.MemberRepository;
 import project.domain.popularitem.dto.PopularItemDTO;
 import project.domain.popularweekitem.dto.PopularWeekItemResponse.PopularWeekItemDTO;
-import project.domain.relatedpurchaseitem.RelatedPurchaseItem;
 import project.domain.relatedpurchaseitem.repository.RelatedPurchaseItemRepository;
 import project.domain.relatedviewitem.repository.RelatedViewItemRepository;
 import project.domain.trenditem.dto.TrendItemDTO;
@@ -26,7 +23,6 @@ import project.global.response.ApiResponse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -50,7 +46,17 @@ public class ItemRecommendService {
                 .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(popularIds);
+
+        Area area;
         String title = "베스트 오브 베스트";
+        if (member != null) {
+            area = member.getArea();
+            title = switch (area) {
+                case KOREA -> "베스트 오브 베스트";
+                case USA, CHINA -> "BEST OF BEST";
+                case JAPAN -> "ベスト・オブ・ベスト";
+            };
+        }
 
         PopularItemsInfoDTO top10ItemsInfoDTOs =
                 ItemRecommendConverter.toPopularItemsInfoDTOs(
@@ -67,7 +73,17 @@ public class ItemRecommendService {
                 .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(trendIds);
+
+        Area area;
         String title = "지금 주목할만한 인기 상품";
+        if (member != null) {
+            area = member.getArea();
+            title = switch (area) {
+                case KOREA -> "지금 주목할만한 인기 상품";
+                case USA, CHINA -> "Trending Items to Watch Now";
+                case JAPAN -> "今注目の人気商品";
+            };
+        }
 
         TrendItemsInfoDTO trendItemsInfoDTOs =
                 ItemRecommendConverter.toTrendItemsInfoDTOs(
@@ -84,7 +100,17 @@ public class ItemRecommendService {
                 .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(popularWeekIds);
+
+        Area area;
         String title = "위클리 베스트";
+        if (member != null) {
+            area = member.getArea();
+            title = switch (area) {
+                case KOREA -> "베스트 오브 베스트";
+                case USA, CHINA -> "WEEKLY OF BEST";
+                case JAPAN -> "ウィークリーベスト";
+            };
+        }
 
         PopularWeekItemsInfoDTO popularWeekItemsInfoDTO = ItemRecommendConverter.toPopularWeekItemsInfoDTOs(
                 title, items, popularWeekItems, wishListIds, lang);
@@ -99,9 +125,9 @@ public class ItemRecommendService {
             area = member.getArea();
             title = switch (area) {
                 case KOREA -> "지금 한국에서 가장 핫한 제품";
-                case USA -> "지금 미국에서 가장 핫한 제품";
-                case JAPAN -> "지금 일본에서 가장 핫한 제품";
-                case CHINA -> "지금 중국에서 가장 핫한 제품";
+                case USA -> "Hottest Products in the U.S. Right Now";
+                case JAPAN -> "今、日本で最も話題の製品";
+                case CHINA -> "Hottest Products in the China Right Now";
             };
         }
 
@@ -146,8 +172,8 @@ public class ItemRecommendService {
 
         Member mem = member != null ? member : memberRepository.findRandom();
 
-        // 고객층 - FEMALE_건성_10대
-        String customerSegment = mem.getGender().toString() + "_" + mem.getSkinType().getString() + "_" + mem.getAgeGroup();
+        // 고객층 - FEMALE_10대_CHINA
+        String customerSegment = mem.getGender().toString() + "_" + mem.getAgeGroup() + mem.getArea().toString();
 
         List<Long> relatedViewItemIds = relatedViewItemRepository
                 .find12RandomRelatedItemIdsByItemIdAndCustomerSegment(itemId, customerSegment);
