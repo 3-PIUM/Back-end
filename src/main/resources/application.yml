@@ -1,0 +1,64 @@
+spring:
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 30MB
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  data:
+    redis:
+      host: ${SPRING_REDIS_ENDPOINT}
+      port: 6379
+  datasource:
+    url: ${SPRING_DB_ENDPOINT}
+    username: ${SPRING_DB_USERNAME}
+    password: ${SPRING_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  kafka:
+    bootstrap-servers: kafka:29092 # Kafka 브로커 서버 주소 (기본값: localhost:9092)
+    consumer:
+      group-id: pium-group # 컨슈머 그룹 ID - 같은 그룹의 컨슈머들은 메시지를 분산 처리
+      auto-offset-reset: earliest # 오프셋이 없거나 잘못된 경우 시작 위치 (earliest: 처음부터, latest: 최신부터)
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer # 키 역직렬화 클래스 - 메시지 키를 String으로 변환
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer # 값 역직렬화 클래스 - 메시지 값을 String으로 변환
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 키 직렬화 클래스 - String을 바이트로 변환하여 전송
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer # 값 직렬화 클래스 - String을 바이트로 변환하여 전송
+
+cloud:
+  aws:
+    credentials:
+      s3-access-key: ${SPRING_S3_AWS_ACCESS_KEY}
+      s3-secret-key: ${SPRING_S3_AWS_SECRET_KEY}
+      access-key: ${SPRING_AWS_ACCESS_KEY}
+      secret-key: ${SPRING_AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      s3:
+        bucket: pium-image-bucket
+      stack:
+        auto: false
+
+jwt:
+  secret: ${SPRING_JWT_SECRET_KEY}
+  refresh-token-validity-in-seconds: 1209600 # 14일
+  access-token-validity-in-seconds: 604800 # 7일
+  
+elasticsearch:
+  host:
+    uris: http://43.203.121.163:9200
