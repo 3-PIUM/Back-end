@@ -20,6 +20,10 @@ fi
 echo "> 🔵 PULL DOCKER IMAGE FROM ECR"
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_REGISTRY
 
+sudo chown root:root ./filebeat/filebeat.yml
+sudo chmod 644 ./filebeat/filebeat.yml
+
 echo "> 🔵 RUN APPLICATION CONTAINER"
+docker compose down
 docker compose pull spring
 docker compose up -d
