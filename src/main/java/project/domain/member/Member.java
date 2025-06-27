@@ -197,6 +197,6 @@ public class Member extends BaseEntity {
         else if (age < 30) return "20대";
         else if (age < 40) return "30대";
         else if (age < 50) return "40대";
-        else return "50대이상";
+        else return "50대 이상";
     }
 }
