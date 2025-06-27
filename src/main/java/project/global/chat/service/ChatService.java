@@ -21,7 +21,12 @@ public class ChatService {
     private final ItemImageRepository itemImageRepository;
 
     public Mono<ChatResponseDTO> sendToFastApi(ChatRequestDTO request, Member member) {
-        request.setSession_id(member.getId().toString());
+        if (member == null) {
+            request.setSession_id("276520");
+        } else {
+            request.setSession_id(member.getId().toString());
+        }
+
         return webClient.post()
             .uri("http://3.106.232.7:8000/chat")
             .bodyValue(request)

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import project.domain.member.Member;
+import project.domain.member.dto.MemberRequest;
 import project.domain.member.dto.MemberRequest.JoinDTO;
 import project.domain.member.dto.MemberRequest.UpdateDTO;
 import project.domain.member.dto.MemberRequest.UpdatePasswordDTO;
@@ -122,6 +123,20 @@ public class MemberController {
         @LoginMember Member member
     ) {
         return memberService.deleteMember(member);
+    }
+
+    @Operation(
+        summary = "관리자 로그인",
+        description = "관리자 해당하는 브랜드 관리 페이지로 이동합니다."
+    )
+    @PostMapping("admin-login")
+    public ApiResponse<String> adminLongin(
+        @RequestBody MemberRequest.LoginDTO request
+    ) {
+        String redirectUrl =
+            "http://3.106.232.7:8501/admin?brand=" + memberService.getVaildAdmin(request);
+
+        return ApiResponse.onSuccess(redirectUrl);
     }
 
 }

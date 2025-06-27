@@ -14,6 +14,7 @@ import project.domain.member.dto.MemberRequest;
 import project.domain.member.dto.MemberRequest.JoinDTO;
 import project.domain.member.dto.MemberResponse;
 import project.domain.member.dto.MemberResponse.DetailInfoDTO;
+import project.domain.member.enums.Role;
 import project.domain.member.repository.MemberRepository;
 import project.global.response.ApiResponse;
 import project.global.response.exception.GeneralException;
@@ -34,6 +35,14 @@ public class MemberService {
 
     private final String dirName = "member-images";
 
+
+    public String getVaildAdmin(MemberRequest.LoginDTO loginDTO) {
+        Member memberByEmail = findMemberByEmail(loginDTO.getEmail());
+        if (memberByEmail.getRole() != Role.ADMIN) {
+            throw new GeneralException(ErrorStatus.ADMIN_NOT_VAILD);
+        }
+        return memberByEmail.getNickname();
+    }
 
     // 회원가입
     @Transactional

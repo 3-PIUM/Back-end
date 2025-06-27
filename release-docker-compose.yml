@@ -86,8 +86,8 @@ services:
     image: alpine:latest
     container_name: backup
     environment:
-      - AWS_ACCESS_KEY_ID=${S3_AWS_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${S3_AWS_SECRET_KEY}
+      - AWS_ACCESS_KEY_ID=${SPRING_S3_AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${SPRING_S3_AWS_SECRET_KEY}
       - S3_BUCKET= pium-image-bucket
       - S3_PREFIX= elk-logs
     volumes:

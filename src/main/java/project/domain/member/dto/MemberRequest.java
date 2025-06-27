@@ -93,4 +93,13 @@ public abstract class MemberRequest {
         @NotNull
         String password;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class LoginDTO {
+
+        String email;
+        String password;
+    }
 }
