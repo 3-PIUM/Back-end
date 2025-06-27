@@ -15,7 +15,7 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: scripts/docker_clean.sh
+    - location: scripts/docker-clean.sh
       timeout: 300
       runas: ec2-user
 
