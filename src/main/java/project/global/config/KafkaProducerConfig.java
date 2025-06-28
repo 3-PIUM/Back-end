@@ -28,13 +28,14 @@ public class KafkaProducerConfig {
 
         // 신뢰성 최우선 설정
         props.put(ProducerConfig.ACKS_CONFIG, "all"); // 모든 replica 확인
-        props.put(ProducerConfig.RETRIES_CONFIG, 10); // 메세지 발행 실패시 10번 재시도
+        props.put(ProducerConfig.RETRIES_CONFIG, 5); // 메세지 발행 실패시 5번 재시도
         props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1000); // 재시도 간격 1초
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true); // 중복 방지
         props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 1); // 순서 보장
-        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384); // 작은 배치(빠른 전송) - 메세지가 쌓여 16KB가 되면 한번에 메세지 전송
-        props.put(ProducerConfig.LINGER_MS_CONFIG, 1); // 대기 시간 - 배치 크기만큼 메세지가 안쌓여도 1ms가 지나면 메세지를 전송
-        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 120000); // 2분 타임아웃
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 8192); // 작은 배치(빠른 전송) - 메세지가 쌓여 8KB가 되면 한번에 메세지 전송
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 5); // 대기 시간 - 배치 크기만큼 메세지가 안쌓여도 5ms가 지나면 메세지를 전송
+        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 16777216); // 버퍼 16MB
+        props.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60000); // 1분 타임아웃
 
         return new DefaultKafkaProducerFactory<>(props);
     }
@@ -58,10 +59,10 @@ public class KafkaProducerConfig {
         // 처리량 최우선 설정
         props.put(ProducerConfig.ACKS_CONFIG, "1"); // 리더만 확인
         props.put(ProducerConfig.RETRIES_CONFIG, 1); // 1번만 재시도
-        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 65536); // 메세지가 64KB 쌓이면 전송
-        props.put(ProducerConfig.LINGER_MS_CONFIG, 50); // 50ms가 지나면 메세지가 64KB 쌓이지 않아도 전송
-        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4"); // 빠른 압축
-        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 134217728); // 버퍼 크기 128MB
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384); // 메세지가 16KB 쌓이면 전송
+        props.put(ProducerConfig.LINGER_MS_CONFIG, 30); // 30ms가 지나면 메세지가 16KB 쌓이지 않아도 전송
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy"); // 빠른 압축
+        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432); // 버퍼 크기 32MB
         props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5); // 하나의 브로커가 동시에 5개 메세지를 받을 수 있음
 
         return new DefaultKafkaProducerFactory<>(props);
@@ -84,12 +85,12 @@ public class KafkaProducerConfig {
 
         // 처리량 최우선 설정
         props.put(ProducerConfig.ACKS_CONFIG, "all"); // 모든 replica가 확인
-        props.put(ProducerConfig.RETRIES_CONFIG, 5); // 5번만 재시도
-        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 32768); // 메세지가 32KB 쌓이면 전송
+        props.put(ProducerConfig.RETRIES_CONFIG, 3); // 3번만 재시도
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 12288); // 메세지가 12KB 쌓이면 전송
         props.put(ProducerConfig.LINGER_MS_CONFIG, 20); // 20ms가 지나면 메세지가 32KB 쌓이지 않아도 전송
-        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4"); // 빠른 압축
-        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 67108864); // 버퍼 크기 64MB
-        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 3); // 하나의 브로커가 동시에 3개 메세지를 받을 수 있음
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy"); // 빠른 압축
+        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 16777216); // 버퍼 크기 16MB
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 2); // 하나의 브로커가 동시에 3개 메세지를 받을 수 있음
 
         return new DefaultKafkaProducerFactory<>(props);
     }
