@@ -63,6 +63,7 @@ public class ReviewService {
     public ApiResponse<ReviewOptionListDTO> getReviewOption(Long itemId, String lang) {
         Item item = isExistsItem(itemId);
         SubCategory subCategory = item.getSubCategory();
+        String upperLang = lang.toUpperCase();
 
         // 메이크업 제품인지 확인후 옵션 별도 처리
         Set<String> makeupCategory = Set.of("베이스메이크업", "립메이크업", "아이메이크업");
@@ -71,11 +72,11 @@ public class ReviewService {
             List<MakeupReviewOption> options = optionLists.stream()
                     .map(MakeupReviewOptionList::getMakeupReviewOption).toList();
 
-            ReviewOptionListDTO makeupReviewOptionListDTO = ReviewConverter.toMakeupReviewOptionListDTO(item, options,lang);
+            ReviewOptionListDTO makeupReviewOptionListDTO = ReviewConverter.toMakeupReviewOptionListDTO(item, options,upperLang);
             return ApiResponse.onSuccess(makeupReviewOptionListDTO);
         } else {
             List<ReviewOption> options = reviewOptionRepository.findBySubCategoryId(subCategory.getId());
-            ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item, options,lang);
+            ReviewOptionListDTO reviewOptionListDTO = ReviewConverter.toReviewOptionListDTO(item, options,upperLang);
             return ApiResponse.onSuccess(reviewOptionListDTO);
         }
     }
