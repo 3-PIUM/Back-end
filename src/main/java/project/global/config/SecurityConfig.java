@@ -59,7 +59,7 @@ public class SecurityConfig {
                                         "http://localhost:8080", // 개발 환경
                                         "http://Pium-LoadBalancer-1515701121.ap-northeast-2.elb.amazonaws.com", //로드 밸런서
                                         "https://pium-front-4iy3.vercel.app",
-                                        "https://pium-front-git-main-hyemis-projects.vercel.app/"
+                                        "https://pium-front.vercel.app"
                                 ));
 
                                 configuration.setAllowedMethods(
