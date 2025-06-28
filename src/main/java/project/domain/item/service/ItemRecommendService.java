@@ -144,7 +144,7 @@ public class ItemRecommendService {
         String customerSegment = mem.getGender().toString() + "_" + skinType + "_" + mem.getAgeGroup();
 
         List<Long> relatedPurchaseItemIds = relatedPurchaseItemRepository
-                .find9RandomItemIdsBySkinTypeAndCustomerSegment(itemId, mem.getSkinType().toString(), customerSegment);
+                .find9RandomItemIdsBySkinTypeAndCustomerSegment(itemId, skinType, customerSegment);
         if (relatedPurchaseItemIds.isEmpty()) {
             relatedPurchaseItemIds = relatedPurchaseItemRepository.find9RandomItemIds();
         }
