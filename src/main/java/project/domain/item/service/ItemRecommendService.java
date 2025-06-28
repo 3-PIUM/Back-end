@@ -19,6 +19,7 @@ import project.domain.relatedpurchaseitem.repository.RelatedPurchaseItemReposito
 import project.domain.relatedviewitem.repository.RelatedViewItemRepository;
 import project.domain.trenditem.dto.TrendItemDTO;
 import project.domain.wishlist.repository.WishlistRepository;
+import project.global.enums.skin.SkinType;
 import project.global.response.ApiResponse;
 
 import java.util.ArrayList;
@@ -136,9 +137,11 @@ public class ItemRecommendService {
         List<Long> wishListIds = getWishListIds(member);
 
         Member mem = member != null ? member : memberRepository.findRandom();
+        String skinType = mem.getSkinType() != null
+                ? mem.getSkinType().toString() : SkinType.getRandomSkinType().toString();
 
         // 고객층 - FEMALE_건성_10대
-        String customerSegment = mem.getGender().toString() + "_" + mem.getSkinType().getString() + "_" + mem.getAgeGroup();
+        String customerSegment = mem.getGender().toString() + "_" + skinType + "_" + mem.getAgeGroup();
 
         List<Long> relatedPurchaseItemIds = relatedPurchaseItemRepository
                 .find9RandomItemIdsBySkinTypeAndCustomerSegment(itemId, mem.getSkinType().toString(), customerSegment);
