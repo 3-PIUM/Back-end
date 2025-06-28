@@ -37,15 +37,15 @@ public class PopularWeekItemsBatchService {
         log.info("최근 일주일간 인기 상품 배치 처리 시작");
 
         try {
-            // 최근 일주일간 각 상품별 조회수 집계
-            Map<Long, Integer> weeklyViewStats = getWeeklyViewStats();
+            // 최근 일주일간 각 상품별 장바구니에 담긴수 집계
+            Map<Long, Integer> weeklyViewStats = getWeeklyCartStats();
             // 최근 일주일간 각 상품별 구매수 집계
             Map<Long, Integer> weeklyPurchaseStats = getWeeklyPurchaseStats();
 
             log.info("구매 통계 집계 시작");
 
             if (weeklyViewStats.isEmpty() || weeklyPurchaseStats.isEmpty()) {
-                log.warn("조회수 또는 구매수 데이터가 없습니다.");
+                log.warn("장바구니수 또는 구매수 데이터가 없습니다.");
                 return;
             }
 
@@ -123,15 +123,15 @@ public class PopularWeekItemsBatchService {
 
 
     /**
-     * 조회 통계 집계
+     * 장바구니 통계 집계
      */
-    private Map<Long, Integer> getWeeklyViewStats() {
+    private Map<Long, Integer> getWeeklyCartStats() {
         Map<Long, Integer> viewStats = new HashMap<>();
 
         try {
             List<String> dates = getRecentWeekDates();
             String allIndices = dates.stream()
-                    .map(date -> "view-events-" + date)
+                    .map(date -> "cart-events-" + date)
                     .collect(Collectors.joining(","));
 
             SearchRequest searchRequest = SearchRequest.of(s -> s
@@ -148,7 +148,7 @@ public class PopularWeekItemsBatchService {
 
             SearchResponse<Object> response = searchElasticsearchClient.search(searchRequest, Object.class);
 
-            // 아이템별 조회수 집계
+            // 아이템별 장바구니 집계
             if (response.aggregations() != null) {
                 Aggregate itemsAgg = response.aggregations().get("items");
 
@@ -162,15 +162,15 @@ public class PopularWeekItemsBatchService {
 
                             viewStats.put(itemId, totalViews);
                         } catch (Exception e) {
-                            log.warn("조회 통계 처리 실패: {}", bucket.key(), e);
+                            log.warn("장바구니 통계 처리 실패: {}", bucket.key(), e);
                         }
                     }
                 }
             }
 
-            log.info("조회 통계 집계 완료 - {}개 상품", viewStats.size());
+            log.info("장바구니 통계 집계 완료 - {}개 상품", viewStats.size());
         } catch (Exception e) {
-            log.error("조회 통계 집계 실패", e);
+            log.error("장바구니 통계 집계 실패", e);
         }
 
         return viewStats;

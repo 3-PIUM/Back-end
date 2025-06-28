@@ -3,6 +3,7 @@ package project.global.redis.service.trend;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import project.domain.trenditem.TrendItem;
 import project.domain.trenditem.dto.TrendItemConverter;
@@ -11,6 +12,7 @@ import project.domain.trenditem.repository.TrendItemRepository;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -47,31 +49,18 @@ public class TrendCacheService {
     // Redis에서 인기 급상승 제품 조회
     private List<TrendItemDTO> getTrendItemsFromRedis() {
         try {
-            Map<Object, Object> cacheData = redisTemplate.opsForHash().entries(TREND_ITEMS_KEY);
+            Set<ZSetOperations.TypedTuple<Object>> cachedData = redisTemplate.opsForZSet().reverseRangeWithScores(TREND_ITEMS_KEY, 0, -1);
+            List<ZSetOperations.TypedTuple<Object>> dataList = new ArrayList<>(cachedData);
 
-            if (cacheData.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            return cacheData.entrySet().stream()
-                    .map(entry -> {
-                        String itemId = entry.getKey().toString();
-                        String[] valueParts = entry.getValue().toString().split(":");
-
-                        if (valueParts.length != 2) {
-                            log.warn("잘못된 캐시 데이터 형식: {}", entry.getValue());
-                            return null;
-                        }
-
+            return IntStream.range(0, dataList.size())
+                    .mapToObj(i -> {
+                        ZSetOperations.TypedTuple<Object> cd = dataList.get(i);
                         return TrendItemDTO.builder()
-                                .itemId(Long.parseLong(itemId))
-                                .score(Double.parseDouble(valueParts[0]))
-                                .ranking(Integer.parseInt(valueParts[1]))
+                                .itemId(Long.parseLong(cd.getValue().toString()))
+                                .score(cd.getScore().doubleValue())
+                                .ranking(i + 1)
                                 .build();
-                    })
-                    .sorted(Comparator.comparing(TrendItemDTO::getScore).reversed())
-                    .limit(10)
-                    .toList();
+                    }).toList();
 
         } catch (Exception e) {
             log.error("Redis에서 인기 급상승 제품 조회 중 오류");
@@ -82,15 +71,13 @@ public class TrendCacheService {
     // DB에서 조회후 Redis 갱신
     private void cacheTrendItems(List<TrendItem> trendItems) {
         try {
-            HashMap<Object, Object> cacheData = new HashMap<>();
+            redisTemplate.delete(TREND_ITEMS_KEY);
 
             for (TrendItem trendItem : trendItems) {
-                String key = trendItem.getItemId().toString();
-                String value = trendItem.getScore().toString() + ":" + trendItem.getRanking().toString();
-                cacheData.put(key, value);
+                redisTemplate.opsForZSet().add(
+                        TREND_ITEMS_KEY, trendItem.getItemId().toString(), trendItem.getScore());
             }
 
-            redisTemplate.opsForHash().putAll(TREND_ITEMS_KEY, cacheData);
             redisTemplate.expire(TREND_ITEMS_KEY, Duration.ofHours(1));
 
         } catch (Exception e) {

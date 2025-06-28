@@ -107,15 +107,11 @@ public class TrendItemBatchService {
     private void updateRecentTrendingItemsInRedis(List<ItemViewScoreDTO> recentTrendingItems) {
         redisTemplate.delete(TREND_ITEMS_KEY);
 
-        int ranking = 1;
-        HashMap<Object, Object> trendItems = new HashMap<>();
         for (ItemViewScoreDTO item : recentTrendingItems) {
-            String key = item.getItemId();
-            String value = item.getScore().toString() + ":" + ranking;
-            trendItems.put(key, value);
+            redisTemplate.opsForZSet().add(
+                    TREND_ITEMS_KEY, item.getItemId(), item.getScore());
         }
 
-        redisTemplate.opsForHash().putAll(TREND_ITEMS_KEY, trendItems);
         redisTemplate.expire(TREND_ITEMS_KEY, Duration.ofHours(1));
 
         log.info("인기 급상승 제품 {}개 레디스 업데이트", recentTrendingItems.size());

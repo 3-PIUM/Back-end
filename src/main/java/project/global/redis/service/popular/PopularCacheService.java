@@ -3,6 +3,7 @@ package project.global.redis.service.popular;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import project.domain.popularitem.PopularItem;
 import project.domain.popularitem.dto.PopularItemConverter;
@@ -11,6 +12,7 @@ import project.domain.popularitem.repository.PopularItemRepository;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -51,52 +53,36 @@ public class PopularCacheService {
     // 레디스에서 인기 상품 조회
     private List<PopularItemDTO> getPopularItemsFromRedis() {
         try {
-            Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(POPULAR_ITEMS_KEY);
+            Set<ZSetOperations.TypedTuple<Object>> cachedData = redisTemplate.opsForZSet().reverseRangeWithScores(
+                    POPULAR_ITEMS_KEY, 0, 9);
+            List<ZSetOperations.TypedTuple<Object>> dataList = new ArrayList<>(cachedData);
 
-            if (cachedData.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            return cachedData.entrySet().stream()
-                    .map(entry -> {
-                        String itemId = entry.getKey().toString();
-                        String[] valueParts = entry.getValue().toString().split(":");
-
-                        // 배열 길이 체크
-                        if (valueParts.length != 2) {
-                            log.warn("잘못된 캐시 데이터 형식: {}", entry.getValue());
-                            return null;
-                        }
-
+            return IntStream.range(0, dataList.size())
+                    .mapToObj(i -> {
+                        ZSetOperations.TypedTuple<Object> cd = dataList.get(i);
                         return PopularItemDTO.builder()
-                                .itemId(Long.parseLong(itemId))
-                                .viewCount(Long.parseLong(valueParts[0]))
-                                .ranking(Integer.parseInt(valueParts[1]))
+                                .itemId(Long.parseLong(cd.getValue().toString()))
+                                .viewCount(cd.getScore().longValue())
+                                .ranking(i + 1)
                                 .build();
                     })
-                    .sorted(Comparator.comparing(PopularItemDTO::getRanking))
-                    .limit(10)
                     .toList();
 
         } catch (Exception e) {
             log.error("Redis에서 인기 상품 조회 오류");
             return Collections.emptyList();
         }
-
     }
 
     // Redis에 인기 상품 캐싱
     private void cachePopularItemsToRedis(List<PopularItem> popularItems) {
         try {
-            HashMap<String, String> cacheData = new HashMap<>();
+            redisTemplate.delete(POPULAR_ITEMS_KEY);
 
             for (PopularItem popularItem : popularItems) {
-                // 조회수:랭킹으로 value 설정
-                String value = popularItem.getViewCount().toString() + ":" + popularItem.getRanking().toString();
-                cacheData.put(popularItem.getItemId().toString(), value);
+                redisTemplate.opsForZSet().add(
+                        POPULAR_ITEMS_KEY, popularItem.getItemId(), popularItem.getViewCount());
             }
-
-            redisTemplate.opsForHash().putAll(POPULAR_ITEMS_KEY, cacheData);
 
             // 1시간 후 만료
             redisTemplate.expire(POPULAR_ITEMS_KEY, Duration.ofHours(1));

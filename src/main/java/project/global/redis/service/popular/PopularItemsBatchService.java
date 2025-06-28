@@ -11,7 +11,10 @@ import project.domain.popularitem.repository.PopularItemRepository;
 import project.global.redis.dto.ItemViewCountDTO;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -91,15 +94,14 @@ public class PopularItemsBatchService {
         // 기존 데이터 삭제
         redisTemplate.delete(POPULAR_ITEMS_KEY);
 
-        HashMap<String, String> popularItems = new HashMap<>();
-        int ranking = 1; // 순위용
         for (ItemViewCountDTO item : top10Items) {
-            String key = item.getItemId().toString();
-            String value = item.getViewCount().toString() + ":" + ranking++;
-            popularItems.put(key, value);
+            redisTemplate.opsForZSet().add(
+                    POPULAR_ITEMS_KEY,
+                    item.getItemId().toString(),
+                    item.getViewCount().doubleValue()
+            );
         }
 
-        redisTemplate.opsForHash().putAll(POPULAR_ITEMS_KEY, popularItems);
         redisTemplate.expire(POPULAR_ITEMS_KEY, Duration.ofHours(1));
 
         log.info("Redis에 인기 상품 {}개 저장 완료", top10Items.size());
@@ -109,14 +111,11 @@ public class PopularItemsBatchService {
     private void addPopularItemsInDB(List<ItemViewCountDTO> top10Items) {
         ArrayList<PopularItem> newItems = new ArrayList<>();
 
-        int ranking = 1; // 순위용
+        int ranking = 1;
         for (ItemViewCountDTO item : top10Items) {
-            Long itemId = item.getItemId();
-            Long viewCount = item.getViewCount();
-
             newItems.add(PopularItem.builder()
-                    .itemId(itemId)
-                    .viewCount(viewCount)
+                    .itemId(item.getItemId())
+                    .viewCount(item.getViewCount())
                     .ranking(ranking++)
                     .build());
         }
