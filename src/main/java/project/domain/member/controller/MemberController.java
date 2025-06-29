@@ -134,7 +134,7 @@ public class MemberController {
         @RequestBody MemberRequest.LoginDTO request
     ) {
         String redirectUrl =
-            "http://3.106.232.7:8501/admin?brand=" + memberService.getVaildAdmin(request);
+            "http://3.36.42.57:8501/admin?brand=" + memberService.getVaildAdmin(request);
 
         return ApiResponse.onSuccess(redirectUrl);
     }
