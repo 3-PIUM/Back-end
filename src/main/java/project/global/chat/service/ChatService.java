@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class ChatService {
 
-    private final WebClient webClient = WebClient.create("http://3.106.232.7:8000");
+    private final WebClient webClient = WebClient.create("http://3.36.42.57:8000");
     private final ItemImageRepository itemImageRepository;
 
     public Mono<ChatResponseDTO> sendToFastApi(ChatRequestDTO request, Member member) {
@@ -28,7 +28,7 @@ public class ChatService {
         }
 
         return webClient.post()
-            .uri("http://3.106.232.7:8000/chat")
+            .uri("http://3.36.42.57:8000/chat")
             .bodyValue(request)
             .retrieve()
             .bodyToMono(ChatResponseDTO.class);
