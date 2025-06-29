@@ -1,9 +1,10 @@
 package project.global.redis.service.popular;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import project.domain.popularitem.PopularItem;
 import project.domain.popularitem.dto.PopularItemConverter;
@@ -11,8 +12,8 @@ import project.domain.popularitem.dto.PopularItemDTO;
 import project.domain.popularitem.repository.PopularItemRepository;
 
 import java.time.Duration;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class PopularCacheService {
 
     private final PopularItemRepository popularItemRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
     private static final String POPULAR_ITEMS_KEY = "popular_items";
 
     // 인기 상품 TOP10 조회(레디스 조회 우선, 없을 경우 DB 조회후 레디스 갱신)
@@ -53,25 +55,24 @@ public class PopularCacheService {
     // 레디스에서 인기 상품 조회
     private List<PopularItemDTO> getPopularItemsFromRedis() {
         try {
-            Set<ZSetOperations.TypedTuple<Object>> cachedData = redisTemplate.opsForZSet().reverseRangeWithScores(
-                    POPULAR_ITEMS_KEY, 0, 9);
-            List<ZSetOperations.TypedTuple<Object>> dataList = new ArrayList<>(cachedData);
+            Object jsonString = redisTemplate.opsForValue().get(POPULAR_ITEMS_KEY);
 
-            return IntStream.range(0, dataList.size())
-                    .mapToObj(i -> {
-                        ZSetOperations.TypedTuple<Object> cd = dataList.get(i);
-                        return PopularItemDTO.builder()
-                                .itemId(Long.parseLong(cd.getValue().toString()))
-                                .viewCount(cd.getScore().longValue())
-                                .ranking(i + 1)
-                                .build();
-                    })
-                    .toList();
+            if (jsonString != null) {
+                JavaType listType = objectMapper.getTypeFactory()
+                        .constructCollectionType(List.class, PopularItem.class);
 
+                List<PopularItem> popularItems = objectMapper.readValue(
+                        jsonString.toString(), listType
+                );
+
+                return PopularItemConverter.toPopularItemDTOs(popularItems);
+            }
         } catch (Exception e) {
             log.error("Redis에서 인기 상품 조회 오류");
             return Collections.emptyList();
         }
+
+        return Collections.emptyList();
     }
 
     // Redis에 인기 상품 캐싱

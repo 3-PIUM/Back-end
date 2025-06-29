@@ -18,7 +18,7 @@ public class ItemViewRedis {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ItemRepository itemRepository;
     private static final String VIEW_COUNT_KEY = "item:view:";
-    private static final String POPULAR_ITEMS_KEY = "popular_items";
+    private static final String CUMULATIVE_VIEWS_KEY = "cumulative_views";
 
     // 조회수 증가(비동기)
     @Async
@@ -49,7 +49,7 @@ public class ItemViewRedis {
 
             // Sorted Set에 점수 업데이트 (실시간 랭킹용) - 누적 점수
             // Sorted Set 키 이름, 점수 증가시킬 아이템, 증가시킬 점수
-            redisTemplate.opsForZSet().incrementScore(POPULAR_ITEMS_KEY, itemId.toString(), 1.0);
+            redisTemplate.opsForZSet().incrementScore(CUMULATIVE_VIEWS_KEY, itemId.toString(), 1.0);
         } catch (Exception e) {
             log.error("조회수 증가 실패");
         }
