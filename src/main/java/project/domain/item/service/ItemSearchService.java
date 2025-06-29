@@ -149,7 +149,7 @@ public class ItemSearchService {
                                 // n-gram 방식 (각 글자별로)
                                 .should(sh -> sh
                                         .matchPhrase(mp -> mp
-                                                .field("name")
+                                                .field("name.ngram")
                                                 .query(keyword)
                                                 .slop(1)  // 단어 순서 바뀌어도 허용
                                                 .boost(1.5f)))
@@ -157,7 +157,7 @@ public class ItemSearchService {
                                 // Fuzzy 검색 (오타 허용)
                                 .should(sh -> sh
                                         .fuzzy(f -> f
-                                                .field("name.ngram")
+                                                .field("name")
                                                 .value(keyword)
                                                 .fuzziness("2")
                                                 .prefixLength(0)  // 접두사 길이 0
