@@ -127,9 +127,9 @@ public class ItemSearchService {
     public ApiResponse<ItemSearchResultDTO> AdvancedSearchByKeyword(Member member, String keyword, Integer size, String lang) throws IOException {
         Language value = Language.valueOf(lang.toUpperCase());
         String index = switch (value) {
-            case KR -> "items";
-            case EN -> "items_en";
-            case JP -> "items_jp";
+            case KR -> "items_v2";
+            case EN -> "items_en_v2";
+            case JP -> "items_jp_v2";
         };
 
         SearchRequest searchRequest = SearchRequest.of(s -> s
