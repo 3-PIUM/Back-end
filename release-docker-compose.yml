@@ -61,7 +61,7 @@ services:
     image: docker.elastic.co/kibana/kibana:8.11.0  # Kibana 8.11.0 이미지 사용
     container_name: kibana  # 컨테이너 이름 지정
     environment:
-      - ELASTICSEARCH_HOSTS=http://43.203.128.119:9200  # Elasticsearch 연결 주소
+      - ELASTICSEARCH_HOSTS=http://43.203.121.163:9200  # Elasticsearch 연결 주소
       - xpack.security.enabled=false
     ports:
       - "5601:5601"
