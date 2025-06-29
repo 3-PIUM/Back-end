@@ -37,14 +37,24 @@ public class ItemRecommendService {
     private final RelatedPurchaseItemRepository relatedPurchaseItemRepository;
     private final RelatedViewItemRepository relatedViewItemRepository;
     private final MemberRepository memberRepository;
+    private final ExchangeRateService exchangeRateService;
+
+    private double changeToRate(String lang) {
+        if ("KR".equalsIgnoreCase(lang)) {
+            return 1.0;
+        } else {
+            return exchangeRateService.getRate(lang.toUpperCase());
+        }
+    }
 
     // 누적 조회수로 찾은 인기 상품 top10
-    public ApiResponse<PopularItemsInfoDTO> getPopularItems(Member member, List<PopularItemDTO> popularItems, String lang) {
+    public ApiResponse<PopularItemsInfoDTO> getPopularItems(Member member,
+        List<PopularItemDTO> popularItems, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         List<Long> popularIds = popularItems.stream()
-                .map(PopularItemDTO::getItemId)
-                .toList();
+            .map(PopularItemDTO::getItemId)
+            .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(popularIds);
 
@@ -54,20 +64,22 @@ public class ItemRecommendService {
             case "JP" -> "ベスト・オブ・ベスト";
             default -> "베스트 오브 베스트";
         };
+        double rate = changeToRate(lang);
 
         PopularItemsInfoDTO top10ItemsInfoDTOs =
-                ItemRecommendConverter.toPopularItemsInfoDTOs(
-                        title, items, popularItems, wishListIds, lang);
+            ItemRecommendConverter.toPopularItemsInfoDTOs(
+                title, items, popularItems, wishListIds, lang, rate);
         return ApiResponse.onSuccess(top10ItemsInfoDTOs);
     }
 
     // 최근 3시간 조회수*가중치로 찾은 인기 급상승 상품 top10
-    public ApiResponse<TrendItemsInfoDTO> getTrendItems(Member member, List<TrendItemDTO> trendItems, String lang) {
+    public ApiResponse<TrendItemsInfoDTO> getTrendItems(Member member,
+        List<TrendItemDTO> trendItems, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         List<Long> trendIds = trendItems.stream()
-                .map(TrendItemDTO::getItemId)
-                .toList();
+            .map(TrendItemDTO::getItemId)
+            .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(trendIds);
 
@@ -78,19 +90,22 @@ public class ItemRecommendService {
             default -> "지금 주목할만한 인기 상품";
         };
 
+        double rate = changeToRate(lang);
+        log.info(String.valueOf(rate));
         TrendItemsInfoDTO trendItemsInfoDTOs =
-                ItemRecommendConverter.toTrendItemsInfoDTOs(
-                        title, items, trendItems, wishListIds, lang);
+            ItemRecommendConverter.toTrendItemsInfoDTOs(
+                title, items, trendItems, wishListIds, lang, rate);
         return ApiResponse.onSuccess(trendItemsInfoDTOs);
     }
 
     // 매주 월요일 정각에 구매 전환율을 계산하여 찾은 인기 상품 20개
-    public ApiResponse<PopularWeekItemsInfoDTO> getPopularWeekItems(Member member, List<PopularWeekItemDTO> popularWeekItems, String lang) {
+    public ApiResponse<PopularWeekItemsInfoDTO> getPopularWeekItems(Member member,
+        List<PopularWeekItemDTO> popularWeekItems, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         List<Long> popularWeekIds = popularWeekItems.stream()
-                .map(PopularWeekItemDTO::getItemId)
-                .toList();
+            .map(PopularWeekItemDTO::getItemId)
+            .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(popularWeekIds);
 
@@ -100,9 +115,9 @@ public class ItemRecommendService {
             case "JP" -> "ウィークリーベスト";
             default -> "위클리 베스트";
         };
-
+        double rate = changeToRate(lang);
         PopularWeekItemsInfoDTO popularWeekItemsInfoDTO = ItemRecommendConverter.toPopularWeekItemsInfoDTOs(
-                title, items, popularWeekItems, wishListIds, lang);
+            title, items, popularWeekItems, wishListIds, lang, rate);
         return ApiResponse.onSuccess(popularWeekItemsInfoDTO);
     }
 
@@ -119,65 +134,67 @@ public class ItemRecommendService {
 
         List<Long> wishListIds = getWishListIds(member);
 
-        List<AreaPopularItem> areaPopularItems = areaPopularItemRepository.findTop30ByAreaOrderByCreatedAtDesc(area);
+        List<AreaPopularItem> areaPopularItems = areaPopularItemRepository.findTop30ByAreaOrderByCreatedAtDesc(
+            area);
         List<Long> areaPopularItemIds = areaPopularItems.stream()
-                .map(AreaPopularItem::getItemId)
-                .toList();
+            .map(AreaPopularItem::getItemId)
+            .toList();
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(areaPopularItemIds);
-
+        double rate = changeToRate(lang);
         AreaPopularItemsInfoDTO areaPopularItemsInfoDTO = ItemRecommendConverter.toAreaPopularItemsInfoDTOs(
-                title, items, areaPopularItems, wishListIds, lang);
+            title, items, areaPopularItems, wishListIds, lang, rate);
 
         return ApiResponse.onSuccess(areaPopularItemsInfoDTO);
     }
 
     // 장바구니 담은 상품과 주로 함께 구매된 상품 조회
-    public ApiResponse<List<RelatedPurchaseItemDTO>> getRelatedPurchaseItems(Member member, Long itemId, String lang) {
+    public ApiResponse<List<RelatedPurchaseItemDTO>> getRelatedPurchaseItems(Member member,
+        Long itemId, String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         Member mem = member != null ? member : memberRepository.findRandom();
         String skinType = mem.getSkinType() != null
-                ? mem.getSkinType().toString() : SkinType.getRandomSkinType().toString();
+            ? mem.getSkinType().toString() : SkinType.getRandomSkinType().toString();
 
         // 고객층 - FEMALE_건성_10대
-        String customerSegment = mem.getGender().toString() + "_" + skinType + "_" + mem.getAgeGroup();
+        String customerSegment =
+            mem.getGender().toString() + "_" + skinType + "_" + mem.getAgeGroup();
 
         List<Long> relatedPurchaseItemIds = relatedPurchaseItemRepository
-                .find9RandomItemIdsBySkinTypeAndCustomerSegment(itemId, skinType, customerSegment);
+            .find9RandomItemIdsBySkinTypeAndCustomerSegment(itemId, skinType, customerSegment);
         if (relatedPurchaseItemIds.isEmpty()) {
             relatedPurchaseItemIds = relatedPurchaseItemRepository.find9RandomItemIds();
         }
 
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(relatedPurchaseItemIds);
-
-
+        double rate = changeToRate(lang);
         List<RelatedPurchaseItemDTO> relatedPurchaseItemDTOs =
-                ItemRecommendConverter.toRelatedPurchaseItemDTOs(items, wishListIds, lang);
+            ItemRecommendConverter.toRelatedPurchaseItemDTOs(items, wishListIds, lang, rate);
         return ApiResponse.onSuccess(relatedPurchaseItemDTOs);
     }
 
     // 다른 고객이 보고 있는 상품과 함께 본 상품 조회
-    public ApiResponse<List<RelatedViewItemDTO>> getRelatedViewItems(Member member, Long itemId, String lang) {
+    public ApiResponse<List<RelatedViewItemDTO>> getRelatedViewItems(Member member, Long itemId,
+        String lang) {
         List<Long> wishListIds = getWishListIds(member);
 
         Member mem = member != null ? member : memberRepository.findRandom();
 
         // 고객층 - FEMALE_10대_CHINA
-        String customerSegment = mem.getGender().toString() + "_" + mem.getAgeGroup() + "_" + mem.getArea().toString();
+        String customerSegment =
+            mem.getGender().toString() + "_" + mem.getAgeGroup() + "_" + mem.getArea().toString();
 
         List<Long> relatedViewItemIds = relatedViewItemRepository
-                .find12RandomRelatedItemIdsByItemIdAndCustomerSegment(itemId, customerSegment);
+            .find12RandomRelatedItemIdsByItemIdAndCustomerSegment(itemId, customerSegment);
         if (relatedViewItemIds.isEmpty()) {
             relatedViewItemIds = relatedPurchaseItemRepository.find9RandomItemIds();
         }
 
-
         List<Item> items = itemRepository.findItemByItemIdsWithMainImage(relatedViewItemIds);
-
-
+        double rate = changeToRate(lang);
         List<RelatedViewItemDTO> relatedViewItemDTOs =
-                ItemRecommendConverter.toRelatedViewItemDTOs(items, wishListIds, lang);
+            ItemRecommendConverter.toRelatedViewItemDTOs(items, wishListIds, lang, rate);
         return ApiResponse.onSuccess(relatedViewItemDTOs);
     }
 
@@ -186,9 +203,9 @@ public class ItemRecommendService {
         List<Long> wishListIds = new ArrayList<>();
         if (member != null) {
             List<Long> fetchedIds = wishlistRepository.findByMemberId(member.getId())
-                    .stream()
-                    .map(w -> w.getItem().getId())
-                    .toList();
+                .stream()
+                .map(w -> w.getItem().getId())
+                .toList();
             wishListIds.addAll(fetchedIds);
         }
         return wishListIds;

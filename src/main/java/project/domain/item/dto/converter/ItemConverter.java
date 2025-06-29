@@ -1,26 +1,29 @@
 package project.domain.item.dto.converter;
 
+import lombok.RequiredArgsConstructor;
 import project.domain.aisummary.AiSummary;
 import project.domain.containingredient.ContainIngredient;
 import project.domain.graph.Graph;
 import project.domain.item.Item;
 import project.domain.item.dto.ItemResponse;
 import project.domain.item.dto.ItemResponse.*;
+import project.domain.item.service.ExchangeRateService;
 import project.domain.itemoption.ItemOption;
 import project.domain.member.enums.Language;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 public abstract class ItemConverter {
 
     public static ItemInfoDTO toItemInfoDTO(Item item, String mainImage, List<String> detailImages,
-        boolean wishStatus, String lang) {
+        boolean wishStatus, String lang,double rate) {
         return ItemInfoDTO.builder()
             .id(item.getId())
             .itemName(item.getName(lang))
             .brand(item.getCompany().getName(lang))
-            .originalPrice(item.getOriginalPrice())
-            .salePrice(item.getSalePrice())
+            .originalPrice((int)(item.getOriginalPrice()*rate))
+            .salePrice((int)(item.getSalePrice()*rate))
             .discountRate(item.getDiscountRate())
             .options(item.getItemOptions().stream()
                 .map(itemOption -> itemOption.getName(lang))

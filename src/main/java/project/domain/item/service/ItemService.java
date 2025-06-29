@@ -49,6 +49,15 @@ public class ItemService {
     private final GraphRepository graphRepository;
     private final WishlistRepository wishlistRepository;
     private final ViewLogProducer viewLogProducer;
+    private final ExchangeRateService exchangeRateService;
+
+    private double changeToRate(String lang) {
+        if ("KR".equalsIgnoreCase(lang)) {
+            return 1.0;
+        } else {
+            return exchangeRateService.getRate(lang.toUpperCase());
+        }
+    }
 
     // 상품 정보 조회
     public ApiResponse<ItemInfoDTO> getItemInfo(Member member, Long itemId, String lang) {
@@ -83,9 +92,9 @@ public class ItemService {
             .build();
 
         viewLogProducer.sendViewLog(viewEventDTO);
-
+        double rate = changeToRate(lang);
         ItemInfoDTO itemInfoImages = ItemConverter.toItemInfoDTO(item, mainImage, detailImages,
-            wishStatus, lang);
+            wishStatus, lang, rate);
         return ApiResponse.onSuccess(itemInfoImages);
     }
 
