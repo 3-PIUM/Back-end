@@ -22,6 +22,7 @@ public abstract class CartResponse {
     @AllArgsConstructor
     public static class CartItemDTO {
         private Long cartItemId;
+        private Long itemId;
         private String itemName;
         private String brand;
         private OptionDTO optionInfo;
