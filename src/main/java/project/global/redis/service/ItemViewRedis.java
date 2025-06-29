@@ -38,17 +38,12 @@ public class ItemViewRedis {
                 redisTemplate.opsForValue().set(itemExistsKey, "true", Duration.ofHours(1));
             }
 
-            // 없으면 자동으로 1로 세팅
-            redisTemplate.opsForValue().increment(VIEW_COUNT_KEY + itemId);
-            itemRepository.findById(itemId).orElseThrow();
-
             // 1시간 단위로 누적 조회수 저장
             String hourlyKey = VIEW_COUNT_KEY + LocalDateTime.now().getHour() + ":" + itemId;
             redisTemplate.opsForValue().increment(hourlyKey);
             redisTemplate.expire(hourlyKey, Duration.ofHours(4));
 
-            // Sorted Set에 점수 업데이트 (실시간 랭킹용) - 누적 점수
-            // Sorted Set 키 이름, 점수 증가시킬 아이템, 증가시킬 점수
+            // Sorted Set에 점수 업데이트 (실시간 랭킹용) - 누적 조회수
             redisTemplate.opsForZSet().incrementScore(CUMULATIVE_VIEWS_KEY, itemId.toString(), 1.0);
         } catch (Exception e) {
             log.error("조회수 증가 실패");
