@@ -157,7 +157,7 @@ public class ItemSearchService {
                                 // Fuzzy 검색 (오타 허용)
                                 .should(sh -> sh
                                         .fuzzy(f -> f
-                                                .field("name")
+                                                .field("name.ngram")
                                                 .value(keyword)
                                                 .fuzziness("2")
                                                 .prefixLength(0)  // 접두사 길이 0
