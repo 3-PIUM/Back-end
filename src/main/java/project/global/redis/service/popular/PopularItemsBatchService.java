@@ -13,8 +13,6 @@ import project.domain.popularitem.repository.PopularItemRepository;
 import project.global.redis.dto.ItemViewCountDTO;
 
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +22,7 @@ import java.util.Set;
 @Slf4j
 public class PopularItemsBatchService {
 
-    private static final String CUMULATIVE_VIEWS_KEY = "cumulative_views:";
+    private static final String CUMULATIVE_VIEWS_KEY = "cumulative_views";
     private static final String POPULAR_ITEMS_KEY = "popular_items";
     private final RedisTemplate<String, Object> redisTemplate;
     private final PopularItemRepository popularItemRepository;
@@ -60,11 +58,9 @@ public class PopularItemsBatchService {
 
     // Redis에서 누적 조회수로 Top10 조회
     private List<ItemViewCountDTO> getPopularItems() {
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-
         List<ItemViewCountDTO> viewCounts = new ArrayList<>();
         Set<ZSetOperations.TypedTuple<Object>> zset = redisTemplate.opsForZSet()
-                .reverseRangeWithScores(CUMULATIVE_VIEWS_KEY + today, 0, 9);
+                .reverseRangeWithScores(CUMULATIVE_VIEWS_KEY, 0, 9);
 
         zset.forEach(s -> {
             try {
