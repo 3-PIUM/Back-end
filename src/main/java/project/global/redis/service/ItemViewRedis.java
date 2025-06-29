@@ -7,7 +7,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import project.domain.item.repository.ItemRepository;
 
 @Slf4j
@@ -18,7 +21,7 @@ public class ItemViewRedis {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ItemRepository itemRepository;
     private static final String VIEW_COUNT_KEY = "item:view:";
-    private static final String CUMULATIVE_VIEWS_KEY = "cumulative_views";
+    private static final String CUMULATIVE_VIEWS_KEY = "cumulative_views:";
 
     // 조회수 증가(비동기)
     @Async
@@ -43,8 +46,15 @@ public class ItemViewRedis {
             redisTemplate.opsForValue().increment(hourlyKey);
             redisTemplate.expire(hourlyKey, Duration.ofHours(4));
 
-            // Sorted Set에 점수 업데이트 (실시간 랭킹용) - 누적 조회수
-            redisTemplate.opsForZSet().incrementScore(CUMULATIVE_VIEWS_KEY, itemId.toString(), 1.0);
+            // Sorted Set에 점수 업데이트 (실시간 랭킹용) - 하루 누적 조회수
+            String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            redisTemplate.opsForZSet().incrementScore(CUMULATIVE_VIEWS_KEY + today, itemId.toString(), 1.0);
+            // 자정까지 남은 시간 계산해서 TTL 설정
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime midnight = now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+            Duration untilMidnight = Duration.between(now, midnight);
+            redisTemplate.expire(CUMULATIVE_VIEWS_KEY, untilMidnight);
+
         } catch (Exception e) {
             log.error("조회수 증가 실패");
         }
