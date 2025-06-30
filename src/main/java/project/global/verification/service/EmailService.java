@@ -1,7 +1,10 @@
 package project.global.verification.service;
 
 import project.domain.member.Member;
+import project.domain.member.repository.MemberRepository;
 import project.domain.member.service.MemberService;
+import project.global.response.exception.GeneralException;
+import project.global.response.status.ErrorStatus;
 import project.global.verification.converter.EmailConverter;
 import project.global.verification.dto.response.MailResponseDTO;
 import project.global.verification.entity.EmailVerification;
@@ -28,6 +31,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final EmailConverter emailConverter;
+    private final MemberRepository memberRepository;
     private final EmailVerificationRepository emailVerificationRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -42,6 +46,11 @@ public class EmailService {
 
     @Transactional
     public MailSend sendVerificationMail(String email) {
+
+        memberRepository.findByEmail(email)
+            .ifPresent(member -> { throw new GeneralException(ErrorStatus.MEMBER_DUPLICATE_BY_EMAIL); });
+
+
         String code = makeVerificationCode();
         EmailVerification verification = new EmailVerification(email, code);
 
@@ -57,7 +66,8 @@ public class EmailService {
 
 
     public MailVerify verifyCode(String email, String code) {
-        Optional<EmailVerification> verificationObject = emailVerificationRepository.findById(email);
+        Optional<EmailVerification> verificationObject = emailVerificationRepository.findById(
+            email);
         boolean check = false;
         if (verificationObject.isPresent()) {
             EmailVerification verification = verificationObject.get();
