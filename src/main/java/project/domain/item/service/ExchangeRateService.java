@@ -21,7 +21,7 @@ public class ExchangeRateService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final RedisTemplate<String, Object> redisTemplate;
-    private static final String EXCHANGE_API_URL = "http://api.currencylayer.com/live?access_key=e4d47d0e20597db6b4548b2cc31f8ed9";
+    private static final String EXCHANGE_API_URL = "https://api.frankfurter.dev/v1/latest?base=KRW";
 
     private static final String REDIS_KEY_EN = "exchange_rate:EN";  // KRW → USD
     private static final String REDIS_KEY_JP = "exchange_rate:JP";  // KRW → JPY
@@ -49,15 +49,15 @@ public class ExchangeRateService {
             ResponseEntity<Map> response = restTemplate.getForEntity(EXCHANGE_API_URL, Map.class);
             Map<String, Object> body = response.getBody();
 
-            if (body != null && body.containsKey("quotes")) {
-                Map<String, Object> quotes = (Map<String, Object>) body.get("quotes");
+            if (body != null && body.containsKey("rates")) {
+                Map<String, Object> quotes = (Map<String, Object>) body.get("rates");
 
-                Double usdToKrw = getDouble(quotes.get("USDKRW"));
-                Double usdToJpy = getDouble(quotes.get("USDJPY"));
+                Double usdToUSD = getDouble(quotes.get("USD"));
+                Double usdToJpy = getDouble(quotes.get("JPY"));
 
-                if (usdToKrw != null && usdToJpy != null) {
-                    double krwToUsd = 1 / usdToKrw;
-                    double krwToJpy = usdToJpy / usdToKrw;
+                if (usdToUSD != null && usdToJpy != null) {
+                    double krwToUsd = usdToUSD;
+                    double krwToJpy = usdToJpy;
 
                     redisTemplate.opsForValue()
                         .set(REDIS_KEY_EN, krwToUsd, CACHE_TTL_MINUTES, TimeUnit.MINUTES);
