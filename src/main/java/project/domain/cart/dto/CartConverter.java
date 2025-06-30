@@ -16,20 +16,22 @@ import java.util.Map;
 
 public abstract class CartConverter {
 
-    public static SummaryCartItemDTO toSummaryCartItemDTO(CartItem cartItem, String lang) {
+    public static SummaryCartItemDTO toSummaryCartItemDTO(CartItem cartItem, String lang,
+        double rate) {
         Item item = cartItem.getItem();
         return SummaryCartItemDTO.builder()
             .itemId(cartItem.getId())
             .itemName(item.getName(lang))
             .option(cartItem.getItemOption())
-            .originalPrice(item.getOriginalPrice())
-            .salePrice(item.getSalePrice())
+            .originalPrice((int) (item.getOriginalPrice() * rate))
+            .salePrice((int) (item.getSalePrice() * rate))
             .quantity(cartItem.getQuantity())
             .itemTotalPrice(item.getSalePrice() * cartItem.getQuantity())
             .build();
     }
 
-    public static CartItemDTO toCartItemDTO(CartItem cartItem, ItemImage mainImage, String lang) {
+    public static CartItemDTO toCartItemDTO(CartItem cartItem, ItemImage mainImage, String lang,
+        double rate) {
         Item item = cartItem.getItem();
         return CartItemDTO.builder()
             .cartItemId(cartItem.getId())
@@ -40,8 +42,8 @@ public abstract class CartConverter {
                     .map(itemOption -> itemOption.getName(lang))
                     .toList())
                 .build())
-            .originalPrice(item.getOriginalPrice())
-            .salePrice(item.getSalePrice())
+            .originalPrice((int) (item.getOriginalPrice() * rate))
+            .salePrice((int) (item.getSalePrice() * rate))
             .mainImageUrl(mainImage.getUrl())
             .quantity(cartItem.getQuantity())
             .itemTotalPrice(item.getSalePrice() * cartItem.getQuantity())
@@ -52,7 +54,8 @@ public abstract class CartConverter {
         Cart cart,
         List<CartItem> cartItems,
         Map<Long, ItemImage> itemImages,
-        String lang
+        String lang,
+        double rate
     ) {
         return CartDTO.builder()
             .cartId(cart.getId())
@@ -69,8 +72,8 @@ public abstract class CartConverter {
                                 .map(itemOption -> itemOption.getName(lang))
                                 .toList())
                             .build())
-                        .originalPrice(ci.getItem().getOriginalPrice())
-                        .salePrice(ci.getItem().getSalePrice())
+                        .originalPrice((int) (ci.getItem().getOriginalPrice() * rate))
+                        .salePrice((int) (ci.getItem().getSalePrice() * rate))
                         .mainImageUrl(ImageUtil.getMainImageUrl(
                             ci.getItem().getId(), itemImages
                         ))

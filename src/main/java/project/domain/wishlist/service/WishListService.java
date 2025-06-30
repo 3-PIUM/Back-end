@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.domain.item.Item;
 import project.domain.item.repository.ItemRepository;
+import project.domain.item.service.ExchangeRateService;
 import project.domain.itemimage.ItemImage;
 import project.domain.itemimage.enums.ImageType;
 import project.domain.itemimage.repository.ItemImageRepository;
@@ -32,6 +33,15 @@ public class WishListService {
     private final WishlistRepository wishlistRepository;
     private final ItemRepository itemRepository;
     private final ItemImageRepository itemImageRepository;
+    private final ExchangeRateService exchangeRateService;
+
+    private double changeToRate(String lang) {
+        if ("KR".equalsIgnoreCase(lang)) {
+            return 1.0;
+        } else {
+            return exchangeRateService.getRate(lang.toUpperCase());
+        }
+    }
 
     /*
         찜 목록 조회
@@ -40,20 +50,23 @@ public class WishListService {
         List<WishList> wishLists = wishlistRepository.findByMemberId(memberId);
 
         List<Long> itemIds = wishLists.stream()
-                .map(w -> w.getItem().getId())
-                .distinct()
-                .toList();
+            .map(w -> w.getItem().getId())
+            .distinct()
+            .toList();
 
         // 각 아이템들에 대한 메인 이미지 저장
-        List<ItemImage> mainImages = itemImageRepository.findByItemIdInAndImageType(itemIds, ImageType.MAIN);
+        List<ItemImage> mainImages = itemImageRepository.findByItemIdInAndImageType(itemIds,
+            ImageType.MAIN);
 
         Map<Long, ItemImage> itemImageMap = mainImages.stream()
-                .collect(Collectors.toMap(
-                        itemImage -> itemImage.getItem().getId()
-                        , Function.identity()
-                ));
+            .collect(Collectors.toMap(
+                itemImage -> itemImage.getItem().getId()
+                , Function.identity()
+            ));
 
-        return ApiResponse.onSuccess(WishListConverter.toWishListResponseDTOList(wishLists, itemImageMap, lang));
+        double rate = changeToRate(lang);
+        return ApiResponse.onSuccess(
+            WishListConverter.toWishListResponseDTOList(wishLists, itemImageMap, lang, rate));
     }
 
     /*
@@ -63,10 +76,11 @@ public class WishListService {
     public ApiResponse<WishListResponseDTO> addWishList(Member member, Long itemId, String lang) {
         // item 정보 확인
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.ITEM_NOT_FOUND));
 
         // 찜 목록에 등록되어 있는지 체크
-        Optional<WishList> existingWishList = wishlistRepository.findByMemberIdAndItemId(member.getId(), itemId);
+        Optional<WishList> existingWishList = wishlistRepository.findByMemberIdAndItemId(
+            member.getId(), itemId);
 
         if (existingWishList.isPresent()) {
             // 찜 목록에 있는 경우 등록 X
@@ -75,12 +89,12 @@ public class WishListService {
             WishList newWishList = WishList.createWishList(member, item);
             wishlistRepository.save(newWishList);
 
-            List<ItemImage> mainImages = itemImageRepository.findByItemIdAndImageType(item.getId(), ImageType.MAIN);
+            List<ItemImage> mainImages = itemImageRepository.findByItemIdAndImageType(item.getId(),
+                ImageType.MAIN);
             ItemImage itemImage = mainImages != null ? mainImages.get(0) : null;
-
-
+            double rate = changeToRate(lang);
             return ApiResponse.onSuccess("찜 목록에 추가된 아이템",
-                    WishListConverter.toWishListResponseDTO(newWishList, itemImage, lang));
+                WishListConverter.toWishListResponseDTO(newWishList, itemImage, lang, rate));
         }
     }
 
@@ -94,7 +108,8 @@ public class WishListService {
         wishlistRepository.deleteById(deleteWishList.getId());
 
         Item deletedItem = deleteWishList.getItem();
-        return ApiResponse.onSuccess("삭제된 아이템", WishListConverter.toDeleteItemDTO(deletedItem,lang));
+        return ApiResponse.onSuccess("삭제된 아이템",
+            WishListConverter.toDeleteItemDTO(deletedItem, lang));
     }
 
     /*
@@ -102,6 +117,6 @@ public class WishListService {
      */
     private WishList findWishList(Long memberId, Long itemId) {
         return wishlistRepository.findByMemberIdAndItemId(memberId, itemId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.WISHLIST_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.WISHLIST_NOT_FOUND));
     }
 }
