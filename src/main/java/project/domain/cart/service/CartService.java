@@ -69,6 +69,38 @@ public class CartService {
     }
 
     /*
+    장바구니 아이템 상세 조회
+     */
+    public ApiResponse<CartDTO> getCartDetailItems(String cartId, String lang) {
+        List<Long> cartIdList = Arrays.stream(cartId.split(","))
+            .map(Long::parseLong)
+            .toList();
+
+        List<CartItem> allById = cartItemRepository.findAllById(cartIdList);
+
+        // 장바구니에 담긴 아이템 id 저장
+        List<Long> ids = allById.stream()
+            .map(cartItem -> cartItem.getItem().getId())
+            .distinct()
+            .toList();
+
+        // 각 아이템 별 메인 이미지 저장
+        List<ItemImage> mainImages = itemImageRepository.findByItemIdInAndImageType(ids,
+            ImageType.MAIN);
+
+        Map<Long, ItemImage> itemImageMap = mainImages.stream()
+            .collect(Collectors.toMap(
+                itemImage -> itemImage.getItem().getId()
+                , Function.identity()
+            ));
+
+        double rate = changeToRate(lang);
+        CartDTO cartDTO = CartConverter.toCartDTO(allById.get(0).getCart(), allById, itemImageMap,
+            lang, rate);
+        return ApiResponse.onSuccess(cartDTO);
+    }
+
+    /*
     장바구니 아이템 조회
      */
     public ApiResponse<CartDTO> getCartItems(Long memberId, String lang) {
