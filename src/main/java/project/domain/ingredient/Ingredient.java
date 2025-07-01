@@ -65,7 +65,7 @@ public class Ingredient extends BaseEntity {
         if (language.equals(Language.EN)) {
             return enName;
         } else if (language.equals(Language.JP)) {
-            return jpName;
+            return enName;
         } else {
             return krName;
         }
@@ -76,7 +76,7 @@ public class Ingredient extends BaseEntity {
         if (language.equals(Language.EN)) {
             return enEffect;
         } else if (language.equals(Language.JP)) {
-            return jpEffect;
+            return enEffect;
         } else {
             return krEffect;
         }
@@ -87,7 +87,7 @@ public class Ingredient extends BaseEntity {
         if (language.equals(Language.EN)) {
             return enRiskCategory;
         } else if (language.equals(Language.JP)) {
-            return jpRiskCategory;
+            return enRiskCategory;
         } else {
             return krRiskCategory;
         }
