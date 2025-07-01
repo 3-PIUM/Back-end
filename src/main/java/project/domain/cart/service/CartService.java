@@ -239,7 +239,7 @@ public class CartService {
         QRCodeWriter writer = new QRCodeWriter();
 
         // url 생성
-        String baseUrl = String.format("http://localhost:8080/cart/pay/%d", memberId);
+        String baseUrl = String.format("https://pium-front.vercel.app/cart/pay/%d", memberId);
         String qrUrl = baseUrl + "?" + "cartItemIds" + "=" + cartItemIds;
 
         // `URL`을 QR 코드 형식의 비트 매트릭스로 인코딩
