@@ -57,7 +57,7 @@ public class TrendItemBatchService {
         Map<String, Double> viewScores = new HashMap<>();
 
         try {
-            int currentHour = LocalDateTime.now(ZoneId.of("Asia/Korea")).getHour();
+            int currentHour = LocalDateTime.now(ZoneId.of("Asia/Seoul")).getHour();
             // 가중치 설정
             double[] weights = new double[]{1.0, 0.7, 0.5};
 
