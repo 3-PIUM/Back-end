@@ -1,5 +1,6 @@
 package project.global.redis.service;
 
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -44,7 +45,8 @@ public class ItemViewRedis {
             redisTemplate.expire(key, Duration.ofHours(1));
 
             // 1시간 단위로 누적 조회수 저장
-            String hourlyKey = VIEW_COUNT_KEY + LocalDateTime.now().getHour() + ":" + itemId;
+            LocalDateTime koreanTime = LocalDateTime.now(ZoneId.of("Asia/Korea"));
+            String hourlyKey = VIEW_COUNT_KEY + koreanTime.getHour() + ":" + itemId;
             redisTemplate.opsForValue().increment(hourlyKey);
             redisTemplate.expire(hourlyKey, Duration.ofHours(4));
 
@@ -53,9 +55,9 @@ public class ItemViewRedis {
             // 자정까지 남은 시간 계산해서 하루 한번만 TTL 설정
             Long currentTTL = redisTemplate.getExpire(CUMULATIVE_VIEWS_KEY);
             if (currentTTL == null || currentTTL == -1) {
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime midnight = now.plusDays(1).withHour(0).withMinute(0).withSecond(0);
-                Duration untilMidnight = Duration.between(now, midnight);
+//                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime midnight = koreanTime.plusDays(1).withHour(0).withMinute(0).withSecond(0);
+                Duration untilMidnight = Duration.between(koreanTime, midnight);
                 redisTemplate.expire(CUMULATIVE_VIEWS_KEY, untilMidnight);
 
                 log.debug("하루 누적 조회 - TTL 설정: {}", untilMidnight);

@@ -1,5 +1,6 @@
 package project.global.redis.service.trend;
 
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -56,7 +57,7 @@ public class TrendItemBatchService {
         Map<String, Double> viewScores = new HashMap<>();
 
         try {
-            int currentHour = LocalDateTime.now().getHour();
+            int currentHour = LocalDateTime.now(ZoneId.of("Asia/Korea")).getHour();
             // 가중치 설정
             double[] weights = new double[]{1.0, 0.7, 0.5};
 
