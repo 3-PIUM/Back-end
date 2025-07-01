@@ -74,7 +74,7 @@ public abstract class ReviewConverter {
                                 .selectOption(s.getSelection())
                                 .build())
                         .toList())
-                .updatedAt(review.getUpdatedAt())
+                .updatedAt(review.getUpdatedAt().toLocalDate())
                 .build();
     }
 
@@ -107,7 +107,7 @@ public abstract class ReviewConverter {
                                                 .selectOption(s.getSelection())
                                                 .build())
                                         .toList())
-                                .updatedAt(review.getUpdatedAt())
+                                .updatedAt(review.getUpdatedAt().toLocalDate())
                                 .build())
                         .toList())
                 .build();
