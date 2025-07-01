@@ -45,7 +45,7 @@ public class ItemViewRedis {
             redisTemplate.expire(key, Duration.ofHours(1));
 
             // 1시간 단위로 누적 조회수 저장
-            LocalDateTime koreanTime = LocalDateTime.now(ZoneId.of("Asia/Korea"));
+            LocalDateTime koreanTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
             String hourlyKey = VIEW_COUNT_KEY + koreanTime.getHour() + ":" + itemId;
             redisTemplate.opsForValue().increment(hourlyKey);
             redisTemplate.expire(hourlyKey, Duration.ofHours(4));
