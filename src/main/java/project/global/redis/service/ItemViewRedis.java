@@ -63,13 +63,13 @@ public class ItemViewRedis {
 
     // 조회수 감소
     public void decrementViewCount(Long itemId) {
-        String key = VIEW_COUNT_KEY + LocalDateTime.now().getHour() + ":" + itemId;
+        String key = VIEW_COUNT_KEY + itemId;
         redisTemplate.opsForValue().decrement(key);
     }
 
     // 특정 상품 조회수 가져오기
     public Long getViewCount(Long itemId) {
-        String key = VIEW_COUNT_KEY + LocalDateTime.now().getHour() + ":" + itemId;
+        String key = VIEW_COUNT_KEY + itemId;
         Object countObj = redisTemplate.opsForValue().get(key);
         return countObj != null ? Long.parseLong(countObj.toString()) : 0L;
     }
