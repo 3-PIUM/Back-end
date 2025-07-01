@@ -38,6 +38,11 @@ public class ItemViewRedis {
                 redisTemplate.opsForValue().set(itemExistsKey, "true", Duration.ofHours(1));
             }
 
+            // 실시간 조회수 저장
+            String key = VIEW_COUNT_KEY + itemId;
+            redisTemplate.opsForValue().decrement(key);
+            redisTemplate.expire(key, Duration.ofHours(1));
+
             // 1시간 단위로 누적 조회수 저장
             String hourlyKey = VIEW_COUNT_KEY + LocalDateTime.now().getHour() + ":" + itemId;
             redisTemplate.opsForValue().increment(hourlyKey);
