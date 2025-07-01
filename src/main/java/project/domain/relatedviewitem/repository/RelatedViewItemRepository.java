@@ -22,4 +22,11 @@ public interface RelatedViewItemRepository extends JpaRepository<RelatedViewItem
             @Param("itemId") Long itemId,
             @Param("customerSegment") String customerSegment
     );
+
+    @Query(value = """
+            SELECT related_item_id FROM related_view_item
+            ORDER BY RAND()
+            LIMIT 9
+            """, nativeQuery = true)
+    List<Long> find9RandomItemIds();
 }
