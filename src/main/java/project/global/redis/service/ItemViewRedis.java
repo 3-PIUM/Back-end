@@ -40,7 +40,7 @@ public class ItemViewRedis {
 
             // 실시간 조회수 저장
             String key = VIEW_COUNT_KEY + itemId;
-            redisTemplate.opsForValue().decrement(key);
+            redisTemplate.opsForValue().increment(key);
             redisTemplate.expire(key, Duration.ofHours(1));
 
             // 1시간 단위로 누적 조회수 저장
